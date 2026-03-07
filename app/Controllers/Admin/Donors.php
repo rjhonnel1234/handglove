@@ -15,6 +15,7 @@ class Donors extends BaseController
         $data['session'] = session();
         $data['styles'] = [
             'plugins/datatables',
+            COMPILED_ASSETS_PATH . 'css/components/dropzone'
         ];
         $data['scripts'] = [
             'https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.2/datatables.min.js',

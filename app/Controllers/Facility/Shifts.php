@@ -125,7 +125,8 @@ class Shifts extends BaseController
             return $this->response->setJSON(['success' => 0, 'message' => 'Facility not found.']);
         }
 
-        $date = $this->request->getPost('date') ?: date("Y-m-d");
+        $date = $this->request->getPost('date') ?: '2026-03-02';
+        // $date = $this->request->getPost('date') ?: date("Y-m-d");
         $unitId = $this->request->getPost('unitID');
 
         $shifts = $this->shiftsModel
@@ -137,35 +138,63 @@ class Shifts extends BaseController
             ->where('tbl_shifts.client_id', $facilityId)
             ->where('tbl_shifts.unit_id', $unitId)
             ->where('tbl_shifts.start_date', $date)
-            ->where("CONCAT(IFNULL(tbl_shifts.end_date, tbl_shifts.start_date), ' ', tbl_shifts.shift_end_time) > '" . date("Y-m-d H:i:s") . "'")
+            ->where("CONCAT(IFNULL(tbl_shifts.end_date, tbl_shifts.start_date), ' ', tbl_shifts.shift_end_time) > '" . '2026-02-19 00:00:00' . "'")
             ->findAll();
 
         foreach ($shifts as &$shift) {
             $shift['shift_end_time_formatted'] = date("h:i A", strtotime($shift['shift_end_time']));
             $shift['shift_start_time_formatted'] = date("h:i A", strtotime($shift['shift_start_time']));
 
-            $shift['action'] = sprintf(
-                '<div class="mt-3"><a href="javascript:;" data-id="%s" data-type="%s" class="request-clinician-table btn thm-btn pl-2 pr-2 pt-1 pb-1" title="Request for Clinicians"><i class="fa fa-plus"></i> Request Clinicians</a></div>',
-                $shift['id'],
-                $shift['shift_type']
-            );
+            //if shift is ongoing remove request clinician button
+            if (strtotime($shift['start_date'] . ' ' . $shift['shift_start_time']) > time()) {
+                $shift['action'] = sprintf(
+                    '<div class="mt-3"><a href="javascript:;" data-id="%s" data-type="%s" class="request-clinician-table btn thm-btn pl-2 pr-2 pt-1 pb-1" title="Request for Clinicians"><i class="fa fa-plus"></i> Request Clinicians</a></div>',
+                    $shift['id'],
+                    $shift['shift_type']
+                );
+            } else {
+                $shift['action'] = '';
+            }
 
             $shift['clinicians'] = $this->shiftCliniciansModel
-                ->select('tbl_clinicians.name as clinician_id, tbl_clinicians.name as clinician_name, tbl_clinicians.profile_pic_url, tbl_shift_clinicians.*')
-                ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_shift_clinicians.clinician_id', 'INNER')
+                ->select('tbl_clinicians.name as clinician_name, tbl_clinicians.profile_pic_url, tbl_client_personnel.first_name as staff_first, tbl_client_personnel.last_name as staff_last, tbl_shift_clinicians.*, tbl_clinicians.type as clinician_type_id, tbl_client_personnel.type as staff_type_id, tbl_clinician_types.name as clinician_type_name, staff_type.name as staff_type_name')
+                ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_shift_clinicians.clinician_id', 'LEFT')
+                ->join('tbl_client_personnel', 'tbl_client_personnel.id = tbl_shift_clinicians.personnel_id', 'LEFT')
+                ->join('tbl_clinician_types', 'tbl_clinician_types.id = tbl_clinicians.type', 'LEFT')
+                ->join('tbl_clinician_types as staff_type', 'staff_type.id = tbl_client_personnel.clinician_type', 'LEFT')
                 ->where('tbl_shift_clinicians.status', 10)
                 ->where('tbl_shift_clinicians.shift_status', 0)
                 ->where('tbl_shift_clinicians.shift_id', $shift['id'])
                 ->findAll();
 
+            //get personnel/staff from shifts
             foreach ($shift['clinicians'] as &$clinician) {
-                $punchIn = $this->shiftsTimekeepingModel
-                    ->where('shift_id', $shift['id'])
-                    ->where('clinician_id', $clinician['clinician_id'])
-                    ->where('punch_type', 10)
-                    ->orderBy('punch_datetime', 'asc')
-                    ->first();
+                // Resolve Name
+                if (!empty($clinician['clinician_id']) && $clinician['clinician_id'] > 0) {
+                    $displayName = $clinician['clinician_name'];
+                    $displayType = $clinician['clinician_type_name'];
+                    $clockInIdField = 'clinician_id';
+                    $clockInId = $clinician['clinician_id'];
+                } else {
+                    $displayName = $clinician['staff_first'] . ' ' . $clinician['staff_last'];
+                    $displayType = $clinician['staff_type_name'];
+                    $clockInIdField = 'personnel_id';
+                    $clockInId = $clinician['personnel_id'];
+                    $clinician['profile_pic_url'] =  base_url('assets/img/blank-img.png');
 
+                }
+                $clinician['display_name'] = $displayName;
+                $clinician['display_type'] = $displayType;
+                $clinician['type'] = $clinician['clinician_id'] > 0 ? 'clinician' : 'staff';
+                $punchIn = '';
+                if($clockInIdField == 'clinician_id'){
+                    $punchIn = $this->shiftsTimekeepingModel
+                        ->where('shift_id', $shift['id'])
+                        ->where($clockInIdField, $clockInId)
+                        ->where('punch_type', 10)
+                        ->orderBy('punch_datetime', 'asc')
+                        ->first();
+                }
 
                 $clinician['is_clocked_in'] = (!empty($punchIn));
             }

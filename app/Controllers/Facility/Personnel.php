@@ -6,12 +6,16 @@ use App\Controllers\BaseController;
 use App\Models\UserModel;
 use App\Models\FacilityModel;
 use App\Models\UserTypesModel;
+use App\Models\ClientPersonnelModel;
+use App\Models\ClinicianTypesModel;
 
 class Personnel extends BaseController
 {
     protected $userModel;
     protected $facilityModel;
     protected $userTypesModel;
+    protected $clientPersonnelModel;
+    protected $clinicianTypesModel;
     protected $session;
 
     public function __construct()
@@ -19,6 +23,8 @@ class Personnel extends BaseController
         $this->userModel = new UserModel();
         $this->facilityModel = new FacilityModel();
         $this->userTypesModel = new UserTypesModel();
+        $this->clientPersonnelModel = new ClientPersonnelModel();
+        $this->clinicianTypesModel = new ClinicianTypesModel();
         $this->session = session();
     }
 
@@ -38,6 +44,7 @@ class Personnel extends BaseController
             'session' => $this->session,
             'facility' => $facility,
             'userTypes' => $this->userTypesModel->findAll(),
+            'clinicianTypes' => $this->clinicianTypesModel->where('status', 1)->findAll(),
             'page' => 'personnel'
         ];
 
@@ -102,28 +109,28 @@ class Personnel extends BaseController
             return $this->response->setJSON(['success' => 0, 'message' => 'Unauthorized.']);
         }
 
-        $users = $this->userModel
-            ->select('tbl_users.*, tbl_user_types.name as type_name')
-            ->join('tbl_user_types', 'tbl_user_types.id = tbl_users.type', 'inner')
-            ->where('facility_id', $facilityId)
+        $personnel = $this->clientPersonnelModel
+            ->select('tbl_client_personnel.*, tbl_user_types.name as type_name')
+            ->join('tbl_user_types', 'tbl_user_types.id = tbl_client_personnel.type', 'inner')
+            ->where('client_id', $facilityId)
             ->findAll();
 
         $formattedData = [];
-        foreach ($users as $user) {
+        foreach ($personnel as $item) {
             $formattedData[] = [
-                'name' => sprintf('<div><strong>%s %s</strong></div>', $user['first_name'], $user['last_name']),
-                'email' => $user['email'],
-                'contact' => $user['contact_number'],
-                'type' => $user['type_name'],
-                'status' => $user['status'] == 1 ? 'Active' : 'Inactive',
-                'action' => sprintf('<div class="text-center"><a href="javascript:;" data-id="%s" class="view-personnel btn btn-yellow pl-2 pr-2 pt-1 pb-1" title="View details"><i class="fa fa-search"></i></a></div>', $user['id'])
+                'name'    => sprintf('<div><strong>%s %s</strong></div>', $item['first_name'], $item['last_name']),
+                'email'   => $item['email'],
+                'contact' => $item['contact_number'],
+                'type'    => $item['type_name'],
+                'status'  => $item['status'] == 1 ? 'Active' : 'Inactive',
+                'action'  => sprintf('<div class="text-center"><a href="javascript:;" data-id="%s" class="view-personnel btn btn-yellow pl-2 pr-2 pt-1 pb-1" title="View details"><i class="fa fa-search"></i></a></div>', $item['id'])
             ];
         }
 
         return $this->response->setJSON([
             'success' => 1,
             'message' => '',
-            'data' => $formattedData
+            'data'    => $formattedData
         ]);
     }
 
@@ -138,9 +145,16 @@ class Personnel extends BaseController
             return $this->response->setJSON(['success' => 0, 'message' => 'Missing ID.']);
         }
 
-        $user = $this->userModel->find($personnelId);
-        if ($user && $user['facility_id'] == $this->session->get('facility_id')) {
-            return $this->response->setJSON(['success' => 1, 'personnel' => $user]);
+        $personnel = $this->clientPersonnelModel->find($personnelId);
+        if ($personnel && $personnel['client_id'] == $this->session->get('facility_id')) {
+            // If linked to a user record, fetch signature and password (hashed) if needed
+            if ($personnel['user_id'] > 0) {
+                $user = $this->userModel->find($personnel['user_id']);
+                // if ($user) {
+                //     $personnel['signature'] = $user['signature'];
+                // }
+            }
+            return $this->response->setJSON(['success' => 1, 'personnel' => $personnel]);
         }
 
         return $this->response->setJSON(['success' => 0, 'message' => 'Personnel not found or unauthorized.']);
@@ -159,43 +173,96 @@ class Personnel extends BaseController
 
         $validation = \Config\Services::validation();
         $rules = [
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required|valid_email|is_unique[tbl_users.email]',
-            'contact_number' => 'required',
-            'signature' => 'required',
-            'type' => 'required',
-            'password' => 'required|min_length[5]'
+            'first_name' => [
+                'label' => 'First Name',
+                'rules' => 'required'
+            ],
+            'last_name' => [
+                'label' => 'Last Name',
+                'rules' => 'required'
+            ],
+            'email' => [
+                'label' => 'Email',
+                'rules' => 'required|valid_email|is_unique[tbl_client_personnel.email]'
+            ],
+            'contact_number' => [
+                'label' => 'Contact Number',
+                'rules' => 'required'
+            ],
+            'signature' => [
+                'label' => 'Signature',
+                'rules' => 'required'
+            ],
+            'type' => [
+                'label' => 'Type',
+                'rules' => 'required'
+            ],
+            'password' => [
+                'label' => 'Password',
+                'rules' => 'required|min_length[5]'
+            ]
         ];
 
+
+        //if type is 7, remove password and signature rules
+        if ($this->request->getPost('type') == 7 || $this->request->getPost('type') == '') {
+            unset($rules['password']);
+            unset($rules['signature']);
+        }
         if (!$this->validate($rules)) {
             return $this->response->setJSON([
                 'success' => 0,
                 'message_header' => 'Personnel',
-                'message' => implode('<br>', $validation->getErrors())
+                'message' => $this->validator->getErrors()
             ]);
         }
 
-        $item = [
-            'facility_id' => $facilityId,
-            'first_name' => $this->request->getPost('first_name'),
-            'last_name' => $this->request->getPost('last_name'),
-            'email' => $this->request->getPost('email'),
+
+        // Initialize item for ClientPersonnelModel
+        $clientPersonnelItem = [
+            'client_id'      => $facilityId,
+            'first_name'     => $this->request->getPost('first_name'),
+            'last_name'      => $this->request->getPost('last_name'),
+            'email'          => $this->request->getPost('email'),
             'contact_number' => $this->request->getPost('contact_number'),
-            'signature' => $this->request->getPost('signature'),
-            'type' => $this->request->getPost('type'),
-            'status' => $this->request->getPost('status'),
-            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'token' => '',
-            'token_active' => 0
+            'type'           => $this->request->getPost('type'),
+            'clinician_type' => $this->request->getPost('clinician_type'),
+            'status'         => $this->request->getPost('status')
         ];
 
-        $this->userModel->save($item);
+        if ($this->request->getPost('type') != 7) {
+            $clientPersonnelItem['signature'] = $this->request->getPost('signature');
+        }
+        // Save to ClientPersonnelModel first
+        $this->clientPersonnelModel->save($clientPersonnelItem);
+        $clientPersonnelId = $this->clientPersonnelModel->getInsertID();
+
+        // If type is not 7, also add to Users model
+        if ($this->request->getPost('type') != 7) {
+            $userItem = [
+                'facility_id'    => $facilityId,
+                'first_name'     => $this->request->getPost('first_name'),
+                'last_name'      => $this->request->getPost('last_name'),
+                'email'          => $this->request->getPost('email'),
+                'contact_number' => $this->request->getPost('contact_number'),
+                'type'           => $this->request->getPost('type'),
+                'status'         => $this->request->getPost('status'),
+                'password'       => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+                'token'          => '',
+                'token_active'   => 0
+            ];
+
+            $this->userModel->save($userItem);
+            $newUserId = $this->userModel->getInsertID();
+
+            // Link the user_id back to client_personnel
+            $this->clientPersonnelModel->update($clientPersonnelId, ['user_id' => $newUserId]);
+        }
 
         return $this->response->setJSON([
-            'success' => 1,
+            'success'        => 1,
             'message_header' => 'Personnel',
-            'message' => 'Personnel successfully added.'
+            'message'        => 'Personnel successfully added.'
         ]);
     }
 
@@ -214,13 +281,37 @@ class Personnel extends BaseController
 
         $validation = \Config\Services::validation();
         $rules = [
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => "required|valid_email|is_unique[tbl_users.email,id,{$personnelId}]",
-            'contact_number' => 'required',
-            'signature' => 'required',
-            'type' => 'required'
+            'first_name' => [
+                'label' => 'First Name',
+                'rules' => 'required'
+            ],
+            'last_name' => [
+                'label' => 'Last Name',
+                'rules' => 'required'
+            ],
+            'email' => [
+                'label' => 'Email',
+                'rules' => "required|valid_email|is_unique[tbl_client_personnel.email,id,{$personnelId}]"
+            ],
+            'contact_number' => [
+                'label' => 'Contact Number',
+                'rules' => 'required'
+            ],
+            'signature' => [
+                'label' => 'Signature',
+                'rules' => 'required'
+            ],
+            'type' => [
+                'label' => 'Type',
+                'rules' => 'required'
+            ]
         ];
+
+        //if type is 7, remove password and signature rules
+        if ($this->request->getPost('type') == 7 || $this->request->getPost('type') == '') {
+            unset($rules['password']);
+            unset($rules['signature']);
+        }
 
         if ($this->request->getPost('password')) {
             $rules['password'] = 'min_length[5]';
@@ -230,30 +321,69 @@ class Personnel extends BaseController
             return $this->response->setJSON([
                 'success' => 0,
                 'message_header' => 'Personnel',
-                'message' => implode('<br>', $validation->getErrors())
+                'message' => $validation->getErrors()
             ]);
         }
 
-        $item = [
-            'first_name' => $this->request->getPost('first_name'),
-            'last_name' => $this->request->getPost('last_name'),
-            'email' => $this->request->getPost('email'),
-            'contact_number' => $this->request->getPost('contact_number'),
-            'signature' => $this->request->getPost('signature'),
-            'type' => $this->request->getPost('type'),
-            'status' => $this->request->getPost('status')
-        ];
-
-        if ($this->request->getPost('password')) {
-            $item['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
+        // Fetch existing record to check for user_id
+        $personnel = $this->clientPersonnelModel->find($personnelId);
+        if (!$personnel) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Personnel not found.']);
         }
 
-        $this->userModel->update($personnelId, $item);
+        $clientPersonnelItem = [
+            'first_name'     => $this->request->getPost('first_name'),
+            'last_name'      => $this->request->getPost('last_name'),
+            'email'          => $this->request->getPost('email'),
+            'contact_number' => $this->request->getPost('contact_number'),
+            'type'           => $this->request->getPost('type'),
+            'signature'      => $this->request->getPost('signature'),
+            'clinician_type' => $this->request->getPost('clinician_type'),
+            'status'         => $this->request->getPost('status')
+        ];
+
+        $this->clientPersonnelModel->update($personnelId, $clientPersonnelItem);
+
+        // Handle User record update/creation
+        if ($this->request->getPost('type') != 7) {
+            $userItem = [
+                'first_name'     => $this->request->getPost('first_name'),
+                'last_name'      => $this->request->getPost('last_name'),
+                'email'          => $this->request->getPost('email'),
+                'contact_number' => $this->request->getPost('contact_number'),
+                'type'           => $this->request->getPost('type'),
+                'status'         => $this->request->getPost('status')
+            ];
+
+            // Conditionally include signature and password
+            // if ($this->request->getPost('signature')) {
+            //     $userItem['signature'] = $this->request->getPost('signature');
+            // }
+            if ($this->request->getPost('password')) {
+                $userItem['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
+            }
+
+            if ($personnel['user_id'] > 0) {
+                // Update existing user
+                $this->userModel->update($personnel['user_id'], $userItem);
+            } else {
+                // Create new user (type changed from 7)
+                $userItem['facility_id'] = $facilityId;
+                $userItem['token'] = '';
+                $userItem['token_active'] = 0;
+                
+                $this->userModel->save($userItem);
+                $newUserId = $this->userModel->getInsertID();
+
+                // Link back to client_personnel
+                $this->clientPersonnelModel->update($personnelId, ['user_id' => $newUserId]);
+            }
+        }
 
         return $this->response->setJSON([
-            'success' => 1,
+            'success'        => 1,
             'message_header' => 'Personnel',
-            'message' => 'Personnel successfully updated.'
+            'message'        => 'Personnel successfully updated.'
         ]);
     }
 }

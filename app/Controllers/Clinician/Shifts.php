@@ -11,6 +11,7 @@ use App\Models\ShiftCliniciansModel;
 use App\Models\FacilityUnitsModel;
 use App\Models\ShiftsTimekeepingModel;
 use App\Models\ClientRatingsModel;
+use App\Models\InvoicesModel;
 use App\Models\UserModel;
 use \Datetime;
 use CodeIgniter\Files\File;
@@ -242,12 +243,13 @@ class Shifts extends BaseController
                     $objTimekeeping = new ShiftsTimekeepingModel;
 
 
-                    $punchInDateTime = date("Y-m-d H:i:s");
+                    $punchOutDateTime = date("Y-m-d H:i:s");
 
+                    $shiftID = $this->request->getPost('shiftID');
                     $item = [
-                        'shift_id' => $this->request->getPost('shiftID'),
+                        'shift_id' => $shiftID,
                         'clinician_id' => $profileData['id'],
-                        'punch_datetime' => $punchInDateTime,
+                        'punch_datetime' => $punchOutDateTime,
                         'punch_type' => 20,
                         'reference' =>  $this->request->getPost('reference'),
                         'ip_address' => $this->request->getPost('ip')
@@ -257,7 +259,46 @@ class Shifts extends BaseController
                         $data['success'] = 1;
                         $data['message'] = 'Punch Out successful.';
 
-                        $data['data']['time'] = $punchInDateTime;
+                        $data['data']['time'] = $punchOutDateTime;
+
+                        //generate invoice
+                        $punchIn = $objTimekeeping
+                                            ->where('shift_id', $shiftID)
+                                            ->where('clinician_id', $profileData['id'])
+                                            ->where('punch_type', 10)
+                                            ->orderBy('punch_datetime', 'asc')
+                                            ->first();
+
+                        if(!empty($punchIn)){
+                            $objShifts = new ShiftsModel();
+                            $shiftDetails = $objShifts->find($shiftID);
+
+                            if(!empty($shiftDetails)){
+                                $start = new DateTime($punchIn['punch_datetime']);
+                                $end = new DateTime($punchOutDateTime);
+                                $interval = $start->diff($end);
+                                
+                                $totalHours = $interval->h + ($interval->days * 24) + ($interval->i / 60);
+                                $rate = $shiftDetails['rate'];
+                                $totalAmount = $totalHours * $rate;
+
+                                $objInvoices = new InvoicesModel();
+                                $objSettings = new \App\Models\SettingsModel();
+                                $billingRate = $objSettings->getSetting('billing_rate', 1.00);
+
+                                $invoiceItem = [
+                                    'shift_id'     => $shiftID,
+                                    'clinician_id' => $profileData['id'],
+                                    'client_id'    => $shiftDetails['client_id'],
+                                    'total_hours'  => $totalHours,
+                                    'rate'         => $rate,
+                                    'billing_rate' => $billingRate,
+                                    'total_amount' => $totalHours * $rate * $billingRate,
+                                    'status'       => 10 // Pending
+                                ];
+                                $objInvoices->save($invoiceItem);
+                            }
+                        }
                     }
 
                 }

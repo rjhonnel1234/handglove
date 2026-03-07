@@ -1,5 +1,4 @@
 <?php
-
 use CodeIgniter\Router\RouteCollection;
 
 /**
@@ -42,9 +41,11 @@ $routes->group("profile", ["namespace" => "App\Controllers\Clinician", "filter" 
     $routes->post('update', 'Profile::update');
     $routes->post('change_password', 'Profile::change_password');
     $routes->post('update_password', 'Profile::update_password');
+    $routes->post('update_status', 'Profile::update_status');
     $routes->post('upload_credentials', 'Profile::upload_credentials');
     $routes->post('test_email', 'Profile::test_email');
     $routes->post('request', 'Profile::request');
+    $routes->get('view-stub/(:num)', 'Profile::view_stub/$1');
     $routes->get('shifts', 'Shifts::index');
     $routes->post('shifts/list', 'Shifts::list');
     $routes->post('shifts/clockIn', 'Shifts::clockIn');
@@ -59,20 +60,35 @@ $routes->group("facility", ["namespace" => "App\Controllers"], function ($routes
     $routes->get('profile/(:num)', 'Facility::profile/$1');
     $routes->get('profile/(:num)/onboarding/(:num)/pdf', 'Facility::onboarding_pdf/$1/$2');
     $routes->get('profile/(:num)/onboarding/(:num)', 'Facility::onboarding/$1/$2');
-    $routes->post('vote', 'Facility::vote');
     $routes->post('get_reviews', 'Facility::get_reviews');
-    $routes->post('upload_schedule', 'Facility::upload_schedule');
+
+
+
+    $routes->group("schedules", ['namespace' => 'App\Controllers\Facility'], function ($routes) {
+        $routes->post('upload', 'Schedules::upload');
+        $routes->post('list', 'Schedules::list');
+        $routes->get('parse/(:num)', 'Schedules::parse/$1');
+        $routes->get('add', 'Schedules::add');
+        $routes->get('view', 'Schedules::view');
+        $routes->get('download/(:num)', 'Schedules::download/$1');
+        $routes->post('save_manual', 'Schedules::save_manual');
+        $routes->post('get_personnel', 'Schedules::get_personnel');
+        $routes->post('delete_personnel', 'Schedules::delete_personnel');
+        $routes->post('get_all_personnel', 'Schedules::get_all_personnel');
+        $routes->post('save_as_shifts', 'Schedules::save_as_shifts');
+    });
+    
     $routes->group("manage", ["namespace" => "App\Controllers\Facility", "filter" => "userAuth"], function ($routes) {
         $routes->get('', 'Dashboard::index');
         $routes->get('profile', 'Profile::index');
         $routes->get('users', 'Users::index');
 
         $routes->group("clinicians", function ($routes) {
-            $routes->get('', 'Clinicians::index');
+        //     $routes->get('', 'Clinicians::index');
             $routes->post('list', 'Clinicians::list');
-            $routes->post('get', 'Clinicians::get');
-            $routes->post('add', 'Clinicians::insert');
-            $routes->post('update', 'Clinicians::update');
+        //     $routes->post('get', 'Clinicians::get');
+        //     $routes->post('add', 'Clinicians::insert');
+        //     $routes->post('update', 'Clinicians::update');
         });
 
         $routes->group("units", function ($routes) {
@@ -133,7 +149,18 @@ $routes->group("facility", ["namespace" => "App\Controllers"], function ($routes
             $routes->post('list', 'Shifts::list');
             $routes->post('transfer', 'Shifts::transfer');
         });
+
+        $routes->group("invoices", function ($routes) {
+            $routes->post('list', 'Invoices::list');
+            $routes->post('pay', 'Invoices::pay');
+            $routes->get('view/(:any)', 'Invoices::view/$1');
+            $routes->post('checkout', 'Invoices::checkout');
+            $routes->get('success', 'Invoices::success');
+            $routes->get('cancel', 'Invoices::cancel');
+        });
     });
+
+    $routes->post('webhook/stripe', 'Invoices::webhook', ['namespace' => 'App\Controllers\Facility']);
 });
 
 $routes->get('/employee-award', 'EmployeeAward::index');
@@ -185,5 +212,31 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->get('delete/(:num)', 'Donors::delete/$1');
         $routes->post('upload', 'Donors::upload');
         $routes->post('list', 'Donors::list');
+    });
+
+    $routes->group('tax-types', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'TaxTypes::index');
+        $routes->get('create', 'TaxTypes::create');
+        $routes->post('store', 'TaxTypes::store');
+        $routes->get('edit/(:num)', 'TaxTypes::edit/$1');
+        $routes->post('update/(:num)', 'TaxTypes::update/$1');
+        $routes->get('delete/(:num)', 'TaxTypes::delete/$1');
+        $routes->post('list', 'TaxTypes::list');
+    });
+
+    $routes->group('settings', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'Settings::index');
+        $routes->post('store', 'Settings::store');
+    });
+
+    $routes->group('payroll', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('setup', 'Payroll::setup');
+        $routes->post('save-settings', 'Payroll::saveSettings');
+        $routes->post('generate-period', 'Payroll::generatePeriod');
+        $routes->get('delete-period/(:num)', 'Payroll::deletePeriod/$1');
+        $routes->get('view-period/(:num)', 'Payroll::viewPeriod/$1');
+        $routes->post('generate-stubs/(:num)', 'Payroll::generateStubs/$1');
+        $routes->get('view-stub/(:num)', 'Payroll::viewStub/$1');
+        $routes->get('mark-as-paid/(:num)', 'Payroll::markAsPaid/$1');
     });
 });

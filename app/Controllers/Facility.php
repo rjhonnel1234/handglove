@@ -104,6 +104,7 @@ class Facility extends BaseController
                 $ratingBonus = ($aggregates['average_percentage'] / 100) * 30;
                 $workFriendlyVal += ceil($ratingBonus);
             }
+            
             $data['workFriendly'] = $workFriendlyVal;
 
             $data['units'] = $units;
@@ -143,9 +144,12 @@ class Facility extends BaseController
             );
 
             if(session()->get('type') == 5){
-                $view = 'scheduler_profile';
+                $view = 'scheduler/profile';
                 $scripts[] = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js';
+                $scripts[] = 'https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js';
                 $scripts[] = ASSETS_URL . 'js/pages/facility_scheduler_profile.min.js';
+
+                $styles[] = COMPILED_ASSETS_PATH . 'css/components/dropzone';
                 $styles[] = COMPILED_ASSETS_PATH . 'css/pages/facility_scheduler_profile';
             }else{
                 $scripts[] = ASSETS_URL . 'js/pages/facility_shifts.min.js';
@@ -532,50 +536,4 @@ class Facility extends BaseController
         }
     }
 
-    public function upload_schedule()
-    {
-        $session = session();
-        if (!$session->get('isLoggedIn') || $session->get('facility_id') == 0) {
-            return $this->response->setJSON(['success' => 0, 'message' => 'Unauthorized']);
-        }
-
-        $validationRule = [
-            'schedule_file' => [
-                'label' => 'PDF File',
-                'rules' => [
-                    'uploaded[schedule_file]',
-                    'mime_in[schedule_file,application/pdf]',
-                    'max_size[schedule_file,10240]', // 10MB
-                ],
-            ],
-        ];
-
-        if (!$this->validate($validationRule)) {
-            return $this->response->setJSON(['success' => 0, 'message' => implode('<br>', $this->validator->getErrors())]);
-        }
-
-        $file = $this->request->getFile('schedule_file');
-        if ($file->isValid() && !$file->hasMoved()) {
-            $newName = $file->getRandomName();
-            if (!is_dir(FCPATH . 'uploads/schedules')) {
-                mkdir(FCPATH . 'uploads/schedules', 0777, true);
-            }
-            $file->move(FCPATH . 'uploads/schedules', $newName);
-
-            $model = new \App\Models\ShiftUploadsModel();
-            $data = [
-                'client_id' => $session->get('facility_id'),
-                'shift_date' => $this->request->getPost('shift_date'),
-                'filename' => $file->getClientName(),
-                'file_path' => 'uploads/schedules/' . $newName,
-                'uploaded_by' => $session->get('id'),
-            ];
-
-            if ($model->insert($data)) {
-                return $this->response->setJSON(['success' => 1, 'message' => 'Schedule uploaded successfully']);
-            }
-        }
-
-        return $this->response->setJSON(['success' => 0, 'message' => 'Failed to upload schedule']);
-    }
 }

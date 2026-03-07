@@ -15,7 +15,9 @@ class UserAuth implements FilterInterface
         }else{
             $uri = current_url(true);
             if(session()->get('type') == 5 && $uri->getSegment(2) == 'manage'){
-                return redirect()->to('facility');
+                if(!$uri->getSegment(3) == 'personnel'){
+                    return redirect()->to('facility');
+                }
             }
         }
     }

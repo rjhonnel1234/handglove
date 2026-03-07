@@ -1,7 +1,6 @@
 <?php echo $this->extend('admin/includes/layout') ?>
 
 <?php echo $this->section('content') ?>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css" />
 
 
 <div class="row">

@@ -13,7 +13,7 @@ class ClinicianTypesModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['name', 'description', 'status'];
+    protected $allowedFields    = ['name', 'description', 'status', 'grouping'];
 
     // Dates
     protected $useTimestamps = false;

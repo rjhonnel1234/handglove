@@ -51,8 +51,25 @@ abstract class BaseController extends Controller
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
 
-        // Preload any models, libraries, etc, here.
+        // Track activity and perform lazy cleanup
+        $session = session();
+        if ($session->get('isLoggedIn')) {
+            $userId = $session->get('id');
+            $userModel = new \App\Models\UserModel();
+            $now = date('Y-m-d H:i:s');
+            
+            // Update last active
+            $userModel->update($userId, ['last_active_at' => $now]);
+            $session->set('last_active_at', $now);
 
-        // E.g.: $this->session = \Config\Services::session();
+            // Lazy cleanup: 5% chance to mark inactive users as offline
+            if (mt_rand(1, 100) <= 5) {
+                $thirtyMinutesAgo = date('Y-m-d H:i:s', strtotime('-30 minutes'));
+                $userModel->where('last_active_at <', $thirtyMinutesAgo)
+                          ->where('online_status', 1)
+                          ->set(['online_status' => 0])
+                          ->update();
+            }
+        }
     }
 }

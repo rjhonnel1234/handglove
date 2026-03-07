@@ -63,13 +63,15 @@
     </script>
     <?php echo view('components/fonts'); ?>
     
-    <?php foreach ($styles as $key => $style): ?>
-        <?php if (is_string($style)): ?>
-            <?php echo view($style); ?>
-        <?php else: ?>
-            <?php echo view($key, $style); ?>
-        <?php endif; ?>
-    <?php endforeach; ?>
+    <?php 
+        foreach ($styles as $key => $style){ 
+            if (is_string($style)){ 
+                echo view($style);
+            }else{ 
+                echo view($key, $style);
+            } 
+        } 
+    ?>
 
     <?php echo view('__compiled_assets__/css/components/notifications.php'); ?>
 </head>

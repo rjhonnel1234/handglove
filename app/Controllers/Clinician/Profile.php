@@ -12,6 +12,10 @@ use App\Models\ShiftRequestsModel;
 use App\Models\ShiftsModel;
 use App\Models\ShiftCliniciansModel;
 use App\Models\ShiftsTimekeepingModel;
+use App\Models\PayStubsModel;
+use App\Models\PayStubDetailsModel;
+use App\Models\PayStubDeductionsModel;
+use App\Models\PayrollPeriodsModel;
 use App\Libraries\Ciqrcode;
 use App\Models\UserModel;
 use \Datetime;
@@ -29,6 +33,8 @@ class Profile extends BaseController
             $credentialTypeModel = new CredentialTypesModel;
             $clinModel = new CliniciansModel;
             $clinCredsModel = new ClinicianCredentialsModel;
+            $stubsModel = new PayStubsModel();
+            $payrollPeriodsModel = new PayrollPeriodsModel();
 
             $data['credential_types'] = $credentialTypeModel->where('status', 1)->findAll();
             $data['profileData'] = $clinModel
@@ -66,6 +72,12 @@ class Profile extends BaseController
 
             $objShifts = new ShiftsModel;
             $data['job_history'] = $objShifts->getJobHistory($data['profileData']['id'], 3);
+
+            $data['pay_stubs'] = $stubsModel->where('clinician_id', $data['profileData']['id'])
+                                            ->join('tbl_payroll_periods', 'tbl_pay_stubs.period_id = tbl_payroll_periods.id')
+                                            ->select('tbl_pay_stubs.*, tbl_payroll_periods.start_date as p_start, tbl_payroll_periods.end_date as p_end, tbl_payroll_periods.pay_date as p_pay')
+                                            ->orderBy('tbl_payroll_periods.pay_date', 'DESC')
+                                            ->findAll();
 
             // PAGE HEAD PROCESSING
             return view('components/header', array(
@@ -603,4 +615,93 @@ class Profile extends BaseController
         pe($email->printDebugger());
     }
 
+
+    //if user logged out or session ended, automatically update status to offline
+    public function update_status()
+    {
+        $session = session();
+        if (!$this->request->isAJAX() || $session->get('isLoggedIn') != 1) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Unauthorized']);
+        }
+
+        $userId = $session->get('id');
+        $latitude = $this->request->getPost('latitude');
+        $longitude = $this->request->getPost('longitude');
+        $onlineStatus = $this->request->getPost('online_status');
+
+        $userModel = new UserModel();
+        $data = [
+            'online_status' => $onlineStatus,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+        ];
+
+        if ($userModel->update($userId, $data)) {
+            // Update session
+            $session->set('online_status', $onlineStatus);
+            $session->set('latitude', $latitude);
+            $session->set('longitude', $longitude);
+
+            return $this->response->setJSON(['success' => 1, 'message' => 'Status updated successfully']);
+        }
+            
+        return $this->response->setJSON(['success' => 0, 'message' => 'Failed to update status']);
+    }
+
+    public function view_stub($id)
+    {
+        $session = session();
+        if (!$session->get('isLoggedIn')) {
+            return redirect()->to('/');
+        }
+
+        $stubsModel = new PayStubsModel();
+        $stub = $stubsModel->find($id);
+
+        // Security Check: Ensure clinician only views their own stub
+        $clinicianModel = new CliniciansModel();
+        $me = $clinicianModel->where('email', $session->get('email'))->first();
+
+        if (!$stub || $stub['clinician_id'] != $me['id']) {
+            return redirect()->to(base_url('profile'))->with('error', 'Unauthorized access to pay stub.');
+        }
+
+        $stubDetailsModel = new PayStubDetailsModel();
+        $periodsModel = new PayrollPeriodsModel();
+
+        $period = $periodsModel->find($stub['period_id']);
+        $details = $stubDetailsModel->getStubShifts($id);
+
+        $payStubDeductionsModel = new PayStubDeductionsModel();
+        $deductions = $payStubDeductionsModel->getStubDeductions($id);
+
+        // Calculate hours logic (mirrored from admin for consistency)
+        foreach ($details as &$d) {
+            $objTimekeeping = new ShiftsTimekeepingModel();
+            $punchIn = $objTimekeeping->where('shift_id', $d['shift_id'])->where('clinician_id', $me['id'])->where('punch_type', 10)->first();
+            $punchOut = $objTimekeeping->where('shift_id', $d['shift_id'])->where('clinician_id', $me['id'])->where('punch_type', 20)->first();
+            
+            if ($punchIn && $punchOut) {
+                $pIn = new DateTime($punchIn['punch_datetime']);
+                $pOut = new DateTime($punchOut['punch_datetime']);
+                $interval = $pIn->diff($pOut);
+                $d['actual_hours'] = $interval->h + ($interval->days * 24) + ($interval->i / 60);
+                $d['actual_amount'] = $d['actual_hours'] * $d['rate'];
+            } else {
+                $d['actual_hours'] = 0;
+                $d['actual_amount'] = 0;
+            }
+        }
+
+        $data = [
+            'page_title' => 'My Pay Stub',
+            'stub' => $stub,
+            'clinician' => $me,
+            'period' => $period,
+            'details' => $details,
+            'deductions' => $deductions,
+        ];
+
+        return view('admin/payroll/pay_stub', $data);
+    }
 }

@@ -284,6 +284,10 @@ class Login extends BaseController
 
     public function logout(){
         $session = session();
+        if ($session->get('isLoggedIn')) {
+            $userModel = new UserModel();
+            $userModel->update($session->get('id'), ['online_status' => 0]);
+        }
         $session->destroy();
         return redirect()->to('/');
     }

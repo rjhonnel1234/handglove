@@ -41,100 +41,38 @@
                     <div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
                         <div class="row">
                             <div class="col-md-12">
+                                <div class="heading d-flex justify-content-between align-items-center mb-4">
+                                    <h2 class="mb-0">Invoices</h2>
+                                    <div class="buttons d-flex align-items-center">
+                                        <button id="paySelectedBtn" class="btn btn-success btn-sm mr-3" style="display: none;"><i class="fas fa-money-bill-wave"></i> Pay Selected</button>
+                                        <select id="invoiceStatus" class="selectpicker">
+                                            <option value="">All Status</option>
+                                            <option value="10">Unpaid</option>
+                                            <option value="20">Paid</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body p-0">
                                         <div class="table-responsive">
-                                            <table class="table table-hover paystub-table mb-0">
+                                            <table id="invoices-table" class="table table-hover paystub-table mb-0">
                                                 <thead>
                                                     <tr>
-                                                        <th class="border-top-0 pl-4">Product</th>
-                                                        <th class="border-top-0 text-center">Amount</th>
-                                                        <th class="border-top-0 text-right">Price</th>
-                                                        <th class="border-top-0 text-right pr-4">Price</th>
+                                                        <th class="border-top-0 text-center pl-4">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input" id="checkAllInvoices">
+                                                                <label class="custom-control-label" for="checkAllInvoices"></label>
+                                                            </div>
+                                                        </th>
+                                                        <th class="border-top-0">Clinician</th>
+                                                        <th class="border-top-0 text-center">Hours</th>
+                                                        <th class="border-top-0 text-right">Rate</th>
+                                                        <th class="border-top-0 text-right">Total Amount</th>
+                                                        <th class="border-top-0 text-center">Status</th>
                                                         <th class="border-top-0"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td class="pl-4">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar-wrapper mr-3">
-                                                                    <img src="<?php echo base_url('assets/img/blank-img.png'); ?>" alt="" class="rounded-circle avatar-sm">
-                                                                    <span class="status-indicator online"></span>
-                                                                </div>
-                                                                <div>
-                                                                    <div class="font-weight-bold">Alden Murray</div>
-                                                                    <div class="text-muted small">Customer ID# 00224</div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-center align-middle">377 <span class="text-muted small">x</span></td>
-                                                        <td class="text-right align-middle font-weight-bold">$ 80.00</td>
-                                                        <td class="text-right align-middle font-weight-bold pr-4">$ 80.00</td>
-                                                        <td class="text-center align-middle">
-                                                            <a href="javascript:;" class="text-muted"><i class="fas fa-chevron-right"></i></a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pl-4">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar-wrapper mr-3">
-                                                                    <img src="<?php echo base_url('assets/img/blank-img.png'); ?>" alt="" class="rounded-circle avatar-sm">
-                                                                    <span class="status-indicator online"></span>
-                                                                </div>
-                                                                <div>
-                                                                    <div class="font-weight-bold">outdoor furniture</div>
-                                                                    <div class="text-muted small">Lamp</div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-center align-middle">337 <span class="text-muted small">x</span></td>
-                                                        <td class="text-right align-middle font-weight-bold">$ 50.00</td>
-                                                        <td class="text-right align-middle font-weight-bold pr-4">$ 50.00</td>
-                                                        <td class="text-center align-middle">
-                                                            <a href="javascript:;" class="text-muted"><i class="fas fa-chevron-right"></i></a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pl-4">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar-wrapper mr-3">
-                                                                    <img src="<?php echo base_url('assets/img/blank-img.png'); ?>" alt="" class="rounded-circle avatar-sm">
-                                                                    <span class="status-indicator online"></span>
-                                                                </div>
-                                                                <div>
-                                                                    <div class="font-weight-bold">laundry bag with stand</div>
-                                                                    <div class="text-muted small">Wallet</div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-center align-middle">217 <span class="text-muted small">x</span></td>
-                                                        <td class="text-right align-middle font-weight-bold">$ 10.00</td>
-                                                        <td class="text-right align-middle font-weight-bold pr-4">$ 10.00</td>
-                                                        <td class="text-center align-middle">
-                                                            <a href="javascript:;" class="text-muted"><i class="fas fa-chevron-right"></i></a>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="pl-4">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar-wrapper mr-3">
-                                                                    <img src="<?php echo base_url('assets/img/blank-img.png'); ?>" alt="" class="rounded-circle avatar-sm">
-                                                                    <span class="status-indicator online"></span>
-                                                                </div>
-                                                                <div>
-                                                                    <div class="font-weight-bold">laundry bag with stand</div>
-                                                                    <div class="text-muted small">Wallet</div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-center align-middle">217 <span class="text-muted small">x</span></td>
-                                                        <td class="text-right align-middle font-weight-bold">$ 10.00</td>
-                                                        <td class="text-right align-middle font-weight-bold pr-4">$ 10.00</td>
-                                                        <td class="text-center align-middle">
-                                                            <a href="javascript:;" class="text-muted"><i class="fas fa-chevron-right"></i></a>
-                                                        </td>
-                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>

@@ -104,15 +104,15 @@ class Clinicians extends BaseController
 
         $clinicianQuery = $this->clinicianModel
             ->select('tbl_clinicians.*, tbl_clinician_types.name as type_name')
-            ->join('tbl_clinician_types', 'tbl_clinician_types.id = tbl_clinicians.type', 'inner')
-            ->where('tbl_clinicians.client_id', $facilityId);
+            ->join('tbl_clinician_types', 'tbl_clinician_types.id = tbl_clinicians.type', 'inner');
+            // ->where('tbl_clinicians.client_id', $facilityId);
 
         $type = $this->request->getVar('type');
         if ($type === 'request') {
-            $shiftType = $this->request->getVar('shiftType');
+            // $shiftType = $this->request->getVar('shiftType');
             $shiftId = $this->request->getVar('shift');
             
-            $clinicianQuery->where('tbl_clinicians.type', $shiftType);
+            // $clinicianQuery->where('tbl_clinicians.type', $shiftType);
             $clinicianQuery->where("tbl_clinicians.id NOT IN (SELECT clinician_id FROM tbl_client_shift_requests WHERE client_id = $facilityId AND shift_id = $shiftId)");
         }
 
