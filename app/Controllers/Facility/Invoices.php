@@ -261,9 +261,24 @@ class Invoices extends BaseController
         return view('components/header', [
             'title' => 'Payment Success',
             'session' => session(),
+            'description' => '',
+            'url' => BASE_URL,
+            'keywords' => '',
+            'meta' => array(
+                'title' => 'Handglove',
+                'description' => '',
+                'image' => IMG_URL . ''
+            ),
             'styles' => [
+                'plugins/font_awesome',
                 COMPILED_ASSETS_PATH . 'css/components/bootstrap',
+                COMPILED_ASSETS_PATH . 'css/components/fontawesome',
+                COMPILED_ASSETS_PATH . 'css/components/owl',
+                COMPILED_ASSETS_PATH . 'css/components/bootstrap-main',
+                COMPILED_ASSETS_PATH . 'css/components/bootstrap-select',
                 COMPILED_ASSETS_PATH . 'css/components/global',
+                COMPILED_ASSETS_PATH . 'css/components/animations',
+                COMPILED_ASSETS_PATH . 'css/components/buttons',
                 COMPILED_ASSETS_PATH . 'css/components/navigation_bar',
                 COMPILED_ASSETS_PATH . 'css/components/footer',
             ]
@@ -275,9 +290,24 @@ class Invoices extends BaseController
         return view('components/header', [
             'title' => 'Payment Cancelled',
             'session' => session(),
+            'description' => '',
+            'url' => BASE_URL,
+            'keywords' => '',
+            'meta' => array(
+                'title' => 'Handglove',
+                'description' => '',
+                'image' => IMG_URL . ''
+            ),
             'styles' => [
+                'plugins/font_awesome',
                 COMPILED_ASSETS_PATH . 'css/components/bootstrap',
+                COMPILED_ASSETS_PATH . 'css/components/fontawesome',
+                COMPILED_ASSETS_PATH . 'css/components/owl',
+                COMPILED_ASSETS_PATH . 'css/components/bootstrap-main',
+                COMPILED_ASSETS_PATH . 'css/components/bootstrap-select',
                 COMPILED_ASSETS_PATH . 'css/components/global',
+                COMPILED_ASSETS_PATH . 'css/components/animations',
+                COMPILED_ASSETS_PATH . 'css/components/buttons',
                 COMPILED_ASSETS_PATH . 'css/components/navigation_bar',
                 COMPILED_ASSETS_PATH . 'css/components/footer',
             ]
