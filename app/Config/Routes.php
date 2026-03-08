@@ -64,25 +64,28 @@ $routes->group("facility", ["namespace" => "App\Controllers"], function ($routes
 
 
 
-    $routes->group("schedules", ['namespace' => 'App\Controllers\Facility'], function ($routes) {
-        $routes->post('upload', 'Schedules::upload');
-        $routes->post('list', 'Schedules::list');
-        $routes->get('parse/(:num)', 'Schedules::parse/$1');
-        $routes->get('add', 'Schedules::add');
-        $routes->get('view', 'Schedules::view');
-        $routes->get('download/(:num)', 'Schedules::download/$1');
-        $routes->post('save_manual', 'Schedules::save_manual');
-        $routes->post('get_personnel', 'Schedules::get_personnel');
-        $routes->post('delete_personnel', 'Schedules::delete_personnel');
-        $routes->post('get_all_personnel', 'Schedules::get_all_personnel');
-        $routes->post('save_as_shifts', 'Schedules::save_as_shifts');
-    });
     
     $routes->group("manage", ["namespace" => "App\Controllers\Facility", "filter" => "userAuth"], function ($routes) {
         $routes->get('', 'Dashboard::index');
         $routes->get('profile', 'Profile::index');
         $routes->get('users', 'Users::index');
 
+
+        $routes->group("schedules", ['namespace' => 'App\Controllers\Facility'], function ($routes) {
+            $routes->post('upload', 'Schedules::upload');
+            $routes->post('list', 'Schedules::list');
+            $routes->get('parse/(:num)', 'Schedules::parse/$1');
+            $routes->get('add', 'Schedules::add');
+            $routes->get('view', 'Schedules::view');
+            $routes->get('download/(:num)', 'Schedules::download/$1');
+            $routes->post('save_manual', 'Schedules::save_manual');
+            $routes->post('get_personnel', 'Schedules::get_personnel');
+            $routes->post('delete_personnel', 'Schedules::delete_personnel');
+            $routes->post('get_all_personnel', 'Schedules::get_all_personnel');
+            $routes->post('save_as_shifts', 'Schedules::save_as_shifts');
+        });
+
+        
         $routes->group("clinicians", function ($routes) {
         //     $routes->get('', 'Clinicians::index');
             $routes->post('list', 'Clinicians::list');
@@ -160,8 +163,9 @@ $routes->group("facility", ["namespace" => "App\Controllers"], function ($routes
         });
     });
 
-    $routes->post('webhook/stripe', 'Invoices::webhook', ['namespace' => 'App\Controllers\Facility']);
 });
+
+$routes->post('webhook/stripe', 'Invoices::webhook', ['namespace' => 'App\Controllers\Facility']);
 
 $routes->get('/employee-award', 'EmployeeAward::index');
 $routes->post('/employee-award/submit', 'EmployeeAward::submit');
