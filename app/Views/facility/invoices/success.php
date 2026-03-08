@@ -6,7 +6,7 @@
         <h1 class="display-4 font-weight-bold mb-3">Payment Successful!</h1>
         <p class="lead text-muted mb-5">Thank you for your payment. Your invoices have been marked as paid and we've sent a confirmation to your email.</p>
         <div>
-            <a href="<?php echo base_url('facility/manage/profile'); ?>" class="btn btn-primary btn-lg px-5">Go to Dashboard</a>
+            <a href="<?php echo base_url('facility/profile'); ?>" class="btn btn-primary btn-lg px-5">Go to Profile</a>
         </div>
     </div>
 </div>
