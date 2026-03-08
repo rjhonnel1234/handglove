@@ -239,7 +239,7 @@ class Invoices extends BaseController
                 'payment_method_types' => ['card'],
                 'line_items' => $lineItems,
                 'mode' => 'payment',
-                'success_url' => base_url('facility/manage/invoices/success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => base_url('facility/manage/invoices/success') . '?sess_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => base_url('facility/manage/invoices/cancel'),
                 'metadata' => [
                     'invoice_ids' => implode(',', $invoiceIds),
