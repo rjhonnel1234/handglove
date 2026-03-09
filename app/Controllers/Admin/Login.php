@@ -30,6 +30,9 @@ class Login extends BaseController
                         foreach($admin as $k => $v){
                             $session->set('admin_' . $k, $v);
                         }
+                        if($admin['isAdmin'] == 1){
+                            $session->set('isAdmin', 1);
+                        }
                         $session->set('isAdminLoggedIn', 1);
                         return redirect()->to('/admin/dashboard');
                     }else{

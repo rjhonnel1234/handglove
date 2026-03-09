@@ -44,6 +44,9 @@ class CreatePayStubsTables extends Migration
                 'type'       => 'DECIMAL',
                 'constraint' => '11,2',
             ],
+            'pay_date' => [
+                'type'       => 'DATE',
+            ],
             'status' => [
                 'type'       => 'INT',
                 'constraint' => 11,

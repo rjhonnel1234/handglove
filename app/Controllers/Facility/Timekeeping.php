@@ -102,10 +102,17 @@ class Timekeeping extends BaseController
         }
 
         $logs = $this->shiftsTimekeepingModel
-            ->select('tbl_shift_timekeeping.*, tbl_clinicians.name as clinician_name, tbl_shift_types.name as shift_type_name, tbl_client_units.name as unit_name, tbl_shifts.start_date as shift_start_date, tbl_shifts.shift_start_time, tbl_shifts.shift_end_time')
+            ->select('
+            tbl_shift_timekeeping.*, 
+            tbl_clinicians.name as clinician_name, 
+            tbl_shift_types.name as shift_type_name, 
+            tbl_client_units.name as unit_name, 
+            tbl_shifts.start_date as shift_start_date, 
+            tbl_shifts.shift_start_time, 
+            tbl_shifts.shift_end_time')
             ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_shift_timekeeping.clinician_id', 'inner')
             ->join('tbl_shifts', 'tbl_shifts.id = tbl_shift_timekeeping.shift_id', 'inner')
-            ->join('tbl_shift_types', 'tbl_shift_types.id = tbl_shifts.shift_type', 'inner')
+            ->join('tbl_shift_types', 'tbl_shift_types.id = tbl_shifts.shift_type', 'left')
             ->join('tbl_client_units', 'tbl_client_units.id = tbl_shifts.unit_id', 'inner')
             ->where('tbl_shifts.client_id', $facilityId)
             ->orderBy('tbl_shift_timekeeping.punch_datetime', 'DESC')

@@ -7,19 +7,18 @@ class AdminUsersModel extends Model
 {
     protected $DBGroup          = 'default';
     protected $table            = 'tbl_admin_users';
-    protected $primaryKey       = 'id';
+    protected $primaryKey       = 'userId';
     protected $useAutoIncrement = true;
-    protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['name', 'email', 'password', 'status', 'token', 'token_active', 'token_datetime'];
+    protected $allowedFields    = ['account_id', 'email', 'password', 'name', 'mobile', 'roleId', 'designation', 'isAdmin', 'isDeleted', 'createdBy', 'updatedBy'];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
+    protected $createdField  = 'createdDtm';
+    protected $updatedField  = 'updatedDtm';
     protected $deletedField  = 'deleted_at';
 
     // Validation

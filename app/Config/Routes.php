@@ -233,6 +233,32 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->post('store', 'Settings::store');
     });
 
+    $routes->group('roles', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'Roles::index');
+        $routes->get('create', 'Roles::create');
+        $routes->post('store', 'Roles::store');
+        $routes->get('edit/(:num)', 'Roles::edit/$1');
+        $routes->post('update/(:num)', 'Roles::update/$1');
+        $routes->get('delete/(:num)', 'Roles::delete/$1');
+        $routes->post('list', 'Roles::list');
+    });
+
+    $routes->group('users', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'Users::index');
+        $routes->get('create', 'Users::create');
+        $routes->post('store', 'Users::store');
+        $routes->get('edit/(:num)', 'Users::edit/$1');
+        $routes->post('update/(:num)', 'Users::update/$1');
+        $routes->get('delete/(:num)', 'Users::delete/$1');
+        $routes->post('list', 'Users::list');
+    });
+
+    $routes->group('invoices', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('/', 'Invoices::index');
+        $routes->get('view/(:num)', 'Invoices::view/$1');
+        $routes->post('list', 'Invoices::list');
+    });
+
     $routes->group('payroll', ['filter' => 'adminAuth'], function ($routes) {
         $routes->get('setup', 'Payroll::setup');
         $routes->post('save-settings', 'Payroll::saveSettings');
