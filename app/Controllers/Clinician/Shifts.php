@@ -13,11 +13,124 @@ use App\Models\ShiftsTimekeepingModel;
 use App\Models\ClientRatingsModel;
 use App\Models\InvoicesModel;
 use App\Models\UserModel;
+use App\Models\ShiftClinicianUpdatesModel;
 use \Datetime;
 use CodeIgniter\Files\File;
 
 class Shifts extends BaseController
 {
+    public function get_offers()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Invalid request.']);
+        }
+
+        $session = session();
+        $clinModel = new CliniciansModel();
+        $profileData = $clinModel->where('email', $session->get('email'))->first();
+
+        if (empty($profileData)) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Profile not found.']);
+        }
+
+        $shiftRequestsModel = new ShiftRequestsModel();
+        $offers = $shiftRequestsModel
+            ->select('tbl_client_shift_requests.*, tbl_shifts.start_date, tbl_shifts.shift_start_time, tbl_shifts.shift_end_time, tbl_shifts.rate, tbl_clients.company_name, tbl_clients.company_logo, tbl_clients.company_address as address,tbl_clients.zip_code as zip, tbl_client_units.name as unit_name, tbl_shift_clinicians.status as shift_clinician_status')
+            ->join('tbl_shifts', 'tbl_shifts.id = tbl_client_shift_requests.shift_id', 'inner')
+            ->join('tbl_clients', 'tbl_clients.id = tbl_client_shift_requests.client_id', 'inner')
+            ->join('tbl_client_units', 'tbl_client_units.id = tbl_shifts.unit_id', 'inner')
+            ->join('tbl_shift_clinicians', 'tbl_shift_clinicians.shift_id = tbl_shifts.id AND tbl_shift_clinicians.clinician_id = tbl_client_shift_requests.clinician_id', 'left')
+            ->where('tbl_client_shift_requests.clinician_id', $profileData['id'])
+            ->whereIn('tbl_client_shift_requests.status', [10, 20])
+            ->where('tbl_shift_clinicians.status', 0)
+            ->where('tbl_client_shift_requests.from_callout', 1)
+            ->findAll();
+
+        foreach ($offers as &$offer) {
+            $offer['shift_start_time_formatted'] = date("h:i A", strtotime($offer['shift_start_time']));
+            $offer['shift_end_time_formatted'] = date("h:i A", strtotime($offer['shift_end_time']));
+            $offer['start_date_formatted'] = date("D, M d", strtotime($offer['start_date']));
+            $offer['distance'] = "5.8 miles"; // Placeholder matching the image
+        }
+
+        return $this->response->setJSON([
+            'success' => 1,
+            'offers' => $offers
+        ]);
+    }
+
+    public function respond_to_offer()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Invalid request.']);
+        }
+
+        $requestId = $this->request->getPost('request_id');
+        $action = $this->request->getPost('action'); // 'accept' or 'decline'
+
+        $shiftRequestsModel = new ShiftRequestsModel();
+        $request = $shiftRequestsModel->find($requestId);
+
+        if (!$request) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Request not found.']);
+        }
+
+        if ($action == 'accept') {
+            // Update request status
+            $shiftRequestsModel->update($requestId, ['status' => 20]);
+
+            // Assign clinician to the shift slot
+            $shiftCliniciansModel = new ShiftCliniciansModel();
+            //if accepted, set the field from_callout to 1, might need to add from_callout on shiftCliniciansModel
+            if ($request['replacing_clinician_id']) {
+                $shiftCliniciansModel->update($request['replacing_clinician_id'], [
+                    'clinician_id' => $request['clinician_id'],
+                    'personnel_id' => 0,
+                    'from_callout' => 1,
+                    'status' => 0, // Pending
+                    'shift_status' => 0 // Not started
+                ]);
+            }
+
+            return $this->response->setJSON(['success' => 1, 'message' => 'Offer accepted.']);
+        } else {
+            // Decline
+            $shiftRequestsModel->update($requestId, ['status' => 100]);
+            return $this->response->setJSON(['success' => 1, 'message' => 'Offer declined.']);
+        }
+    }
+
+    public function send_update()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Invalid request.']);
+        }
+
+        $shiftClinicianId = $this->request->getPost('shift_clinician_id');
+        $statusText = $this->request->getPost('status_text');
+        $locationText = $this->request->getPost('location_text');
+        $minutesAway = $this->request->getPost('minutes_away');
+        $isArrival = $this->request->getPost('is_arrival');
+
+        $updateModel = new ShiftClinicianUpdatesModel();
+        $updateModel->insert([
+            'shift_clinician_id' => $shiftClinicianId,
+            'status_text' => $statusText,
+            'location_text' => $locationText,
+            'minutes_away' => $minutesAway,
+            'is_arrival' => $isArrival ? 1 : 0
+        ]);
+
+        if ($isArrival) {
+            $shiftCliniciansModel = new ShiftCliniciansModel();
+            $shiftCliniciansModel->update($shiftClinicianId, [
+                'status' => 10 // Active/Confirmed arrival
+            ]);
+        }
+
+        return $this->response->setJSON(['success' => 1, 'message' => 'Update sent successfully.']);
+    }
+
     public function index()
     {
         $session = session();

@@ -22,10 +22,12 @@ class GenerateDummyData extends BaseCommand
         $shiftModel = new ShiftsModel();
         $shiftClinModel = new ShiftCliniciansModel();
         $timekeepingModel = new ShiftsTimekeepingModel();
+        $unitModel = new \App\Models\FacilityUnitsModel();
 
         $clinicians = $clinModel->findAll();
         $clientId = 3;
-        $unitId = 1; // Emergency Room
+        $units = $unitModel->where('client_id', $clientId)->findAll();
+        $unitIds = !empty($units) ? array_column($units, 'id') : [1];
 
         $startDate = new DateTime('2026-03-01');
         $endDate = new DateTime('2026-03-08');
@@ -53,7 +55,7 @@ class GenerateDummyData extends BaseCommand
                 $shiftData = [
                     'facility_id'      => $clientId, // facility_id seems to be used as client_id in some places
                     'client_id'        => $clientId,
-                    'unit_id'          => $unitId,
+                    'unit_id'          => $unitIds[array_rand($unitIds)],
                     'start_date'       => $dateStr,
                     'end_date'         => $endDateStr,
                     'shift_start_time' => $randomShift['start'],

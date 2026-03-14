@@ -107,6 +107,7 @@ class Jobs extends BaseController
                 ASSETS_URL . 'js/plugins/bootstrap-datepicker.js',
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
+                ASSETS_URL . 'js/components/notifications.min.js',
                 ASSETS_URL . 'js/plugins/toastr.min.js',
                 ASSETS_URL . 'js/pages/facility_jobs.min.js',
             ]

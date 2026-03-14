@@ -11,8 +11,9 @@ use App\Models\ShiftCliniciansModel;
 use App\Models\FacilityUnitsModel;
 use App\Models\ShiftsTimekeepingModel;
 use App\Models\UserModel;
-use \Datetime;
+use App\Models\ShiftClinicianUpdatesModel;
 use CodeIgniter\Files\File;
+use \Datetime;
 
 class Shifts extends BaseController
 {
@@ -102,6 +103,7 @@ class Shifts extends BaseController
                 ASSETS_URL . 'js/plugins/bootstrap-datepicker.js',
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
+                ASSETS_URL . 'js/components/notifications.min.js',
                 ASSETS_URL . 'js/plugins/toastr.min.js',
                 ASSETS_URL . 'js/pages/facility_shifts.min.js',
             ]
@@ -125,14 +127,15 @@ class Shifts extends BaseController
             return $this->response->setJSON(['success' => 0, 'message' => 'Facility not found.']);
         }
 
-        $date = $this->request->getPost('date') ?: '2026-03-02';
+        $date = $this->request->getPost('date') ?: '2026-03-13';
         // $date = $this->request->getPost('date') ?: date("Y-m-d");
         $unitId = $this->request->getPost('unitID');
 
         $shifts = $this->shiftsModel
             ->select('tbl_shifts.*, tbl_shift_types.name as type_name, tbl_client_units.name as unit_name, 
                 (SELECT count(tbl_client_shift_requests.id) FROM tbl_client_shift_requests WHERE tbl_client_shift_requests.client_id = tbl_shifts.client_id AND tbl_client_shift_requests.shift_id = tbl_shifts.id) as applicants, 
-                (SELECT count(tbl_client_shift_requests.id) FROM tbl_client_shift_requests WHERE tbl_client_shift_requests.client_id = tbl_shifts.client_id AND tbl_client_shift_requests.shift_id = tbl_shifts.id AND status = 20) as accepted')
+                (SELECT count(tbl_client_shift_requests.id) FROM tbl_client_shift_requests WHERE tbl_client_shift_requests.client_id = tbl_shifts.client_id AND tbl_client_shift_requests.shift_id = tbl_shifts.id AND status = 20) as accepted,
+                (SELECT count(tbl_client_shift_requests.id) FROM tbl_client_shift_requests WHERE tbl_client_shift_requests.shift_id = tbl_shifts.id AND status = 10 AND from_callout = 1) as pending_callout_requests')
             ->join('tbl_client_units', 'tbl_client_units.id = tbl_shifts.unit_id', 'inner')
             ->join('tbl_shift_types', 'tbl_shift_types.id = tbl_shifts.shift_type', 'inner')
             ->where('tbl_shifts.client_id', $facilityId)
@@ -211,12 +214,82 @@ class Shifts extends BaseController
                 ->where('tbl_shifts.unit_id !=', $shift['unit_id'])
                 ->where('tbl_shifts.status', 1)
                 ->findAll();
+
+            // Get pending replacement requests
+            $pendingReplacements = $this->shiftRequestsModel
+                ->where('shift_id', $shift['id'])
+                ->where('status', 10)
+                ->where('from_callout', 1)
+                ->findAll();
+            
+            $shift['pending_replacements'] = [];
+            foreach ($pendingReplacements as $pr) {
+                $shift['pending_replacements'][$pr['replacing_clinician_id']] = $pr['id'];
+            }
+            $shift['clinicians_html'] = '';
+            foreach ($shift['clinicians'] as $clinician) {
+                $shift['clinicians_html'] .= view('facility/manage/_shift_clinician_item', [
+                    'clinician' => $clinician,
+                    'shift' => $shift
+                ]);
+            }
         }
 
         return $this->response->setJSON([
             'success' => 1,
             'message' => '',
             'data' => $shifts
+        ]);
+    }
+
+    public function get_clinician_details($id)
+    {
+        $clinModel = new \App\Models\CliniciansModel();
+        $clinician = $clinModel->find($id);
+        if (!$clinician) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Clinician not found']);
+        }
+
+        $objShiftClinician = new \App\Models\ShiftCliniciansModel();
+        $total_shifts = $objShiftClinician->where('clinician_id', $id)->where('status', 10)->countAllResults();
+
+        $objTimekeeping = new \App\Models\ShiftsTimekeepingModel();
+        $stats = $objTimekeeping->getStats($id);
+
+        return $this->response->setJSON([
+            'success' => 1,
+            'data' => [
+                'id' => $clinician['id'],
+                'name' => $clinician['name'],
+                'address' => $clinician['address'],
+                'contact_number' => $clinician['contact_number'],
+                'profile_pic_url' => $clinician['profile_pic_url'] ?: base_url('assets/img/blank-img.png'),
+                'total_shifts' => $total_shifts,
+                'attendance_percentage' => $stats['attendance'],
+                'lateness_percentage' => $stats['lateness'],
+            ]
+        ]);
+    }
+
+    public function get_clinician_timeline($shiftClinicianId)
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Invalid request.']);
+        }
+
+        $updateModel = new ShiftClinicianUpdatesModel();
+        $updates = $updateModel
+            ->where('shift_clinician_id', $shiftClinicianId)
+            ->orderBy('created_at', 'ASC')
+            ->findAll();
+
+        foreach ($updates as &$update) {
+            $update['created_at_formatted'] = date("D, M d, h:i A", strtotime($update['created_at']));
+        }
+
+        return $this->response->setJSON([
+            'success' => 1,
+            'updates' => $updates
         ]);
     }
 

@@ -56,10 +56,10 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="">Unit Manager</label>
-                                <select name="unit_manager_id" id="unit_manager_id" class="selectpicker form-control" data-title="Select unit manager">
-                                    <option value="">Supervisor 1</option>
-                                    <option value="">Supervisor 2</option>
-                                    <option value="">Supervisor 3</option>
+                                <select name="unit_manager_id" id="unit_manager_id" class="selectpicker form-control" data-title="Select unit manager" data-live-search="true">
+                                    <?php foreach ($personnel as $person): ?>
+                                        <option value="<?= $person['id'] ?>"><?= esc($person['first_name'] . ' ' . $person['last_name']) ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>
@@ -118,10 +118,10 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="">Unit Manager</label>
-                                <select name="unit_manager_id" id="unit_manager_id" class="selectpicker form-control" data-title="Select unit manager">
-                                    <option value="">Supervisor 1</option>
-                                    <option value="">Supervisor 2</option>
-                                    <option value="">Supervisor 3</option>
+                                <select name="unit_manager_id" id="edit_unit_manager_id" class="selectpicker form-control" data-title="Select unit manager" data-live-search="true">
+                                    <?php foreach ($personnel as $person): ?>
+                                        <option value="<?= $person['id'] ?>"><?= esc($person['first_name'] . ' ' . $person['last_name']) ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>

@@ -13,7 +13,7 @@ class FacilityOnboardingSettingsModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['client_id', 'timezone', 'clock_in', 'access', 'clock_out_approval', 'task_delay', 'back_up_approval', 'phone', 'allow_overtime', 'accepted_per_diem_network', 'total_beds', 'average_census'];
+    protected $allowedFields    = ['client_id', 'timezone', 'clock_in', 'access', 'clock_out_approval', 'task_delay', 'back_up_approval', 'phone', 'allow_overtime', 'accepted_per_diem_network', 'total_beds', 'average_census', 'average_rate', 'bonus'];
 
     // Dates
     protected $useTimestamps = false;

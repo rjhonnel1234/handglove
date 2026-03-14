@@ -43,6 +43,11 @@ class AdminMenu extends BaseConfig
                 'url'   => 'admin/donors',
                 'icon'  => 'fa fa-users-cog'
             ],
+            [
+                'title' => 'Schedules',
+                'url'   => 'admin/schedules',
+                'icon'  => 'fa fa-calendar-alt'
+            ],
         ],
         'Settings' => [
             [

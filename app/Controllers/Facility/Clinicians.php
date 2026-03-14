@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\CliniciansModel;
 use App\Models\ClinicianTypesModel;
 use App\Models\FacilityModel;
+use App\Models\ShiftRequestsModel;
+use App\Models\FacilityOnboardingSettingsModel;
 use CodeIgniter\Files\File;
 
 class Clinicians extends BaseController
@@ -177,5 +179,173 @@ class Clinicians extends BaseController
             'message' => '',
             'clinician' => $clinician
         ]);
+    }
+
+    public function online_list()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Invalid request.']);
+        }
+
+        $session = session();
+        $userModel = new \App\Models\UserModel();
+        $me = $userModel->find($session->get('id'));
+        
+        $lat1 = ($me && !empty($me['latitude'])) ? $me['latitude'] : 34.0522; // Fallback to CA
+        $lng1 = ($me && !empty($me['longitude'])) ? $me['longitude'] : -118.2437;
+
+        $facilityId = $this->session->get('facility_id');
+        $shiftId = $this->request->getGet('shift_id');
+        $onlineUsers = $userModel
+            ->select('tbl_users.id as user_id, tbl_users.latitude, tbl_users.longitude, tbl_clinicians.name, tbl_clinicians.address, tbl_clinicians.profile_pic_url, tbl_clinicians.company_worked, tbl_clinician_types.name as type_name, tbl_clinicians.id as clinician_id')
+            ->join('tbl_clinicians', 'tbl_clinicians.email = tbl_users.email', 'inner')
+            ->join('tbl_clinician_types', 'tbl_clinician_types.id = tbl_clinicians.type', 'inner')
+            ->where('tbl_users.online_status', 1)
+            ->where("tbl_clinicians.id NOT IN (SELECT clinician_id FROM tbl_client_shift_requests WHERE client_id = $facilityId AND shift_id = $shiftId)")
+            ->findAll();
+        
+
+
+        $data = [];
+        foreach ($onlineUsers as $user) {
+            $distance = $this->calculateDistance($lat1, $lng1, $user['latitude'] ?? 0, $user['longitude'] ?? 0);
+            $time = round($distance * 2); // Simple estimate: 2 mins per mile
+
+            $data[] = [
+                'name' => $user['name'],
+                'type' => $user['type_name'],
+                'company' => $user['company_worked'] ?: 'Independent',
+                'profile_pic' => $user['profile_pic_url'] ?: base_url('assets/img/blank-img.png'),
+                'distance' => round($distance, 1),
+                'time_away' => $time > 0 ? $time : 1,
+                'clinician_id' => $user['clinician_id']
+            ];
+        }
+
+        // Sort by distance
+        usort($data, function($a, $b) {
+            return $a['distance'] <=> $b['distance'];
+        });
+
+        $shiftId = $this->request->getGet('shift_id');
+        $replacingClinicianId = $this->request->getGet('replacing_clinician_id');
+        $pendingRequests = [];
+        
+        if ($shiftId && $replacingClinicianId) {
+            $shiftRequestsModel = new ShiftRequestsModel();
+            $pendingRequests = $shiftRequestsModel
+                ->select('tbl_client_shift_requests.*, tbl_clinicians.name as clinician_name')
+                ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_client_shift_requests.clinician_id', 'inner')
+                ->join('tbl_shift_clinicians', 'tbl_shift_clinicians.id = tbl_client_shift_requests.replacing_clinician_id', 'left')
+                ->join('tbl_client_personnel as replacing_staff', 'replacing_staff.id = tbl_shift_clinicians.personnel_id', 'left')
+                ->where([
+                    'tbl_client_shift_requests.shift_id' => $shiftId,
+                    'tbl_client_shift_requests.replacing_clinician_id' => $replacingClinicianId,
+                    'tbl_client_shift_requests.status' => 10,
+                    'tbl_client_shift_requests.from_callout' => 1
+                ])->findAll();
+        }
+
+        return $this->response->setJSON([
+            'success' => 1,
+            'data' => $data,
+            'pending_requests' => $pendingRequests
+        ]);
+    }
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2) {
+        $earthRadius = 3958.8; // miles
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+        $a = sin($dLat/2) * sin($dLat/2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($dLon/2) * sin($dLon/2);
+        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+        return $earthRadius * $c;
+    }
+
+    public function request_shift()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Invalid request.']);
+        }
+
+        $facilityId = $this->session->get('facility_id');
+        if ($facilityId == 0) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Unauthorized.']);
+        }
+
+        $shiftId = $this->request->getPost('shift_id');
+        $clinicianId = $this->request->getPost('clinician_id');
+        $replacingClinicianId = $this->request->getPost('replacing_clinician_id');
+        $fromCallout = $this->request->getPost('from_callout') ?? 0;
+
+        if (!$shiftId || !$clinicianId) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Missing required parameters.']);
+        }
+
+        $onboardingModel = new FacilityOnboardingSettingsModel();
+        $onboarding = $onboardingModel->where('client_id', $facilityId)->first();
+        $bonus = ($onboarding && !empty($onboarding['bonus'])) ? $onboarding['bonus'] : 0;
+
+        $shiftRequestsModel = new ShiftRequestsModel();
+        
+        // Check if request already exists for this candidate on this shift
+        $existing = $shiftRequestsModel->where([
+            'shift_id' => $shiftId,
+            'clinician_id' => $clinicianId
+        ])->first();
+
+        if ($existing) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'A request has already been sent to this clinician for this shift.']);
+        }
+
+        // Enforce one pending request per clinician on the shift list for callouts
+        if ($fromCallout && $replacingClinicianId) {
+            $pendingForReplaced = $shiftRequestsModel->where([
+                'shift_id' => $shiftId,
+                'replacing_clinician_id' => $replacingClinicianId,
+                'status' => 10
+            ])->first();
+
+            if ($pendingForReplaced) {
+                return $this->response->setJSON(['success' => 0, 'message' => 'There is already a pending request to replace this clinician. Please cancel it first if you wish to request someone else.']);
+            }
+        }
+
+        $data = [
+            'client_id' => $facilityId,
+            'shift_id' => $shiftId,
+            'clinician_id' => $clinicianId,
+            'replacing_clinician_id' => $replacingClinicianId,
+            'status' => 10, // Awaiting response
+            'from_callout' => $fromCallout,
+            'bonus' => $bonus
+        ];
+
+        if ($shiftRequestsModel->insert($data)) {
+            return $this->response->setJSON(['success' => 1, 'message' => 'Shift request sent successfully.']);
+        }
+
+        return $this->response->setJSON(['success' => 0, 'message' => 'Failed to send shift request.']);
+    }
+
+    public function cancel_request()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Invalid request.']);
+        }
+
+        $requestId = $this->request->getPost('request_id');
+        if (!$requestId) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Missing request ID.']);
+        }
+
+        $shiftRequestsModel = new ShiftRequestsModel();
+        if ($shiftRequestsModel->delete($requestId)) {
+            return $this->response->setJSON(['success' => 1, 'message' => 'Request cancelled successfully.']);
+        }
+
+        return $this->response->setJSON(['success' => 0, 'message' => 'Failed to cancel request.']);
     }
 }

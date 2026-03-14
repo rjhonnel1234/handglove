@@ -92,6 +92,7 @@ class Schedules extends BaseController
                 ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
                 ASSETS_URL . 'js/components/global.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
+                ASSETS_URL . 'js/components/notifications.min.js',
                 ASSETS_URL . 'js/pages/facility/scheduler/facility_scheduler_form.min.js',
             ]
         ]);
@@ -302,12 +303,17 @@ class Schedules extends BaseController
                     break;
             }
 
+            //get average_rate column on facility onboarding settings
+            $onboarding = $this->facilityOnboardingSettingsModel->where('client_id', $facilityId)->first();
+            $averageRate = ($onboarding && !empty($onboarding['average_rate'])) ? $onboarding['average_rate'] : 0;
+ 
             // Check if a shift already exists for this unit, date, time, and type
             $shift = $this->shiftsModel->where([
                 'client_id' => $facilityId,
                 'unit_id' => $unitId,
                 'start_date' => $date,
                 'shift_start_time' => $startTime,
+                'rate' => $averageRate,
                 // 'shift_type' => $shiftType
             ])->first();
 

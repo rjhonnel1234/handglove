@@ -127,6 +127,7 @@ class Onboarding extends BaseController
                 ASSETS_URL . 'js/plugins/bootstrap-datepicker.js',
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
+                ASSETS_URL . 'js/components/notifications.min.js',
                 ASSETS_URL . 'js/plugins/toastr.min.js',
                 ASSETS_URL . 'js/pages/facility_onboarding.min.js',
             ]
@@ -331,6 +332,8 @@ class Onboarding extends BaseController
             'allow_overtime' => $postData['allow_overtime'] ?? 0,
             'total_beds' => $postData['total_beds'] ?? null,
             'average_census' => $averageCensus,
+            'average_rate' => $postData['average_rate'] ?? null,
+            'bonus' => $postData['bonus'] ?? null,
         ];
         
         foreach ($fields as $field) {

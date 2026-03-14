@@ -189,6 +189,7 @@ class Invoices extends BaseController
                     ASSETS_URL . 'js/components/global.min.js',
                     ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                     ASSETS_URL . 'js/components/navigation_bar.min.js',
+                ASSETS_URL . 'js/components/notifications.min.js',
                     ASSETS_URL . 'js/pages/facility_profile.min.js',
                     'https://cdn.jsdelivr.net/npm/sweetalert2@10'
                 )

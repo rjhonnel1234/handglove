@@ -13,7 +13,7 @@ class ShiftCliniciansModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['client_id', 'shift_id', 'clinician_id', 'personnel_id', 'status', 'shift_status', 'pcc_status', 'dnr_remarks'];
+    protected $allowedFields    = ['client_id', 'shift_id', 'clinician_id', 'personnel_id', 'status', 'shift_status', 'pcc_status', 'dnr_remarks', 'from_callout'];
 
     // Dates
     protected $useTimestamps = false;

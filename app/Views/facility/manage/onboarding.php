@@ -99,17 +99,41 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="">Accepted Per Diem Network</label>
-                                        <select name="accepted_per_diem_network[]" data-title="Select per diem network.." id="accepted_per_diem_network" class="selectpicker form-control" multiple>
-                                            <option value="ConnectRN" <?php echo (isset($onboardingSettings['accepted_per_diem_network']) && in_array('ConnectRN', $onboardingSettings['accepted_per_diem_network']) ? 'selected' : '' ); ?>>ConnectRN</option>
-                                            <option value="Shiftkey" <?php echo (isset($onboardingSettings['accepted_per_diem_network']) && in_array('Shiftkey', $onboardingSettings['accepted_per_diem_network']) ? 'selected' : '' ); ?>>Shiftkey</option>
-                                            <option value="Shiftmed" <?php echo (isset($onboardingSettings['accepted_per_diem_network']) && in_array('Shiftmed', $onboardingSettings['accepted_per_diem_network']) ? 'selected' : '' ); ?>>Shiftmed</option>
-                                            <option value="CSU" <?php echo (isset($onboardingSettings['accepted_per_diem_network']) && in_array('CSU', $onboardingSettings['accepted_per_diem_network']) ? 'selected' : '' ); ?>>CSU</option>
-                                            <option value="Clipboard" <?php echo (isset($onboardingSettings['accepted_per_diem_network']) && in_array('Clipboard', $onboardingSettings['accepted_per_diem_network']) ? 'selected' : '' ); ?>>Clipboard</option>
-                                            <option value="Eshift" <?php echo (isset($onboardingSettings['accepted_per_diem_network']) && in_array('Eshift', $onboardingSettings['accepted_per_diem_network']) ? 'selected' : '' ); ?>>Eshift</option>
-                                        </select>
+                                        <div id="per-diem-networks-container">
+                                            <?php 
+                                            $networks = ['ConnectRN', 'Shiftkey', 'Shiftmed', 'CSU', 'Clipboard', 'Eshift'];
+                                            foreach ($networks as $network): 
+                                                // Handle both old array format and new associative array format
+                                                $isChecked = false;
+                                                $noteValue = '';
+                                                if (isset($onboardingSettings['accepted_per_diem_network'])) {
+                                                    if (isset($onboardingSettings['accepted_per_diem_network'][$network])) {
+                                                        // New format: ['Network' => ['enabled' => 1, 'note' => '...']]
+                                                        $isChecked = isset($onboardingSettings['accepted_per_diem_network'][$network]['enabled']);
+                                                        $noteValue = $onboardingSettings['accepted_per_diem_network'][$network]['note'] ?? '';
+                                                    } else if (is_array($onboardingSettings['accepted_per_diem_network']) && in_array($network, $onboardingSettings['accepted_per_diem_network'])) {
+                                                        // Old format: ['Network1', 'Network2']
+                                                        $isChecked = true;
+                                                    }
+                                                }
+                                            ?>
+                                            <div class="row align-items-center mb-2 per-diem-row">
+                                                <div class="col-md-5">
+                                                    <div class="custom-control custom-checkbox pt-1">
+                                                        <input type="checkbox" class="custom-control-input per-diem-checkbox" id="network_<?php echo $network; ?>" name="accepted_per_diem_network[<?php echo $network; ?>][enabled]" value="1" <?php echo $isChecked ? 'checked' : ''; ?>>
+                                                        <label class="custom-control-label" for="network_<?php echo $network; ?>"><?php echo $network; ?></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7 per-diem-note-container" style="<?php echo $isChecked ? 'display: block;' : 'display: none;'; ?>">
+                                                    <input type="text" name="accepted_per_diem_network[<?php echo $network; ?>][note]" value="<?php echo $noteValue; ?>" class="form-control form-control-sm" placeholder="Note for <?php echo $network; ?>">
+                                                </div>
+                                            </div>
+                                            <?php endforeach; ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
 
                             <div class="row">
                                 <div class="col-md-6">
@@ -127,6 +151,21 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Average Rate</label>
+                                        <input type="number" name="average_rate" value="<?php echo (isset($onboardingSettings['average_rate']) ? $onboardingSettings['average_rate'] : '' ); ?>" class="form-control" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Bonus</label>
+                                        <input type="number" name="bonus" value="<?php echo (isset($onboardingSettings['bonus']) ? $onboardingSettings['bonus'] : '' ); ?>" class="form-control" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">

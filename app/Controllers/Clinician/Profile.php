@@ -98,12 +98,14 @@ class Profile extends BaseController
                     COMPILED_ASSETS_PATH . 'css/components/owl',
                     COMPILED_ASSETS_PATH . 'css/components/bootstrap-main',
                     COMPILED_ASSETS_PATH . 'css/components/bootstrap-select',
+                    COMPILED_ASSETS_PATH . 'css/components/bootstrap-datepicker',
                     COMPILED_ASSETS_PATH . 'css/components/global',
+                    COMPILED_ASSETS_PATH . 'css/components/toastr',
                     COMPILED_ASSETS_PATH . 'css/components/animations',
                     COMPILED_ASSETS_PATH . 'css/components/buttons',
                     COMPILED_ASSETS_PATH . 'css/components/navigation_bar',
                     COMPILED_ASSETS_PATH . 'css/components/footer',
-                    COMPILED_ASSETS_PATH . 'css/pages/profile'
+                    COMPILED_ASSETS_PATH . 'css/pages/profile',
                 ),
                 'session' => $data['session']
             ))
@@ -118,9 +120,11 @@ class Profile extends BaseController
                     ASSETS_URL . 'js/plugins/popper.min.js',
                     ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
                     ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-datepicker.js',
                     ASSETS_URL . 'js/components/global.min.js',
                     ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                     ASSETS_URL . 'js/components/navigation_bar.min.js',
+                    ASSETS_URL . 'js/plugins/toastr.min.js',
                     ASSETS_URL . 'js/components/notifications.min.js',
                     ASSETS_URL . 'js/pages/profile.min.js',
                 )
@@ -191,7 +195,9 @@ class Profile extends BaseController
                         COMPILED_ASSETS_PATH . 'css/components/owl',
                         COMPILED_ASSETS_PATH . 'css/components/bootstrap-main',
                         COMPILED_ASSETS_PATH . 'css/components/bootstrap-select',
+                        COMPILED_ASSETS_PATH . 'css/components/bootstrap-datepicker',
                         COMPILED_ASSETS_PATH . 'css/components/global',
+                        COMPILED_ASSETS_PATH . 'css/components/toastr',
                         COMPILED_ASSETS_PATH . 'css/components/animations',
                         COMPILED_ASSETS_PATH . 'css/components/buttons',
                         COMPILED_ASSETS_PATH . 'css/components/navigation_bar',
@@ -210,9 +216,11 @@ class Profile extends BaseController
                         ASSETS_URL . 'js/plugins/popper.min.js',
                         ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
                         ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
+                        ASSETS_URL . 'js/plugins/bootstrap-datepicker.js',
                         ASSETS_URL . 'js/components/global.min.js',
                         ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                         ASSETS_URL . 'js/components/navigation_bar.min.js',
+                        ASSETS_URL . 'js/plugins/toastr.min.js',
                         ASSETS_URL . 'js/pages/profile.min.js',
                     )
                 ))
@@ -277,6 +285,7 @@ class Profile extends BaseController
                 ASSETS_URL . 'js/plugins/jquery.validate.min.js',
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
+                ASSETS_URL . 'js/components/notifications.min.js',
                 ASSETS_URL . 'js/pages/profile.min.js',
             )
         ));

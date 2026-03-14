@@ -124,6 +124,7 @@ class Facility extends BaseController
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
                 ASSETS_URL . 'js/plugins/bootstrap-datepicker.js',
                 ASSETS_URL . 'js/pages/facility_profile.min.js',
+                ASSETS_URL . 'js/components/notifications.min.js',
                 ASSETS_URL . 'js/plugins/toastr.min.js',
             );
 
@@ -325,6 +326,7 @@ class Facility extends BaseController
                     ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
                     ASSETS_URL . 'js/components/global.min.js',
                     ASSETS_URL . 'js/plugins/owl.carousel.min.js',
+                    ASSETS_URL . 'js/components/notifications.min.js',
                     ASSETS_URL . 'js/components/navigation_bar.min.js',
                     ASSETS_URL . 'js/pages/facility_profile.min.js',
                 )
@@ -444,6 +446,49 @@ class Facility extends BaseController
                 $clinModel = new CliniciansModel;
                 $data['profileData'] = $clinModel->where('email', session()->get('email'))->first();
 
+
+                $objVotes = new FacilityVotesModel;
+                
+
+                $objShifts = new ShiftsModel();
+                $hasActiveShift = $objShifts->hasActiveShift($facility_id);
+                $hasActiveShiftThisWeek = $objShifts->hasActiveShiftThisWeek($facility_id);
+
+                $hasActiveVoting = $objVotes->hasActiveVoting($facility_id);
+                $workFriendlyVal = 0;
+                //Check if facility has active shift for this week, add 30 points if yes
+                if($hasActiveVoting){
+                    $workFriendlyVal += 20;
+                }
+                if($hasActiveShift){
+                    $workFriendlyVal += 20;
+                }
+                if($hasActiveShiftThisWeek){
+                    $workFriendlyVal += 30;
+                }
+
+                $objRatings = new ClientRatingsModel();
+                $aggregatesData = $objRatings->select('AVG(cleanliness) as cleanliness, AVG(work_environment) as work_environment, AVG(tools_needed) as tools_needed, AVG(average) as average')
+                    ->where('client_id', $facility_id)
+                    ->first();
+
+                $aggregates = [
+                    'cleanliness' => number_format($aggregatesData['cleanliness'] ?? 0, 2),
+                    'work_environment' => number_format($aggregatesData['work_environment'] ?? 0, 2),
+                    'tools_needed' => number_format($aggregatesData['tools_needed'] ?? 0, 2),
+                    'average' => number_format($aggregatesData['average'] ?? 0, 2),
+                    'average_percentage' => ($aggregatesData['average'] ?? 0) / 5 * 100
+                ];
+
+                if ($aggregates['average_percentage'] > 0) {
+                    // Get the percentage value of average_percentage relative to 30 points
+                    $ratingBonus = ($aggregates['average_percentage'] / 100) * 30;
+                    $workFriendlyVal += ceil($ratingBonus);
+                }
+                
+                $data['workFriendly'] = $workFriendlyVal;
+
+                
                 // PAGE HEAD PROCESSING
                 $session = session();
                 $data['session'] = $session;

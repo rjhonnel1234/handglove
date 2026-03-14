@@ -31,7 +31,7 @@
                             <li class="list-inline-item dropdown mr-2">
                                 <a href="javascript:void(0)" class="header-item noti-icon position-relative" id="notification" data-toggle="dropdown" aria-expanded="false">
                                     <i class="fa fa-bell"></i>
-                                    <div class="count position-absolute" id="notification-count" style="display:none; background-color: #E41E3F; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; top: -5px; right: -5px;">0</div>
+                                    <div class="count position-absolute notification-count" style="display:none; background-color: #E41E3F; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; top: -5px; right: -5px;">0</div>
                                 </a>
                                 <div class="dropdown-menu p-0 notification-dropdown" aria-labelledby="notification">
                                     <div class="notification-header">
@@ -75,7 +75,14 @@
                                         </div>
                                     </div>
                                     <div class="dropdown-divider"></div>
-
+                                    <?php if( session()->get('type') == 10){ ?>
+                                        <div id="shift-offers-container" style="display: none;">
+                                            <div class="notification-header border-0 pb-0">
+                                                <h6 style="font-size: 18px;">Shift Offers</h6>
+                                            </div>
+                                            <div id="shift-offers-list"></div>
+                                        </div>
+                                    <?php } ?>
                                 </div>
                             </li>
                             <li class="dropdown">

@@ -20,6 +20,7 @@ class Units extends BaseController
     protected $userModel;
     protected $facilityModel;
     protected $facilityUnitsModel;
+    protected $clientPersonnelModel;
     protected $session;
 
     public function __construct()
@@ -30,6 +31,7 @@ class Units extends BaseController
         $this->userModel = new UserModel();
         $this->facilityModel = new FacilityModel();
         $this->facilityUnitsModel = new FacilityUnitsModel();
+        $this->clientPersonnelModel = new \App\Models\ClientPersonnelModel();
         $this->session = session();
     }
 
@@ -48,6 +50,7 @@ class Units extends BaseController
         $data = [
             'session' => $this->session,
             'facility' => $facility,
+            'personnel' => $this->clientPersonnelModel->where('client_id', $this->session->get('facility_id'))->where('status', 1)->where('type', 6)->findAll(),
             'page' => 'units'
         ];
 
@@ -93,6 +96,7 @@ class Units extends BaseController
                 ASSETS_URL . 'js/components/global.min.js',
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
+                ASSETS_URL . 'js/components/notifications.min.js',
                 ASSETS_URL . 'js/plugins/toastr.min.js',
                 ASSETS_URL . 'js/pages/facility_units.min.js',
             ]
@@ -150,9 +154,13 @@ class Units extends BaseController
                 'rules' => 'required',
                 'label' => 'Name'
             ],
-            'census[]' => [
+            'census.*' => [
                 'rules' => 'required',
                 'label' => 'Census'
+            ],
+            'unit_manager_id' => [
+                'rules' => 'required',
+                'label' => 'Unit Manager'
             ]
         ];
 
@@ -171,6 +179,7 @@ class Units extends BaseController
             'client_id' => $facilityId,
             'name' => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'unit_manager_id' => $this->request->getPost('unit_manager_id'),
             'census' => $census,
         ];
 
@@ -202,9 +211,13 @@ class Units extends BaseController
                 'rules' => 'required',
                 'label' => 'Name'
             ],
-            'census[]' => [
+            'census.*' => [
                 'rules' => 'required',
                 'label' => 'Census'
+            ],
+            'unit_manager_id' => [
+                'rules' => 'required',
+                'label' => 'Unit Manager'
             ]
         ];
 
@@ -222,6 +235,7 @@ class Units extends BaseController
         $item = [
             'name' => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'unit_manager_id' => $this->request->getPost('unit_manager_id'),
             'census' => $census,
         ];
 
