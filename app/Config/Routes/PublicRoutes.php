@@ -38,7 +38,7 @@ $routes->post('/jobs/apply', 'Jobs::apply');
 $routes->post('/jobs/apply_register', 'Jobs::apply_register_clinician');
 $routes->get('/apply', 'Apply::index');
 $routes->get('/board-of-directors', 'BoardOfDirectors::index');
-$routes->get('/donors', 'Donors::index');
+$routes->get('/awards', 'Donors::index');
 $routes->get('/claim-facility', 'ClaimFacility::index');
 
 $routes->group('claim', function($routes){
