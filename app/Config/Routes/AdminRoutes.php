@@ -89,4 +89,10 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->post('list', 'Schedules::list');
         $routes->post('details', 'Schedules::details');
     });
+
+    $routes->group('shifts', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('/', 'Shifts::index');
+        $routes->post('list', 'Shifts::list');
+        $routes->get('resources', 'Shifts::resources');
+    });
 });

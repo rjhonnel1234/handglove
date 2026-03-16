@@ -165,7 +165,7 @@ class Shifts extends BaseController
                 ->join('tbl_client_personnel', 'tbl_client_personnel.id = tbl_shift_clinicians.personnel_id', 'LEFT')
                 ->join('tbl_clinician_types', 'tbl_clinician_types.id = tbl_clinicians.type', 'LEFT')
                 ->join('tbl_clinician_types as staff_type', 'staff_type.id = tbl_client_personnel.clinician_type', 'LEFT')
-                ->where('tbl_shift_clinicians.status', 10)
+                ->whereIn('tbl_shift_clinicians.status', [10, 0])
                 ->where('tbl_shift_clinicians.shift_status', 0)
                 ->where('tbl_shift_clinicians.shift_id', $shift['id'])
                 ->findAll();

@@ -29,7 +29,9 @@ class Home extends BaseController
                 COMPILED_ASSETS_PATH . 'css/components/animations',
                 COMPILED_ASSETS_PATH . 'css/components/buttons',
                 COMPILED_ASSETS_PATH . 'css/components/navigation_bar',
+                COMPILED_ASSETS_PATH . 'css/components/colors',
                 COMPILED_ASSETS_PATH . 'css/components/footer',
+                COMPILED_ASSETS_PATH . 'css/components/theme',
                 COMPILED_ASSETS_PATH . 'css/pages/home'
             )
         ))
@@ -44,11 +46,15 @@ class Home extends BaseController
                 ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
                 ASSETS_URL . 'js/components/global.min.js',
                 ASSETS_URL . 'js/plugins/createjs.min.js',
+                ASSETS_URL . 'js/plugins/appear.js',
+                ASSETS_URL . 'js/plugins/isotope.js',
+                ASSETS_URL . 'js/plugins/scrollbar.js',
+                ASSETS_URL . 'js/plugins/tweenmax.js',
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
                 ASSETS_URL . 'js/pages/home.min.js',
             )
         ))
-        .view('components/footer');
+        .view('components/footer_v3');
     }
 }

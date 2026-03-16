@@ -42,15 +42,22 @@ class Shifts extends BaseController
             ->join('tbl_shift_clinicians', 'tbl_shift_clinicians.shift_id = tbl_shifts.id AND tbl_shift_clinicians.clinician_id = tbl_client_shift_requests.clinician_id', 'left')
             ->where('tbl_client_shift_requests.clinician_id', $profileData['id'])
             ->whereIn('tbl_client_shift_requests.status', [10, 20])
-            ->where('tbl_shift_clinicians.status', 0)
             ->where('tbl_client_shift_requests.from_callout', 1)
             ->findAll();
 
+        $updateModel = new ShiftClinicianUpdatesModel();
         foreach ($offers as &$offer) {
             $offer['shift_start_time_formatted'] = date("h:i A", strtotime($offer['shift_start_time']));
             $offer['shift_end_time_formatted'] = date("h:i A", strtotime($offer['shift_end_time']));
             $offer['start_date_formatted'] = date("D, M d", strtotime($offer['start_date']));
             $offer['distance'] = "5.8 miles"; // Placeholder matching the image
+            
+            // Get latest status update
+            $latestUpdate = $updateModel->where('shift_clinician_id', $offer['replacing_clinician_id'])
+                                       ->orderBy('created_at', 'DESC')
+                                       ->first();
+            $offer['latest_status'] = $latestUpdate ? $latestUpdate['status_text'] : 'Accepted';
+            $offer['is_arrival_confirmed'] = ($offer['shift_clinician_status'] == 10);
         }
 
         return $this->response->setJSON([
