@@ -91,28 +91,22 @@
         <div class="outer-container">
             <div class="clients-carousel owl-carousel owl-theme owl-dots-none owl-nav-none">
                 <figure class="clients-logo-box">
-                    <a href="index.html"><img src="assets/img/clients/clients-logo-1.png" alt=""></a>
-                    <span class="logo-title"><a href="index.html">Visit Website</a></span>
+                    <img src="assets/img/clients/clients-logo-1.png" alt="">
                 </figure>
                 <figure class="clients-logo-box">
-                    <a href="index.html"><img src="assets/img/clients/clients-logo-2.png" alt=""></a>
-                    <span class="logo-title"><a href="index.html">Visit Website</a></span>
+                    <img src="assets/img/clients/clients-logo-2.png" alt="">
                 </figure>
                 <figure class="clients-logo-box">
-                    <a href="index.html"><img src="assets/img/clients/clients-logo-3.png" alt=""></a>
-                    <span class="logo-title"><a href="index.html">Visit Website</a></span>
+                    <img src="assets/img/clients/clients-logo-3.png" alt="">
                 </figure>
                 <figure class="clients-logo-box">
-                    <a href="index.html"><img src="assets/img/clients/clients-logo-4.png" alt=""></a>
-                    <span class="logo-title"><a href="index.html">Visit Website</a></span>
+                    <img src="assets/img/clients/clients-logo-4.png" alt="">
                 </figure>
                 <figure class="clients-logo-box">
-                    <a href="index.html"><img src="assets/img/clients/clients-logo-5.png" alt=""></a>
-                    <span class="logo-title"><a href="index.html">Visit Website</a></span>
+                    <img src="assets/img/clients/clients-logo-5.png" alt="">
                 </figure>
                 <figure class="clients-logo-box">
-                    <a href="index.html"><img src="assets/img/clients/clients-logo-6.png" alt=""></a>
-                    <span class="logo-title"><a href="index.html">Visit Website</a></span>
+                    <img src="assets/img/clients/clients-logo-6.png" alt="">
                 </figure>
             </div>
         </div>
@@ -142,12 +136,12 @@
                                             <li class="tab-btn active-btn" data-tab="#tab-1">
                                                 <i class="employ-icon flaticon-businessman"></i>
                                                 <h5>For Employers</h5>
-                                                <i class="arrow-icon flaticon-up-arrow-2"></i>
+                                                <i class="arrow-icon fa fa-arrow-up"></i>
                                             </li>
                                             <li class="tab-btn" data-tab="#tab-2">
                                                 <i class="employ-icon flaticon-employer"></i>
                                                 <h5>For Employees</h5>
-                                                <i class="arrow-icon flaticon-up-arrow-2"></i>
+                                                <i class="arrow-icon fa fa-arrow-up"></i>
                                             </li>
                                         </ul>
                                     </div>
@@ -172,9 +166,6 @@
                                                         <h4>Find the Perfect Candidate</h4>
                                                     </li>
                                                 </ul>
-                                                <div class="link"><a href="index.html"><i
-                                                            class="flaticon-right-arrow"></i>Your Required
-                                                        Talent</a></div>
                                             </div>
                                         </div>
                                         <div class="tab" id="tab-2">
@@ -198,9 +189,6 @@
                                                         <h4>Non Excecutive Opportunities</h4>
                                                     </li>
                                                 </ul>
-                                                <div class="link"><a href="index.html"><i
-                                                            class="flaticon-right-arrow"></i>Your Required
-                                                        Talent</a></div>
                                             </div>
                                         </div>
                                     </div>
@@ -229,8 +217,7 @@
                                         <figure class="icon-box"><img src="assets/img/icons/icon-3.png" alt="">
                                         </figure>
                                         <h3>Educational Resources <br />for Job Seekers</h3>
-                                        <a href="index.html">Guides & E-books<i
-                                                class="flaticon-direct-download"></i></a>
+                                        <a href="index.html">Guides & E-books<i class="fa fa-download"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -247,7 +234,7 @@
                                             with long-term value, strong community impact, and disciplined execution..
                                         </p>
                                     </div>
-                                    <div class="link"><a href="index.html"><i class="flaticon-right-arrow"></i>More
+                                    <div class="link"><a href="index.html"><i class="fa fa-arrow-right"></i>More
                                             About Us</a></div>
                                     <div class="author-box">
                                         <div class="author-text">
@@ -368,7 +355,7 @@
                                 <div class="overlay-content">
                                     <p>Explain to you how this idea denouncing pleasure & praising pain was born.
                                     </p>
-                                    <a href="contract-hire.html"><i class="flaticon-right-arrow"></i>More
+                                    <a href="contract-hire.html"><i class="fa fa-arrow-right"></i>More
                                         details</a>
                                 </div>
                             </div>
@@ -384,11 +371,11 @@
         <section class="recruitment-technology">
             <div class="auto-container">
                 <div class="row clearfix">
-                    <div class="col-lg-6 col-md-12 col-sm-12 image-column">
-                        <figure class="image-box js-tilt clearfix"><img src="assets/img/resource/recruitment-1.png"
+                    <div class="col-lg-7 col-md-12 col-sm-12 image-column">
+                        <figure class="image-box js-tilt clearfix" style="margin-right: 0;"><img src="/assets/img/technology.png"
                                 alt=""></figure>
                     </div>
-                    <div class="col-lg-6 col-md-12 col-sm-12 content-column">
+                    <div class="col-lg-5 col-md-12 col-sm-12 content-column">
                         <div id="content_block_4">
                             <div class="content-box">
                                 <div class="sec-title">
@@ -404,7 +391,7 @@
                                             <figure class="icon-box"><img src="assets/img/icons/icon-7.png" alt="">
                                             </figure>
                                             <h3><span>01</span><a href="index.html">Sourcing the Best<i
-                                                        class="flaticon-right-arrow"></i></a></h3>
+                                                        class="fa fa-arrow-right"></i></a></h3>
                                             <p>Using Trusted Network of Healthcare Vendor & Headhunting.</p>
                                         </div>
                                     </div>
@@ -414,7 +401,7 @@
                                             <figure class="icon-box"><img src="assets/img/icons/icon-8.png" alt="">
                                             </figure>
                                             <h3><span>02</span><a href="index.html">Volume Hiring<i
-                                                        class="flaticon-right-arrow"></i></a></h3>
+                                                        class="fa fa-arrow-right"></i></a></h3>
                                             <p>This create speed, scale, and access to a large clinician network to keep
                                                 facilities fully staffed.</p>
                                         </div>

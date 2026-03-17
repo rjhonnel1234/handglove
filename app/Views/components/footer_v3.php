@@ -31,16 +31,16 @@
                                     <h3>Useful Links</h3>
                                 </div>
                                 <ul class="links-list clearfix">
-                                    <li><a href="index.html">About Us</a></li>
-                                    <li><a href="index.html">Resources</a></li>
-                                    <li><a href="index.html">Our Solutions</a></li>
-                                    <li><a href="index.html">Testimonials</a></li>
-                                    <li><a href="index.html">Employers</a></li>
-                                    <li><a href="index.html">How It’s Work</a></li>
-                                    <li><a href="index.html">Job Seekers</a></li>
-                                    <li><a href="index.html">Industries</a></li>
-                                    <li><a href="index.html">Leadership</a></li>
-                                    <li><a href="index.html">Contact Us</a></li>
+                                    <li><a href="<?= base_url('about-us') ?>">About Us</a></li>
+                                    <li><a href="<?= base_url('resources') ?>">Resources</a></li>
+                                    <li><a href="<?= base_url('our-solutions') ?>">Our Solutions</a></li>
+                                    <li><a href="<?= base_url('testimonials') ?>">Testimonials</a></li>
+                                    <li><a href="<?= base_url('employers') ?>">Employers</a></li>
+                                    <li><a href="<?= base_url('how-it-works') ?>">How It’s Work</a></li>
+                                    <li><a href="<?= base_url('job-seekers') ?>">Job Seekers</a></li>
+                                    <li><a href="<?= base_url('industries') ?>">Industries</a></li>
+                                    <li><a href="<?= base_url('leadership') ?>">Leadership</a></li>
+                                    <li><a href="<?= base_url('contact-us') ?>">Contact Us</a></li>
                                 </ul>
                             </div>
                         </div>

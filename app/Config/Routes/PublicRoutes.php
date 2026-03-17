@@ -4,6 +4,7 @@
  * Public and Common Routes
  */
 $routes->get('/', 'Home::index');
+$routes->set404Override('App\Controllers\NotFound::index');
 
 $routes->get('/login', 'Login::index',['filter' => 'authenticate']);
 $routes->get('/login/reset-password/(:segment)', 'Login::reset_password/$1',['filter' => 'authenticate']);
@@ -49,3 +50,16 @@ $routes->group('claim', function($routes){
     $routes->post('verifySMSOTP', 'Claim::verifySMSOTP');
     $routes->post('submit', 'Claim::submit');
 });
+
+
+$routes->get('about-us', 'AboutUs::index');
+$routes->get('our-solutions', 'OurSolutions::index');
+$routes->get('employers', 'Employers::index');
+$routes->get('job-seekers', 'JobSeekers::index');
+$routes->get('leadership', 'Leadership::index');
+$routes->get('resources', 'Resources::index');
+$routes->get('testimonials', 'Testimonials::index');
+$routes->get('how-it-works', 'HowItWorks::index');
+$routes->get('industries', 'Industries::index');
+$routes->get('contact-us', 'ContactUs::index');
+$routes->post('contact-us/submit', 'ContactUs::submit');

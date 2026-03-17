@@ -50,12 +50,16 @@
                     <nav class="main-menu navbar-expand-md navbar-light">
                         <div class="collapse navbar-collapse show clearfix" id="navbarSupportedContent">
                             <ul class="navigation clearfix">
-                                <li class="current"><a href="index.html">Home</a></li>
-                                <li><a href="index.html">About</a></li>
-                                <li><a href="index.html">Awards</a></li>
-                                <li class="dropdown"><a href="index.html">Solutions</a>
+                                <li class="current"><a href="<?php echo base_url(); ?>">Home</a></li>
+                                <li><a href="<?php echo base_url('about'); ?>">Facility</a></li>
+                                <li><a href="<?php echo base_url('about'); ?>">Clinician</a></li>
+                                <li><a href="<?php echo base_url('about'); ?>">MSP</a></li>
+                                <!-- <li class="current"><a href="<?php echo base_url(); ?>">Home</a></li>
+                                <li><a href="<?php echo base_url('about'); ?>">About</a></li>
+                                <li><a href="<?php echo base_url('awards'); ?>">Awards</a></li>
+                                <li class="dropdown"><a href="<?php echo base_url(); ?>">Solutions</a>
                                     <ul>
-                                        <li><a href="service.html">Our Solutions</a></li>
+                                        <li><a href="<?php echo base_url(); ?>">Our Solutions</a></li>
                                         <li><a href="temprory-staffing.html">Temprory Staffing</a></li>
                                         <li><a href="direct-hire.html">Direct Hire</a></li>
                                         <li><a href="contract-hire.html">Contract to Hire</a></li>
@@ -78,14 +82,15 @@
                                         <li><a href="testimonials.html">Testimonials</a></li>
                                     </ul>
                                 </li>
-                                <li><a href="contact.html">Contact</a></li>
+                                <li><a href="contact.html">Contact</a></li> -->
                             </ul>
                         </div>
                     </nav>
                 </div>
                 <ul class="menu-right-content">
                     <li>
-                        <a href="index.html" class="theme-btn-one">Appointment</a>
+                        <a href="#" class="theme-btn-one">Appointment</a>
+                        <a href="<?php echo base_url('login'); ?>" class="theme-link p-3">Portal Login</a>
                     </li>
                 </ul>
             </div>
@@ -109,6 +114,7 @@
                 <ul class="menu-right-content pull-right clearfix">
                     <li>
                         <a href="index.html" class="theme-btn-one">Appointment</a>
+                        <a href="<?php echo base_url('login'); ?>" class="theme-link p-3">Portal Login</a>
                     </li>
                 </ul>
             </div>
@@ -121,7 +127,7 @@
     <div class="menu-backdrop"></div>
     <div class="close-btn"><i class="fas fa-times"></i></div>
     <nav class="menu-box">
-        <div class="nav-logo"><a href="index.html"><img src="assets/images/logo-2.png" alt="" title=""></a>
+        <div class="nav-logo"><a href="<?php echo base_url(); ?>"><img src="assets/images/logo-2.png" alt="" title=""></a>
         </div>
         <div class="menu-outer">
             <!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header-->
