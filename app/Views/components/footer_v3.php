@@ -1,5 +1,5 @@
     <footer class="main-footer bg-color-1">
-        <div class="pattern-layer" style="background-image: url(assets/images/shape/pattern-11.png);"></div>
+        <div class="pattern-layer" style="background-image: url(/assets/img/shape/pattern-11.png);"></div>
         <div class="auto-container">
             <div class="footer-top">
                 <div class="widget-section">
@@ -99,6 +99,5 @@
 
 
     <!--Scroll to top-->
-    <button class="scroll-top scroll-to-target" data-target="html"><i class="flaticon-up-arrow-1"></i>Top</button>
-
+    <button class="scroll-top scroll-to-target" data-target="html"><i class="fa fa-arrow-up"></i>Top</button>
 </div>

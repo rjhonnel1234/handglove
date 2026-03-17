@@ -8,7 +8,7 @@ class Home extends BaseController
     {
 
         // PAGE HEAD PROCESSING
-        return view('components/header', array(
+        return view('components/header_v3', array(
             'title' => 'Handglove',
             'description' => 'Water for Every Filipino. 50 years in the pipe manufacturing industry and more than 30 years experience in bulk water supply, water distribution system and wastewater management.',
             'url' => BASE_URL,
@@ -44,12 +44,12 @@ class Home extends BaseController
                 ),
                 ASSETS_URL . 'js/plugins/popper.min.js',
                 ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
-                ASSETS_URL . 'js/components/global.min.js',
-                ASSETS_URL . 'js/plugins/createjs.min.js',
                 ASSETS_URL . 'js/plugins/appear.js',
                 ASSETS_URL . 'js/plugins/isotope.js',
-                ASSETS_URL . 'js/plugins/scrollbar.js',
                 ASSETS_URL . 'js/plugins/tweenmax.js',
+                ASSETS_URL . 'js/plugins/scrollbar.js',
+                ASSETS_URL . 'js/components/global.min.js',
+                ASSETS_URL . 'js/plugins/createjs.min.js',
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
                 ASSETS_URL . 'js/pages/home.min.js',
