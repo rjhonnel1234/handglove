@@ -12784,7 +12784,7 @@ div#mCSB_1_container{
   }
 
   .main-header .header-top .right-info{
-    width: 100%;
+    /* width: 100%; */
   }
 
   .main-header .outer-box{
