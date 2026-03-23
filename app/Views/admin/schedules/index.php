@@ -4,37 +4,65 @@
 <div class="row">
     <div class="col-12">
         <div class="heading d-flex justify-content-between align-items-center mb-4">
-            <h2>Schedules Calendar</h2>
-            <div class="filter-wrapper" style="min-width: 300px;">
-                <select id="facility-filter" class="form-control selectpicker" data-live-search="true" data-title="Select Facility">
-                    <?php foreach ($facilities as $facility): ?>
-                        <option value="<?= $facility['id'] ?>"><?= esc($facility['company_name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-        </div>
-        
-        <div class="legend mb-4 d-flex align-items-center">
-            <span class="mr-3 font-weight-bold">Legend:</span>
-            <div class="d-flex align-items-center mr-4">
-                <span style="display:inline-block; width:15px; height:15px; background:#faf089; border-radius:3px; margin-right:5px; border:1px solid #ecc94b;"></span>
-                <span>Active Shift</span>
-            </div>
-            <div class="d-flex align-items-center">
-                <span style="display:inline-block; width:15px; height:15px; background:#9ae6b4; border-radius:3px; margin-right:5px; border:1px solid #48bb78;"></span>
-                <span>Call-out Replacement</span>
-            </div>
+            <h2>Schedules Management</h2>
         </div>
     </div>
 </div>
 
 <div class="row">
     <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                <div id="admin-schedules-calendar"></div>
+        <?php if (!empty($facilities)): ?>
+            <?php foreach ($facilities as $facility): ?>
+                <div class="facility-schedule-card mb-4 shadow-sm">
+                    <div class="row no-gutters">
+                        <div class="col-md-3 facility-info p-4 d-flex flex-column justify-content-center border-right">
+                            <div class="text-center mb-3">
+                                <img src="<?= $facility['company_logo'] ?: base_url('assets/img/logo-placeholder.png') ?>" alt="Logo" class="facility-logo mb-2">
+                                <h5 class="mb-1 font-weight-bold"><?= esc($facility['company_name']) ?></h5>
+                            </div>
+                            <div class="small text-muted mb-2">
+                                <i class="fas fa-map-marker-alt mr-1 text-primary"></i> <?= esc($facility['company_address']) ?> <?= esc($facility['zip_code']) ?>
+                            </div>
+                            <div class="small text-muted">
+                                <i class="fas fa-phone mr-1 text-primary"></i> <?= esc($facility['company_number']) ?>
+                            </div>
+                        </div>
+                        <div class="col-md-9 p-4 bg-light">
+                            <div class="schedule-grid">
+                                <?php foreach ($dates as $index => $date): ?>
+                                    <?php 
+                                        $count = $shift_counts[$facility['id']][$date] ?? 0;
+                                        $isToday = $date == date('Y-m-d');
+                                        $isWeekend = in_array(date('N', strtotime($date)), [6, 7]);
+                                    ?>
+                                    <?php if ($index == 13): // 14th slot replaced by "More" ?>
+                                        <a href="#" class="day-slot more-slot text-decoration-none d-flex flex-column align-items-center justify-content-center" data-facility-id="<?= $facility['id'] ?>">
+                                            <span class="font-weight-bold h5 mb-0">More</span>
+                                        </a>
+                                    <?php else: ?>
+                                        <div class="day-slot <?= $count > 0 ? 'has-shifts' : '' ?> <?= $isToday ? 'is-today' : '' ?> <?= $isWeekend && $count == 0 ? 'is-weekend' : '' ?>" 
+                                             data-date="<?= $date ?>" 
+                                             data-facility-id="<?= $facility['id'] ?>">
+                                            <div class="day-name"><?= date('D', strtotime($date)) ?></div>
+                                            <div class="date-label"><?= date('M d', strtotime($date)) ?></div>
+                                            <div class="shift-count"><?= $count > 0 ? $count . ' appts' : 'No appts' ?></div>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
+            <div class="pagination-wrapper mt-4">
+                <?= $pager->links('default', 'admin_full') ?>
             </div>
-        </div>
+        <?php else: ?>
+            <div class="alert alert-info py-4 text-center shadow-sm">
+                <i class="fas fa-info-circle mr-2"></i> No facilities found.
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -68,6 +96,9 @@
                             <!-- Supervisors will be injected here -->
                         </div>
                     </div>
+                    <div id="shifts-list-container" class="px-4 pb-4">
+                        <!-- Shifts list will be injected here -->
+                    </div>
                 </div>
             </div>
             <div class="modal-footer border-0">
@@ -78,65 +109,88 @@
 </div>
 
 <style>
-    #admin-schedules-calendar {
-        min-height: 700px;
+    .facility-schedule-card {
         background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
     }
-    .fc-event {
+    .facility-logo {
+        max-width: 100%;
+        max-height: 80px;
+        object-fit: contain;
+    }
+    .schedule-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 12px;
+    }
+    .day-slot {
+        background: #fff;
+        border-radius: 6px;
+        padding: 10px 5px;
+        text-align: center;
+        transition: all 0.2s ease;
         cursor: pointer;
-        padding: 2px 5px;
-        border-radius: 4px;
-        font-size: 0.85em;
+        min-height: 90px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border: 1px solid #edf2f7;
     }
-    .fc-toolbar-title {
-        font-size: 1.5rem !important;
+    .day-slot:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-color: #cbd5e0;
+    }
+    .day-slot.has-shifts {
+        background: #fff9c4; /* Match mockup yellow */
+        border-color: #fdd835;
+    }
+    .day-slot.is-today {
+        border: 2px solid #4299e1;
+    }
+    .day-slot.is-weekend {
+        background: #f8fafc;
+        color: #94a3b8;
+    }
+    .day-slot.is-weekend .date-label {
+        color: #94a3b8;
+    }
+    .day-name {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #718096;
+        text-transform: capitalize;
+        margin-bottom: 2px;
+    }
+    .date-label {
+        font-size: 0.85rem;
         font-weight: 700;
         color: #2d3748;
+        margin-bottom: 8px;
     }
-    .fc-button-primary {
-        background-color: #3182ce !important;
-        border-color: #3182ce !important;
-    }
-    .fc-button-primary:hover {
-        background-color: #2b6cb0 !important;
-        border-color: #2b6cb0 !important;
-    }
-    .fc .fc-daygrid-day-frame {
-        background: #f3efef;
-    }
-    .shift-detail-card {
-        border-left: 4px solid #3182ce;
-        transition: transform 0.2s;
-    }
-    .shift-detail-card:hover {
-        transform: translateY(-2px);
-    }
-    .clinician-pill {
-        font-size: 0.8rem;
-        padding: 4px 10px;
-        background: #ebf8ff;
-        color: #2b6cb0;
-        border-radius: 20px;
-        border: 1px solid #bee3f8;
-        display: inline-block;
-        margin-right: 5px;
-        margin-bottom: 5px;
-    }
-    .clinician-pill.external {
-        background: #f0fff4;
-        color: #2f855a;
-        border-color: #c6f6d5;
-    }
-    .status-badge {
+    .shift-count {
         font-size: 0.75rem;
-        padding: 2px 8px;
-        border-radius: 4px;
-        text-transform: uppercase;
-        font-weight: 700;
+        font-weight: 600;
+        color: #718096;
     }
+    .has-shifts .shift-count {
+        color: #b7791f;
+    }
+    .more-slot {
+        border: 2px solid #2d3748;
+        color: #2d3748;
+    }
+    .more-slot:hover {
+        background: #f7fafc;
+        color: #1a202c;
+    }
+
     .scheduler-profile-img {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid #fff;
@@ -147,91 +201,64 @@
         justify-content: flex-start;
         align-items: center;
         margin-bottom: 0.75rem;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
     .supervisor-info-col {
-        min-width: 150px;
+        min-width: 140px;
     }
-    .supervisor-info-col.time { min-width: 100px; }
-    .supervisor-info-col.phone { min-width: 150px; }
-    .supervisor-info-col.email { min-width: 200px; }
+    .shift-detail-card {
+        border-left: 4px solid #3182ce;
+        background: #fff;
+        margin-bottom: 10px;
+        padding: 15px;
+        border-radius: 0 8px 8px 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
 </style>
 <?php echo $this->endSection() ?>
 
 <?php echo $this->section('customJS') ?>
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('admin-schedules-calendar');
-        var facilityFilter = document.getElementById('facility-filter');
+    $(document).ready(function() {
+        $('.day-slot:not(.more-slot)').on('click', function() {
+            var date = $(this).data('date');
+            var facilityId = $(this).data('facility-id');
+            
+            if (!date || !facilityId) return;
 
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            selectable: true,
-            fixedWeekCount: false,
-            dayMaxEvents: true,
-            themeSystem: 'bootstrap',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth'
-            },
-            events: {
-                url: '<?= base_url('admin/schedules/list') ?>',
+            $('#modal-date-display').text('...');
+            $('#modal-loading').show();
+            $('#modal-content').hide();
+            $('#shiftDetailsModal').modal('show');
+
+            $.ajax({
+                url: '<?= base_url('admin/schedules/details') ?>',
                 method: 'POST',
-                extraParams: function() {
-                    return {
-                        facility_id: facilityFilter.value
-                    };
+                data: {
+                    date: date,
+                    facility_id: facilityId
                 },
-                failure: function() {
-                    alert('There was an error while fetching events!');
-                }
-            },
-            eventContent: function (info) {
-                console.info(info);
-                return { html: info.event.extendedProps.html };
-            },
-            eventClick: function(info) {
-                var date = info.event.extendedProps.date;
-                if (!date) return;
-
-                $('#modal-date-display').text('...');
-                $('#modal-loading').show();
-                $('#modal-content').hide();
-                $('#shiftDetailsModal').modal('show');
-
-                $.ajax({
-                    url: '<?= base_url('admin/schedules/details') ?>',
-                    method: 'POST',
-                    data: {
-                        date: date,
-                        facility_id: facilityFilter.value
-                    },
-                    success: function(res) {
-                        if (res.success) {
-                            $('#modal-date-display').text(res.date);
-                            renderShiftDetails(res);
-                        } else {
-                            alert(res.message || 'Failed to fetch details');
-                            $('#shiftDetailsModal').modal('hide');
-                        }
-                    },
-                    error: function() {
-                        alert('Network error while fetching details');
+                success: function(res) {
+                    if (res.success) {
+                        $('#modal-date-display').text(res.date);
+                        renderShiftDetails(res);
+                    } else {
+                        alert(res.message || 'Failed to fetch details');
                         $('#shiftDetailsModal').modal('hide');
                     }
-                });
-            },
-            eventDidMount: function(info) {
-                // Add tooltip or custom styling if needed
-            }
+                },
+                error: function() {
+                    alert('Network error while fetching details');
+                    $('#shiftDetailsModal').modal('hide');
+                }
+            });
         });
 
-        calendar.render();
-
-        facilityFilter.addEventListener('change', function() {
-            calendar.refetchEvents();
+        $('.more-slot').on('click', function(e) {
+            e.preventDefault();
+            // Optional: Redirect to a full calendar for this facility
+            var facilityId = $(this).data('facility-id');
+            alert('Opening full calendar for facility #' + facilityId);
         });
 
         function renderShiftDetails(data) {
@@ -248,7 +275,7 @@
                             <img src="<?= base_url('assets/img/blank-img.png') ?>" class="scheduler-profile-img mr-3" alt="Scheduler">
                             <div>
                                 <div class="mb-0"><span class="font-weight-bold">Scheduler:</span> ${s.first_name} ${s.last_name}</div>
-                                <div class="mb-0"><span class="font-weight-bold">Phone:</span> &nbsp;&nbsp;&nbsp; ${s.contact_number || 'N/A'}</div>
+                                <div class="mb-0 small"><span class="font-weight-bold">Phone:</span> ${s.contact_number || 'N/A'}</div>
                             </div>
                         </div>
                     `;
@@ -265,8 +292,8 @@
                     supHtml += `
                         <div class="supervisor-item">
                             <div class="supervisor-info-col font-weight-bold text-dark">${sup.name} ${sup.time ? `<span class="font-weight-normal text-muted ml-1">${sup.time}</span>` : ''}</div>
-                            <div class="supervisor-info-col phone text-muted">${sup.phone || ''}</div>
-                            <div class="supervisor-info-col email text-muted">${sup.email || ''}</div>
+                            <div class="supervisor-info-col text-muted">${sup.phone || ''}</div>
+                            <div class="supervisor-info-col text-muted">${sup.email || ''}</div>
                         </div>
                     `;
                 });
@@ -274,6 +301,36 @@
                 $('#supervisor-section').show();
             } else {
                 $('#supervisor-section').hide();
+            }
+
+            // Render Shifts
+            var shiftsHtml = '';
+            if (shifts && shifts.length > 0) {
+                shifts.forEach(function(shift) {
+                    var cliniciansHtml = '';
+                    if (shift.clinicians && shift.clinicians.length > 0) {
+                        shift.clinicians.forEach(function(c) {
+                            cliniciansHtml += `<span class="badge badge-info mr-1">${c.display_name}</span>`;
+                        });
+                    } else {
+                        cliniciansHtml = '<span class="text-muted small">No clinicians assigned</span>';
+                    }
+
+                    shiftsHtml += `
+                        <div class="shift-detail-card">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h6 class="font-weight-bold mb-0">${shift.unit_name || 'General Unit'}</h6>
+                                <span class="badge badge-primary">${shift.shift_start_time} - ${shift.shift_end_time}</span>
+                            </div>
+                            <div class="clinicians-assigned">
+                                ${cliniciansHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+                $('#shifts-list-container').html(shiftsHtml);
+            } else {
+                $('#shifts-list-container').html('<div class="text-center p-3 text-muted">No shifts found for this date.</div>');
             }
 
             $('#modal-content').fadeIn();
