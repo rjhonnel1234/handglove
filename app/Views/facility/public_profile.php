@@ -115,7 +115,7 @@
                     <strong>Accepted Per Diem</strong>
                     <div class="mt-2">
                         <?php if(!empty($onboardingSettings['accepted_per_diem_network'])){ ?>
-                            <?php foreach($onboardingSettings['accepted_per_diem_network'] as $network){ ?>
+                            <?php foreach($onboardingSettings['accepted_per_diem_network'] as $network => $networkData){ ?>
                                 <span class="badge badge-light border rounded-pill px-3 py-2 mr-2 mb-2"><?= $network ?></span>
                             <?php } ?>
                         <?php } else { ?>

@@ -8,6 +8,7 @@ $routes->group("facility", ["namespace" => "App\Controllers"], function ($routes
     $routes->get('profile/(:num)', 'Facility::profile/$1');
     $routes->get('profile/(:num)/onboarding/(:num)/pdf', 'Facility::onboarding_pdf/$1/$2');
     $routes->get('profile/(:num)/onboarding/(:num)', 'Facility::onboarding/$1/$2');
+    $routes->post('vote', 'Facility::vote');
     $routes->post('get_reviews', 'Facility::get_reviews');
 
     $routes->group("schedules", ['namespace' => 'App\Controllers\Facility'], function ($routes) {
@@ -51,6 +52,8 @@ $routes->group("facility", ["namespace" => "App\Controllers"], function ($routes
             $routes->post('add', 'Votes::insert');
             $routes->post('update', 'Votes::update');
             $routes->post('delete', 'Votes::delete');
+            $routes->post('get_clinicians_by_week', 'Votes::get_clinicians_by_week');
+            $routes->post('generate_certificate', 'Votes::generate_certificate');
         });
 
         $routes->group("jobs", function ($routes) {

@@ -6,6 +6,9 @@ class Home extends BaseController
 {
     public function index()
     {
+        $voteDetailsModel = new \App\Models\FacilityVoteDetailsModel();
+        $gnaWinners = $voteDetailsModel->getTopCliniciansLastWeek('gna', 2);
+        $nurseWinners = $voteDetailsModel->getTopCliniciansLastWeek('nurse', 2);
 
         // PAGE HEAD PROCESSING
         return view('components/header_v3', array(
@@ -35,7 +38,10 @@ class Home extends BaseController
                 COMPILED_ASSETS_PATH . 'css/pages/home'
             )
         ))
-        .view('home')
+        .view('home', [
+            'gna_winners' => $gnaWinners,
+            'nurse_winners' => $nurseWinners
+        ])
         .view('components/scripts_render', array(
             'scripts' => array(
                 'https://code.jquery.com/jquery-3.5.1.min.js' => array(

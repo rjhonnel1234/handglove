@@ -137,6 +137,7 @@
                 </div>
                 <div class="modal-body">
                     <form action="" id="unitUpdateForm">
+                        <input type="hidden" name="unitID" id="unitID">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -179,6 +180,9 @@
                             </div>
                         </div>
                     </form>
+                </div>
+                <div class="modal-footer" id="award-footer" style="display: none;">
+                    <button type="button" class="btn btn-primary" id="generateCertificate">Generate Certificate</button>
                 </div>
             </div>
         </div>

@@ -327,7 +327,7 @@
                                         </figure>
                                         <h4> Allied</h4>
                                     </div>
-                                    <div class="link"><a href="contract-hire.html">OT, PT, OT, ST </a></div>
+                                    <div class="link"><a href="contract-hire.html">OT, PT, ST </a></div>
                                 </div>
                                 <div class="overlay-content">
                                     <p>Explain to you how this idea denouncing pleasure & praising pain was born.
@@ -741,7 +741,7 @@
                                             </div>
                                         </figure>
                                         <div class="lower-content">
-                                            <h3><a href="index.html">Mrs Jennifer </a></h3>
+                                            <h3><a href="index.html">Jennifer Mercene</a></h3>
                                             <span class="designation">Operational Manager </span>
                                         </div>
                                     </div>
@@ -817,32 +817,24 @@
                 <div class="row clearfix">
                     <div class="col-lg-4 col-md-12 col-sm-12 inner-column">
                         <div class="inner-block">
-                            <div class="single-award-block">
-                                <div class="inner-box">
-                                    <div class="upper-box">
-                                        <figure class="icon-box"><img src="assets/img/icons/icon-19.png" alt="">
-                                        </figure>
-                                        <h3>Best of Staffing Talent Award</h3>
+
+                            <?php if (!empty($gna_winners)): ?>
+                                <?php foreach ($gna_winners as $winner): ?>
+                                <div class="single-award-block">
+                                    <div class="inner-box">
+                                        <div class="upper-box">
+                                            <figure class="icon-box"><img src="assets/img/icons/icon-19.png" alt="">
+                                            </figure>
+                                            <h3>GNA of<br>the Week</h3>
+                                        </div>
+                                        <ul class="lower-box">
+                                            <li><span><?php echo $winner['name']; ?></li>
+                                            <li><span>Award by</span>:<?php echo $winner['company_name']; ?></li>
+                                        </ul>
                                     </div>
-                                    <ul class="lower-box">
-                                        <li><span>Year</span>:2009-2010</li>
-                                        <li><span>Award by</span>:Los Vegas Business Time</li>
-                                    </ul>
                                 </div>
-                            </div>
-                            <div class="single-award-block">
-                                <div class="inner-box">
-                                    <div class="upper-box">
-                                        <figure class="icon-box"><img src="assets/img/icons/icon-19.png" alt="">
-                                        </figure>
-                                        <h3>Best Companies to Work in Texas</h3>
-                                    </div>
-                                    <ul class="lower-box">
-                                        <li><span>Year</span>:2012-2013</li>
-                                        <li><span>Award by</span>:Sparks Group</li>
-                                    </ul>
-                                </div>
-                            </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-12 col-sm-12 image-column">
@@ -851,32 +843,26 @@
                     </div>
                     <div class="col-lg-4 col-md-12 col-sm-12 inner-column">
                         <div class="inner-block">
-                            <div class="single-award-block">
-                                <div class="inner-box">
-                                    <div class="upper-box">
-                                        <figure class="icon-box"><img src="assets/img/icons/icon-19.png" alt="">
-                                        </figure>
-                                        <h3>Fast Growing Staffing Firms</h3>
+                            <?php if (!empty($nurse_winners)): ?>
+                                <?php foreach ($nurse_winners as $winner): ?>
+                                <div class="single-award-block">
+                                    <div class="inner-box">
+                                        <div class="upper-box">
+                                            <figure class="icon-box"><img src="assets/img/icons/icon-19.png" alt="">
+                                            </figure>
+                                            <h3>Nurse of<br>the Week</h3>
+                                        </div>
+                                        <div class="d-flex align-items-center pb-3">
+                                            <img src="/assets/img/blank-img.png" alt="Member" class="winner-avatar mr-2">
+                                            <ul class="lower-box">    
+                                                <li><span><?php echo $winner['name']; ?></li>
+                                                <li><span>Award by:</span><?php echo $winner['company_name']; ?></li>
+                                            </ul>
+                                        </div>
                                     </div>
-                                    <ul class="lower-box">
-                                        <li><span>Year</span>:2015</li>
-                                        <li><span>Award by</span>:Dallas Association 100</li>
-                                    </ul>
                                 </div>
-                            </div>
-                            <div class="single-award-block">
-                                <div class="inner-box">
-                                    <div class="upper-box">
-                                        <figure class="icon-box"><img src="assets/img/icons/icon-19.png" alt="">
-                                        </figure>
-                                        <h3>Best of Staffing Client Satisfaction</h3>
-                                    </div>
-                                    <ul class="lower-box">
-                                        <li><span>Year</span>:2018-2019</li>
-                                        <li><span>Award by</span>:Forbes International</li>
-                                    </ul>
-                                </div>
-                            </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

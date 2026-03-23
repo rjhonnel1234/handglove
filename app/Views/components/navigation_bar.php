@@ -117,3 +117,33 @@
         </div><!-- /.container -->
     </nav><!-- /.main-nav-one -->
 </header>
+
+<div class="modal fade" id="minutesAwayModal" tabindex="-1" role="dialog" aria-labelledby="minutesAwayModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 350px;">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-warning text-dark border-0">
+                <h5 class="modal-title" id="minutesAwayModalLabel">
+                    <i class="fa fa-clock mr-2"></i>Estimated Arrival
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="form-group mb-0">
+                    <label for="minutes_away_input" class="d-block mb-3 text-muted">How many minutes away are you?</label>
+                    <div class="input-group">
+                        <input type="number" id="minutes_away_input" class="form-control form-control-lg text-center" value="30" min="1" max="240">
+                        <div class="input-group-append">
+                            <span class="input-group-text">mins</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-secondary w-100 mb-2" data-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmOnWayUpdate" class="btn btn-warning w-100 font-weight-bold">SEND UPDATE</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -203,8 +203,8 @@
             </div>
             <div id="profile-sidebar" class="col-lg-4 col-md-12 col-sm-12 col-12">
                 <h3>Overview</h3>
-                <div class="divider"></div>
-                <div class="sidebar-list-job mt-10">
+                <!-- <div class="divider"></div> -->
+                <!-- <div class="sidebar-list-job mt-10"> -->
                     <!-- <ul>
                         <li>
                             <div class="sidebar-icon-item"><i class="fa fa-briefcase"></i></div>
@@ -235,12 +235,31 @@
                             </div>
                         </li>
                     </ul> -->
-                </div>
-                <div class="divider"></div>
-                <div class="buttons">
+                <!-- </div> -->
+                <!-- <div class="divider"></div> -->
+                <div class="buttons mt-3">
                     <button class="btn thm-btn-secondary" data-toggle="modal" data-target="#uploadModal">Credentials</button>
                     <button class="btn thm-btn-white" data-toggle="modal" data-target="#availabilityModal">Availability</button>
                 </div>
+                <div class="divider"></div>
+                <div id="certificates">
+                    <h4>Certificates</h4>
+                    <div class="award-icons d-flex flex-wrap">
+                        <?php if(!empty($awards)){ ?>
+                            <?php foreach($awards as $award){ ?>                                
+                                <a href="<?php echo base_url('awards/pdf/' . $award['id']); ?>" target="_blank" title="Download Certificate">
+                                    <div class="award-item mr-3 mb-3 text-center" title="<?php echo $award['award_name'] . ' (' . date("M d, Y", strtotime($award['award_date'])) . ')'; ?>">
+                                        <i class="fa fa-medal fa-3x text-warning"></i>
+                                        <div class="small mt-1"><?php echo date("M Y", strtotime($award['award_date'])); ?></div>
+                                    </div>
+                                </a>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <p class="text-muted small">No voting certificates awarded yet.</p>
+                        <?php } ?>
+                    </div>
+                </div>
+                <div class="divider"></div>
                 <div id="connector">
                     <h4>Referrals</h4>
                     <?php if(!empty($referrals)){ ?>

@@ -102,6 +102,24 @@
                     <h5>Availability</h5>
                 </div>
                 <div class="divider"></div>
+
+                <div id="certificates">
+                    <h5>Certificates</h5>
+                    <div class="award-icons d-flex flex-wrap">
+                        <?php if(!empty($awards)){ ?>
+                            <?php foreach($awards as $award){ ?>
+                                <a href="<?php echo base_url('awards/pdf/' . $award['id']); ?>" target="_blank" title="Download Certificate">
+                                    <div class="award-item mr-3 mb-3 text-center" title="<?php echo $award['award_name'] . ' (' . date("M d, Y", strtotime($award['award_date'])) . ')'; ?>">
+                                        <i class="fa fa-medal fa-3x text-warning"></i>
+                                        <div class="small mt-1"><?php echo date("M Y", strtotime($award['award_date'])); ?></div>
+                                    </div>
+                                </a>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <p class="text-muted small">No voting certificates awarded yet.</p>
+                        <?php } ?>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

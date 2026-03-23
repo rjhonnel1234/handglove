@@ -24,8 +24,43 @@ class Schedules extends BaseController
         }
 
         $data = [];
-        $data['page_title'] = "Schedules";
-        $data['facilities'] = $this->facilityModel->orderBy('company_name', 'ASC')->findAll();
+        $data['page_title'] = "Schedules Management";
+
+        // Date range logic: last week (Monday) to this week (Sunday)
+        $startOfLastWeek = date('Y-m-d', strtotime('monday last week'));
+        $endOfThisWeek = date('Y-m-d', strtotime('sunday this week'));
+
+        // Generate the 14-day range
+        $dates = [];
+        $current = $startOfLastWeek;
+        while ($current <= $endOfThisWeek) {
+            $dates[] = $current;
+            $current = date('Y-m-d', strtotime($current . ' +1 day'));
+        }
+        $data['dates'] = $dates;
+
+        // Paginated facilities (3 per page)
+        $data['facilities'] = $this->facilityModel->orderBy('company_name', 'ASC')->paginate(3);
+        $data['pager'] = $this->facilityModel->pager;
+
+        // Shift counts for the facilities on the current page
+        $facilityIds = array_column($data['facilities'], 'id');
+        $shiftCounts = [];
+        if (!empty($facilityIds)) {
+            $db = \Config\Database::connect();
+            $results = $db->table('tbl_shifts')
+                ->select('client_id, start_date, COUNT(id) as shift_count')
+                ->whereIn('client_id', $facilityIds)
+                ->where('start_date >=', $startOfLastWeek)
+                ->where('start_date <=', $endOfThisWeek)
+                ->groupBy('client_id, start_date')
+                ->get()->getResultArray();
+
+            foreach ($results as $row) {
+                $shiftCounts[$row['client_id']][$row['start_date']] = $row['shift_count'];
+            }
+        }
+        $data['shift_counts'] = $shiftCounts;
 
         return view('admin/schedules/index', $data);
     }

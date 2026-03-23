@@ -20,6 +20,8 @@ use App\Libraries\Ciqrcode;
 use App\Models\UserModel;
 use \Datetime;
 use CodeIgniter\Files\File;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class Profile extends BaseController
 {
@@ -78,6 +80,9 @@ class Profile extends BaseController
                                             ->select('tbl_pay_stubs.*, tbl_payroll_periods.start_date as p_start, tbl_payroll_periods.end_date as p_end, tbl_payroll_periods.pay_date as p_pay')
                                             ->orderBy('tbl_payroll_periods.pay_date', 'DESC')
                                             ->findAll();
+
+            $awardModel = new \App\Models\ClinicianAwardsModel();
+            $data['awards'] = $awardModel->where('clinician_id', $data['profileData']['id'])->findAll();
 
             // PAGE HEAD PROCESSING
             return view('components/header', array(
@@ -175,6 +180,9 @@ class Profile extends BaseController
 
                 $objShifts = new ShiftsModel;
                 $data['job_history'] = $objShifts->getJobHistory($data['profileData']['id'], 3);
+
+                $awardModel = new \App\Models\ClinicianAwardsModel();
+                $data['awards'] = $awardModel->where('clinician_id', $data['profileData']['id'])->findAll();
 
                 // PAGE HEAD PROCESSING
                 return view('components/header', array(
@@ -712,5 +720,45 @@ class Profile extends BaseController
         ];
 
         return view('admin/payroll/pay_stub', $data);
+    }
+
+    public function generate_award_pdf($award_id)
+    {
+        $awardModel = new \App\Models\ClinicianAwardsModel();
+        $award = $awardModel->find($award_id);
+
+        if (!$award) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        $clinicianModel = new CliniciansModel();
+        $clinician = $clinicianModel->find($award['clinician_id']);
+
+        $facilityModel = new \App\Models\FacilityModel();
+        $facility = $facilityModel->find($award['client_id']);
+
+        $data = [
+            'award' => $award,
+            'clinician' => $clinician,
+            'facility' => $facility,
+        ];
+
+        $html = view('awards/certificate_pdf', $data);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'Helvetica');
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+
+        $filename = 'Certificate_' . str_replace(' ', '_', $clinician['name']) . '_' . $award['award_date'] . '.pdf';
+        
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="' . $filename . '"')
+            ->setBody($dompdf->output());
     }
 }

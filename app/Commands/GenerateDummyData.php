@@ -29,14 +29,16 @@ class GenerateDummyData extends BaseCommand
         $units = $unitModel->where('client_id', $clientId)->findAll();
         $unitIds = !empty($units) ? array_column($units, 'id') : [1];
 
-        $startDate = new DateTime('2026-03-01');
-        $endDate = new DateTime('2026-03-08');
+        $startDate = new DateTime('2026-03-09');
+        $endDate = new DateTime('2026-03-22');
 
         CLI::write("Generating dummy data for " . count($clinicians) . " clinicians...");
 
-        foreach ($clinicians as $clin) {
+        // foreach ($clinicians as $clin) {
             $currentDate = clone $startDate;
             while ($currentDate <= $endDate) {
+                $clinID = $clinicians[array_rand($clinicians)]['id'];
+
                 $dateStr = $currentDate->format('Y-m-d');
                 $shiftTypes = [
                     ['start' => '07:00:00', 'end' => '15:00:00', 'next_day' => false],
@@ -45,11 +47,11 @@ class GenerateDummyData extends BaseCommand
                 ];
                 $randomShift = $shiftTypes[array_rand($shiftTypes)];
 
-                $endDate = clone $currentDate;
+                $endDateShift = clone $currentDate;
                 if ($randomShift['next_day']) {
-                    $endDate->modify('+1 day');
+                    $endDateShift->modify('+1 day');
                 }
-                $endDateStr = $endDate->format('Y-m-d');
+                $endDateStr = $endDateShift->format('Y-m-d');
 
                 // Create Shift
                 $shiftData = [
@@ -69,7 +71,7 @@ class GenerateDummyData extends BaseCommand
                     // Assign Clinician
                     $shiftClinModel->insert([
                         'shift_id'     => $shiftId,
-                        'clinician_id' => $clin['id'],
+                        'clinician_id' => $clinID,
                         'client_id'    => $clientId,
                         'status'       => 10, // Accepted
                         'shift_status' => 0, // Not finished
@@ -78,7 +80,7 @@ class GenerateDummyData extends BaseCommand
                     // Punch In
                     $timekeepingModel->insert([
                         'shift_id'       => $shiftId,
-                        'clinician_id'   => $clin['id'],
+                        'clinician_id'   => $clinID,
                         'punch_datetime' => $dateStr . ' ' . $randomShift['start'],
                         'punch_type'     => 10,
                         'ip_address'     => '127.0.0.1',
@@ -87,7 +89,7 @@ class GenerateDummyData extends BaseCommand
                     // Punch Out
                     $timekeepingModel->insert([
                         'shift_id'       => $shiftId,
-                        'clinician_id'   => $clin['id'],
+                        'clinician_id'   => $clinID,
                         'punch_datetime' => $endDateStr . ' ' . $randomShift['end'],
                         'punch_type'     => 20,
                         'reference'      => 'DUMMY_DATA',
@@ -95,10 +97,10 @@ class GenerateDummyData extends BaseCommand
                     ]);
                 }
 
+                CLI::write("Done for date: " . $dateStr);
                 $currentDate->modify('+1 day');
             }
-            CLI::write("Done for clinician: " . $clin['name']);
-        }
+        // }
 
         CLI::write("Dummy data generation complete!", 'green');
     }

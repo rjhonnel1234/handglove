@@ -328,6 +328,7 @@ class Facility extends BaseController
                     ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                     ASSETS_URL . 'js/components/notifications.min.js',
                     ASSETS_URL . 'js/components/navigation_bar.min.js',
+                    ASSETS_URL . 'js/plugins/toastr.min.js',
                     ASSETS_URL . 'js/pages/facility_profile.min.js',
                 )
             ))
