@@ -54,48 +54,43 @@ $(document).ready(function () {
     const $facilitySelect = $('#client_ids');
     const $pccWrapper = $('#pcc-fields-wrapper');
     const $pccContainer = $('.pcc-credentials-container');
+    const clinicianId = $form.data('clinician-id');
 
     $facilitySelect.on('change', function () {
-        const selectedOptions = $(this).find('option:selected');
-        const selectedIds = selectedOptions.map(function () { return $(this).val(); }).get();
+        const selectedId = $(this).val();
+        const selectedName = $(this).find('option:selected').text();
 
-        if (selectedIds.length > 0) {
+        if (selectedId) {
             $pccContainer.show();
+            $('.pcc-facility-name').text(selectedName);
+
+            // Clear fields first
+            $('#pcc_username').val('').attr('name', `pcc[${selectedId}][username]`);
+            $('#pcc_password').val('').attr('name', `pcc[${selectedId}][password]`);
+
+            if (clinicianId) {
+                // Fetch credentials via AJAX
+                $.ajax({
+                    url: `${$form.data('base-url')}admin/clinicians/get-pcc-credentials`,
+                    type: 'GET',
+                    data: {
+                        clinician_id: clinicianId,
+                        facility_id: selectedId
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            $('#pcc_username').val(response.data.username);
+                            $('#pcc_password').val(response.data.password);
+                        }
+                    }
+                });
+            }
         } else {
             $pccContainer.hide();
+            $('#pcc_username').attr('name', '');
+            $('#pcc_password').attr('name', '');
         }
-
-        // Add missing rows
-        selectedOptions.each(function () {
-            const id = $(this).val();
-            const name = $(this).text();
-
-            if ($pccWrapper.find(`[data-facility-id="${id}"]`).length === 0) {
-                const html = `
-                    <div class="pcc-facility-row mb-3 pb-2 border-bottom" data-facility-id="${id}">
-                        <div class="row g-2">
-                            <div class="col-12 mb-2">
-                                <label class="small text-muted">PCC Username</label>
-                                <input type="text" name="pcc[${id}][username]" class="form-control form-control-sm" placeholder="Username">
-                            </div>
-                            <div class="col-12">
-                                <label class="small text-muted">PCC Password</label>
-                                <input type="password" name="pcc[${id}][password]" class="form-control form-control-sm" placeholder="Password">
-                            </div>
-                        </div>
-                    </div>
-                `;
-                $pccWrapper.append(html);
-            }
-        });
-
-        // Remove unselected rows
-        $pccWrapper.find('.pcc-facility-row').each(function () {
-            const id = $(this).data('facility-id').toString();
-            if (!selectedIds.includes(id)) {
-                $(this).remove();
-            }
-        });
     });
 
     // Company Work Dynamic Handling
@@ -103,7 +98,7 @@ $(document).ready(function () {
     $('#add-company-work').on('click', function () {
         const html = `
             <div class="row mb-2 pb-2 border-bottom company-work-row">
-                <div class="col-md-4 pl-0">
+                <div class="col-md-4">
                     <input type="text" name="company_work[${companyWorkIndex}][company_name]" class="form-control form-control-sm" placeholder="Company Name">
                 </div>
                 <div class="col-md-3 pl-0">
@@ -135,8 +130,56 @@ $(document).ready(function () {
         }
     }
 
+    // Handglove User Access Toggle
+    $('#create_clinician_access').on('change', function () {
+        if ($(this).is(':checked')) {
+            $('#handglove-user-access').slideDown();
+            // Sync email to username if username is empty
+            const email = $('input[name="email"]').val();
+            if (email && !$('input[name="handglove_username"]').val()) {
+                $('input[name="handglove_username"]').val(email);
+            }
+        } else {
+            $('#handglove-user-access').slideUp();
+        }
+    });
+
+    $('input[name="email"]').on('keyup change', function () {
+        if ($('#create_clinician_access').is(':checked')) {
+            $('input[name="handglove_username"]').val($(this).val());
+        }
+    });
+
     // Initial check
     updateCompanyRemoveButtons();
+    $facilitySelect.trigger('change');
+
+    $(document).on('click', '.toggle-user-access', function () {
+        const userId = $(this).data('user-id');
+        const status = $(this).data('status');
+        const $btn = $(this);
+
+        if (confirm(`Are you sure you want to ${status == 1 ? 'activate' : 'deactivate'} this user access?`)) {
+            $.ajax({
+                url: `${$form.data('base-url')}admin/clinicians/toggle-user-status`,
+                type: 'POST',
+                data: {
+                    user_id: userId,
+                    status: status,
+                    [csrfToken]: csrfHash
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        toastr.success(response.message);
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                }
+            });
+        }
+    });
 
     // Form submission
     $form.on('submit', function (e) {

@@ -29,6 +29,7 @@ class InitialDataSeeder extends Seeder
             ['id' => 5, 'name' => 'Scheduler', 'description' => ''],
             ['id' => 6, 'name' => 'Unit Manager', 'description' => ''],
             ['id' => 7, 'name' => 'Staff', 'description' => ''],
+            ['id' => 10, 'name' => 'Clinician', 'description' => ''],
         ];
         $this->db->table('tbl_user_types')->insertBatch($userTypes);
 

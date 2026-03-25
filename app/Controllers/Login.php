@@ -154,7 +154,7 @@ class Login extends BaseController
                 ASSETS_URL . 'js/plugins/popper.min.js',
                 ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
                 ASSETS_URL . 'js/components/global.min.js',
-                ASSETS_URL . 'js/plugins/jquery.validate.min.js',
+                ASSETS_URL . 'js/plugins/jquery.validate.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
                 ASSETS_URL . 'js/pages/reset_password.min.js',
             )
@@ -181,7 +181,7 @@ class Login extends BaseController
                     $this->user->where('id', $tokens[1])->set(['password' => password_hash($password, PASSWORD_DEFAULT), 'token_active' => 0])->update();
     
                     $data['success'] = 1;
-                    $data['message'] = '<div id="reg-form"><div class="fields"><h3>Change password successful</h3><p>Your password has been reset. You can now sign-in <a href="'.base_url('login').'">here.</a></p></div></div>';
+                    $data['message'] = '<div id="reg-form"><div class="fields"><h3>Change password successful</h3><p class="text-center">Your password has been reset.<br>You can now sign-in <a href="'.base_url('login').'">here.</a></p></div></div>';
                 }else{
                     $data['message'] = 'The reset password link is either invalid or already expired.';
                 }

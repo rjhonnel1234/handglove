@@ -52,7 +52,7 @@ class AdminMenu extends BaseConfig
         'Settings' => [
             [
                 'title' => 'Clinician Types',
-                'url'   => 'admin/donors',
+                'url'   => 'admin/clinician-types',
                 'icon'  => 'fa fa-user-nurse'
             ],
             [

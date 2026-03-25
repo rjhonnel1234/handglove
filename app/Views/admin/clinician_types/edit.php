@@ -3,21 +3,31 @@
 <?= $this->section('content') ?>
 <div class="container-fluid px-4">
     <div class="heading mb-4">
-        <h2>Agencies</h2>
-        <div class="kicker-bottom">Add New Agency</div>
+        <h2>Clinician Types</h2>
+        <div class="kicker-bottom">Edit Clinician Type</div>
     </div>
 
     <div class="row">
         <div class="col-lg-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <form id="agency-form" action="<?= base_url('admin/agencies/store') ?>" method="post">
+                    <form id="clinician-type-form" action="<?= base_url('admin/clinician-types/update/' . $clinician_type['id']) ?>" method="post">
                         <?= csrf_field() ?>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label class="form-label fw-bold">Agency Name</label>
-                                    <input type="text" name="name" class="form-control" placeholder="Enter agency name" required>
+                                    <label class="form-label fw-bold">Name</label>
+                                    <input type="text" name="name" class="form-control" value="<?= esc($clinician_type['name']) ?>" placeholder="Enter type name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">Grouping</label>
+                                    <select name="grouping" class="form-select form-control selectpicker" required>
+                                        <option value="">Select Grouping</option>
+                                        <option value="gna" <?= $clinician_type['grouping'] == 'gna' ? 'selected' : '' ?>>GNA</option>
+                                        <option value="nurse" <?= $clinician_type['grouping'] == 'nurse' ? 'selected' : '' ?>>Nurse</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -25,7 +35,7 @@
                             <div class="col-md-8">
                                 <div class="form-group mb-3">
                                     <label class="form-label fw-bold">Description</label>
-                                    <textarea name="description" class="form-control" rows="4" placeholder="Optional description"></textarea>
+                                    <textarea name="description" class="form-control" rows="4" placeholder="Optional description"><?= esc($clinician_type['description']) ?></textarea>
                                 </div>
                             </div>
                         </div>
@@ -35,16 +45,16 @@
                                 <div class="form-group mb-4">
                                     <label class="form-label fw-bold">Status</label>
                                     <select name="status" class="form-select form-control selectpicker">
-                                        <option value="1">Active</option>
-                                        <option value="0">Inactive</option>
+                                        <option value="1" <?= $clinician_type['status'] == 1 ? 'selected' : '' ?>>Active</option>
+                                        <option value="0" <?= $clinician_type['status'] == 0 ? 'selected' : '' ?>>Inactive</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" class="btn thm-btn px-4 mr-2">Create Agency</button>
-                            <a href="<?= base_url('admin/agencies') ?>" class="btn btn-outline-secondary px-4">Cancel</a>
+                            <button type="submit" class="btn thm-btn px-4 mr-2">Update Clinician Type</button>
+                            <a href="<?= base_url('admin/clinician-types') ?>" class="btn btn-outline-secondary px-4">Cancel</a>
                         </div>
                     </form>
                 </div>
@@ -57,12 +67,12 @@
 <?= $this->section('customJS') ?>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#agency-form').on('submit', function(e) {
+        $('#clinician-type-form').on('submit', function(e) {
             e.preventDefault();
             const $form = $(this);
             const $btn = $form.find('button[type="submit"]');
             
-            $btn.prop('disabled', true).text('Saving...');
+            $btn.prop('disabled', true).text('Updating...');
 
             $.ajax({
                 url: $form.attr('action'),
@@ -82,12 +92,12 @@
                         } else {
                             toastr.error(response.message || 'Validation failed');
                         }
-                        $btn.prop('disabled', false).text('Create Agency');
+                        $btn.prop('disabled', false).text('Update Clinician Type');
                     }
                 },
                 error: function() {
                     toastr.error('An error occurred. Please try again.');
-                    $btn.prop('disabled', false).text('Create Agency');
+                    $btn.prop('disabled', false).text('Update Clinician Type');
                 }
             });
         });

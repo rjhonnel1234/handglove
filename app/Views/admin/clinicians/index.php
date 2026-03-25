@@ -2,8 +2,11 @@
 
 <?= $this->section('content') ?>
 <div class="container-fluid px-4">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800"><?= $page_title ?></h1>
+    <div class="heading d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Clinicians</h2>
+            <div class="kicker-bottom">Manage Clinicians</div>
+        </div>
         <a href="<?= base_url('admin/clinicians/create') ?>" class="btn thm-btn d-flex align-items-center">
             <i class="fas fa-plus me-2"></i>&nbsp;&nbsp;Add Clinician
         </a>
@@ -11,6 +14,19 @@
 
     <div class="card shadow mb-4">
         <div class="card-body">
+
+            <?php if(session()->getFlashdata('message')):?>
+                <div class="alert alert-success">
+                    <?= session()->getFlashdata('message') ?>
+                </div>
+            <?php endif;?>
+
+            <?php if(session()->getFlashdata('error')):?>
+                <div class="alert alert-danger">
+                    <?= session()->getFlashdata('error') ?>
+                </div>
+            <?php endif;?>
+
             <div class="table-responsive">
                 <table class="table table-hover align-middle" id="cliniciansTable" width="100%" cellspacing="0">
                     <thead class="table-light">

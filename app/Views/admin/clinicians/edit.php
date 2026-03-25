@@ -15,6 +15,7 @@
         data-csrf-hash="<?= csrf_hash() ?>"
         data-base-url="<?= base_url() ?>"
         data-existing-image="<?= $clinician['profile_pic_url'] ?>"
+        data-clinician-id="<?= $clinician['id'] ?>"
         enctype="multipart/form-data">
         <?= csrf_field() ?>
         <input type="hidden" name="profile_pic_path" id="profile_pic_path">
@@ -175,15 +176,39 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-12 border-end">
-                                <div class="mb-2">
-                                    <label class="small text-muted">Username</label>
-                                    <input type="text" name="handglove_username" class="form-control form-control-sm" value="">
-                                </div>
-                                <div>
-                                    <label class="small text-muted">Password</label>
-                                    <input type="password" name="handglove_password" class="form-control form-control-sm" value="">
-                                </div>
+                            <div class="col-md-12">
+                                <?php if ($user_record): ?>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <label class="small text-muted d-block mb-0">User Access Status</label>
+                                            <span class="badge <?= $user_record['status'] == 1 ? 'bg-success' : 'bg-danger' ?> text-white">
+                                                <?= $user_record['status'] == 1 ? 'Active' : 'Inactive' ?>
+                                            </span>
+                                        </div>
+                                        <button type="button" 
+                                            class="btn btn-sm <?= $user_record['status'] == 1 ? 'btn-outline-danger' : 'btn-outline-success' ?> toggle-user-access" 
+                                            data-user-id="<?= $user_record['id'] ?>" 
+                                            data-status="<?= $user_record['status'] == 1 ? 0 : 1 ?>">
+                                            <?= $user_record['status'] == 1 ? 'Deactivate Access' : 'Activate Access' ?>
+                                        </button>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="small text-muted">Reset Password</label>
+                                        <input type="password" name="handglove_password" class="form-control form-control-sm" placeholder="Leave blank to keep current">
+                                    </div>
+                                <?php else: ?>
+                                    <div class="alert alert-info py-2 small">
+                                        No Handglove user account found for this clinician.
+                                    </div>
+                                    <div class="form-group mb-1 d-flex align-items-center">
+                                        <input type="checkbox" name="create_clinician_access" id="create_clinician_access" class="form-check-input" style="margin-left: 0; display: block; position: relative; margin-top: 0; margin-right: 10px; margin-bottom: .5rem;">
+                                        <label class="form-label fw-bold">Create User Access</label>
+                                    </div>
+                                    <div id="handglove-user-access" style="display: none;">
+                                        <label class="small text-muted">Initial Password</label>
+                                        <input type="password" name="handglove_password" class="form-control form-control-sm">
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -195,39 +220,30 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
+                            <?php $selectedFacilities = array_keys($pcc_credentials ?? []); ?>
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label class="form-label fw-bold">Facility</label>
-                                    <select name="client_ids[]" id="client_ids" class="form-select form-control selectpicker" data-title="Select Facility">
+                                    <select id="client_ids" class="form-select form-control selectpicker" data-title="Select Facility">
                                         <?php foreach($facilities as $facility): ?>
-                                            <option value="<?= $facility['id'] ?>"><?= $facility['company_name'] ?></option>
+                                            <option value="<?= $facility['id'] ?>" <?= in_array($facility['id'], $selectedFacilities) ? 'selected' : '' ?>><?= $facility['company_name'] ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-12 pcc-credentials-container" style="display: none;">
                                 <div id="pcc-fields-wrapper">
-                                    <?php 
-                                    $selectedFacilities = explode(',', $clinician['client_ids'] ?? ''); 
-                                    foreach($facilities as $facility): 
-                                        if (in_array($facility['id'], $selectedFacilities)):
-                                            $creds = $pcc_credentials[$facility['id']] ?? ['username' => '', 'password' => ''];
-                                    ?>
-                                        <div class="pcc-facility-row mb-3 pb-2 border-bottom" data-facility-id="<?= $facility['id'] ?>">
-                                            <div class="small fw-bold mb-1 text-truncate"><?= $facility['company_name'] ?></div>
-                                            <div class="row g-2">
-                                                <div class="col-6">
-                                                    <input type="text" name="pcc[<?= $facility['id'] ?>][username]" class="form-control form-control-sm" placeholder="Username" value="<?= esc($creds['username']) ?>">
-                                                </div>
-                                                <div class="col-6">
-                                                    <input type="password" name="pcc[<?= $facility['id'] ?>][password]" class="form-control form-control-sm" placeholder="Password" value="<?= esc($creds['password']) ?>">
-                                                </div>
+                                    <div class="pcc-facility-row mb-3 pb-2 border-bottom">
+                                        <div class="small fw-bold mb-1 text-truncate pcc-facility-name"></div>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <input type="text" id="pcc_username" name="" class="form-control form-control-sm" placeholder="Username">
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="password" id="pcc_password" name="" class="form-control form-control-sm" placeholder="Password">
                                             </div>
                                         </div>
-                                    <?php 
-                                        endif;
-                                    endforeach; 
-                                    ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>

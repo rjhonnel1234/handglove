@@ -158,17 +158,23 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-
-                            <div class="col-md-12 border-end mb-4">
-                                <div class="mb-2">
-                                    <label class="small text-muted">Username</label>
-                                    <input type="text" name="handglove_username" class="form-control form-control-sm">
+                            <!-- add checkbox for "Create Handglove Clinician Access" -->
+                            <div class="col-md-12">
+                                <div class="form-group mb-1 d-flex align-items-center">
+                                    <input type="checkbox" name="create_clinician_access" id="create_clinician_access" class="form-check-input" style="margin-left: 0; display: block; position: relative; margin-top: 0; margin-right: 10px; margin-bottom: .5rem;">
+                                    <label class="form-label fw-bold">Create User Access</label>
                                 </div>
+                            </div>
+                            
+                            
+                            <div id="handglove-user-access" class="col-md-12 border-end mb-4" style="display: none;">
                                 <div>
                                     <label class="small text-muted">Password</label>
                                     <input type="password" name="handglove_password" class="form-control form-control-sm">
                                 </div>
                             </div>
+
+                            
                         </div>
 
 
@@ -184,7 +190,7 @@
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label class="form-label fw-bold">Facility</label>
-                                    <select name="client_ids[]" id="client_ids" class="form-select form-control selectpicker" data-title="Select Facility">
+                                    <select id="client_ids" class="form-select form-control selectpicker" data-title="Select Facility">
                                         <?php foreach($facilities as $facility): ?>
                                             <option value="<?= $facility['id'] ?>"><?= $facility['company_name'] ?></option>
                                         <?php endforeach; ?>
@@ -193,7 +199,17 @@
                             </div>
                             <div class="col-md-12 pcc-credentials-container" style="display: none;">
                                 <div id="pcc-fields-wrapper">
-                                    <!-- Dynamic fields will be injected here -->
+                                    <div class="pcc-facility-row mb-3 pb-2 border-bottom">
+                                        <div class="small fw-bold mb-1 text-truncate pcc-facility-name"></div>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <input type="text" id="pcc_username" name="" class="form-control form-control-sm" placeholder="Username">
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="password" id="pcc_password" name="" class="form-control form-control-sm" placeholder="Password">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -204,7 +220,7 @@
 
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-primary px-4">Create Clinician</button>
+                <button type="submit" class="btn thm-btn px-4 mr-2">Create Clinician</button>
                 <a href="<?= base_url('admin/clinicians') ?>" class="btn btn-outline-secondary px-4">Reset</a>
             </div>
         </div>

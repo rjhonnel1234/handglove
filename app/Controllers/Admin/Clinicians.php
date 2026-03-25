@@ -89,7 +89,7 @@ class Clinicians extends BaseController
             'rate'           => $this->request->getPost('rate'),
             'agencies'      => implode(",",$this->request->getPost('agencies')),
             'company_worked' => addslashes(serialize($this->request->getPost('company_work') ?: [])),
-            'handglove_username' => $this->request->getPost('handglove_username'),
+            'handglove_username' => $this->request->getPost('email'),
             'handglove_password' => $this->request->getPost('handglove_password'),
         ];
 
@@ -108,6 +108,35 @@ class Clinicians extends BaseController
         }
 
         $clinician_id = $model->insert($data);
+
+        // Create Handglove User Access if requested
+        if ($this->request->getPost('create_clinician_access')) {
+            $userModel = new UserModel();
+            $userData = [
+                'email'    => $data['email'],
+                'password' => password_hash($data['handglove_password'], PASSWORD_DEFAULT),
+                'first_name' => $data['name'], // Or split name if needed, but 'name' is used in clinicians
+                'status'   => 1,
+                'type'     => 10, // Staff/Clinician type based on InitialDataSeeder (Staff is 7)
+            ];
+            
+            // Check if user already exists
+            $existingUser = $userModel->where('email', $data['email'])->first();
+            if ($existingUser) {
+                //show error message
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message_header' => 'Clinician',
+                    'message' => 'Unable to create access for clinician, user with this email already exists. Clinician details have been saved.',
+                    'redirect' => base_url('admin/clinicians')
+                ]);
+            } else {
+                $user_id = $userModel->insert($userData);
+            }
+
+            // Link user_id to clinician
+            $model->update($clinician_id, ['user_id' => $user_id]);
+        }
 
         // Save Facility-specific PCC Credentials
         $pcc_data = $this->request->getPost('pcc');
@@ -156,6 +185,7 @@ class Clinicians extends BaseController
         $pccModel = new ClinicianPccModel();
         $pcc_creds = $pccModel->where('clinician_id', $id)->findAll();
         $data['pcc_credentials'] = [];
+        
         foreach ($pcc_creds as $cred) {
             $data['pcc_credentials'][$cred['facility_id']] = $cred;
         }
@@ -164,6 +194,10 @@ class Clinicians extends BaseController
         if (!$data['company_worked']) {
             $data['company_worked'] = [];
         }
+
+        // Fetch associated user record
+        $userModel = new UserModel();
+        $data['user_record'] = $userModel->where('email', $data['clinician']['email'])->first();
 
 
         $data['styles'] = [
@@ -210,7 +244,7 @@ class Clinicians extends BaseController
             'rate'           => $this->request->getPost('rate'),
             'agencies'      => implode(",",$this->request->getPost('agencies')),
             'company_worked' => serialize($this->request->getPost('company_work') ?: []),
-            'handglove_username' => $this->request->getPost('handglove_username'),
+            'handglove_username' => $this->request->getPost('email'),
             'handglove_password' => $this->request->getPost('handglove_password'),
         ];
 
@@ -228,11 +262,20 @@ class Clinicians extends BaseController
             }
         }
 
+        $old_email = $model->find($id)['email'];
         $model->update($id, $data);
+
+        // Sync Email/Username in tbl_users if email changed
+        if ($old_email != $data['email']) {
+            $userModel = new UserModel();
+            $userModel->where('email', $old_email)->set(['email' => $data['email']])->update();
+        }
 
         // Update Facility-specific PCC Credentials
         $pccModel = new ClinicianPccModel();
-        $pccModel->where('clinician_id', $id)->delete();
+        if ($id) {
+            $pccModel->where('clinician_id', $id)->delete();
+        }
         $pcc_data = $this->request->getPost('pcc');
         if ($pcc_data && is_array($pcc_data)) {
             foreach ($pcc_data as $facility_id => $creds) {
@@ -253,6 +296,24 @@ class Clinicians extends BaseController
             'message_header' => 'Clinician',
             'message' => 'Clinician updated successfully.',
             'redirect' => base_url('admin/clinicians')
+        ]);
+    }
+
+    public function toggle_user_status()
+    {
+        $user_id = $this->request->getPost('user_id');
+        $status = $this->request->getPost('status');
+
+        if (!$user_id) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Missing User ID']);
+        }
+
+        $userModel = new UserModel();
+        $userModel->update($user_id, ['status' => $status]);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'User status updated successfully.'
         ]);
     }
 
@@ -306,6 +367,28 @@ class Clinicians extends BaseController
         ]);
     }
 
+    public function get_pcc_credentials()
+    {
+        $clinician_id = $this->request->getGet('clinician_id');
+        $facility_id = $this->request->getGet('facility_id');
+
+        if (!$clinician_id || !$facility_id) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Missing IDs']);
+        }
+
+        $pccModel = new ClinicianPccModel();
+        $creds = $pccModel->where([
+            'clinician_id' => $clinician_id,
+            'facility_id'  => $facility_id
+        ])->first();
+
+        if ($creds) {
+            return $this->response->setJSON(['status' => 'success', 'data' => $creds]);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'No credentials found']);
+        }
+    }
+
     public function sendResetPassword($id)
     {
         $clinicianModel = new CliniciansModel();
@@ -341,6 +424,8 @@ class Clinicians extends BaseController
         if ($email->send()) {
             return redirect()->to('admin/clinicians')->with('message', 'Password reset email sent successfully.');
         } else {
+            //show email error if there are any
+            pe($email->printDebugger());
             return redirect()->to('admin/clinicians')->with('error', 'Failed to send password reset email.');
         }
     }

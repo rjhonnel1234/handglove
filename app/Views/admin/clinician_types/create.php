@@ -3,21 +3,31 @@
 <?= $this->section('content') ?>
 <div class="container-fluid px-4">
     <div class="heading mb-4">
-        <h2>Agencies</h2>
-        <div class="kicker-bottom">Add New Agency</div>
+        <h2>Clinician Types</h2>
+        <div class="kicker-bottom">Add New Clinician Type</div>
     </div>
 
     <div class="row">
         <div class="col-lg-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <form id="agency-form" action="<?= base_url('admin/agencies/store') ?>" method="post">
+                    <form id="clinician-type-form" action="<?= base_url('admin/clinician-types/store') ?>" method="post">
                         <?= csrf_field() ?>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label class="form-label fw-bold">Agency Name</label>
-                                    <input type="text" name="name" class="form-control" placeholder="Enter agency name" required>
+                                    <label class="form-label fw-bold">Name</label>
+                                    <input type="text" name="name" class="form-control" placeholder="Enter type name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">Grouping</label>
+                                    <select name="grouping" class="form-select form-control selectpicker" required>
+                                        <option value="">Select Grouping</option>
+                                        <option value="gna">GNA</option>
+                                        <option value="nurse">Nurse</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -43,8 +53,8 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" class="btn thm-btn px-4 mr-2">Create Agency</button>
-                            <a href="<?= base_url('admin/agencies') ?>" class="btn btn-outline-secondary px-4">Cancel</a>
+                            <button type="submit" class="btn thm-btn px-4 mr-2">Create Clinician Type</button>
+                            <a href="<?= base_url('admin/clinician-types') ?>" class="btn btn-outline-secondary px-4">Cancel</a>
                         </div>
                     </form>
                 </div>
@@ -57,7 +67,7 @@
 <?= $this->section('customJS') ?>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#agency-form').on('submit', function(e) {
+        $('#clinician-type-form').on('submit', function(e) {
             e.preventDefault();
             const $form = $(this);
             const $btn = $form.find('button[type="submit"]');
@@ -82,12 +92,12 @@
                         } else {
                             toastr.error(response.message || 'Validation failed');
                         }
-                        $btn.prop('disabled', false).text('Create Agency');
+                        $btn.prop('disabled', false).text('Create Clinician Type');
                     }
                 },
                 error: function() {
                     toastr.error('An error occurred. Please try again.');
-                    $btn.prop('disabled', false).text('Create Agency');
+                    $btn.prop('disabled', false).text('Create Clinician Type');
                 }
             });
         });

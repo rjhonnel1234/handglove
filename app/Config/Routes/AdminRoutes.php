@@ -77,6 +77,16 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->post('list', 'Agencies::list');
     });
 
+    $routes->group('clinician-types', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'ClinicianTypes::index');
+        $routes->get('create', 'ClinicianTypes::create');
+        $routes->post('store', 'ClinicianTypes::store');
+        $routes->get('edit/(:num)', 'ClinicianTypes::edit/$1');
+        $routes->post('update/(:num)', 'ClinicianTypes::update/$1');
+        $routes->get('delete/(:num)', 'ClinicianTypes::delete/$1');
+        $routes->post('list', 'ClinicianTypes::list');
+    });
+
     $routes->group('clinicians', ['filter' => 'adminAuth'], function ($routes) {
         $routes->get('', 'Clinicians::index');
         $routes->get('create', 'Clinicians::create');
@@ -86,6 +96,8 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->get('delete/(:num)', 'Clinicians::delete/$1');
         $routes->get('send-reset-password/(:num)', 'Clinicians::sendResetPassword/$1');
         $routes->post('upload', 'Clinicians::upload');
+        $routes->get('get-pcc-credentials', 'Clinicians::get_pcc_credentials');
+        $routes->post('toggle-user-status', 'Clinicians::toggle_user_status');
         $routes->post('list', 'Clinicians::list');
     });
 
