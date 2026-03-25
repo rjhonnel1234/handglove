@@ -240,7 +240,7 @@
                                                 <input type="text" id="pcc_username" name="" class="form-control form-control-sm" placeholder="Username">
                                             </div>
                                             <div class="col-6">
-                                                <input type="password" id="pcc_password" name="" class="form-control form-control-sm" placeholder="Password">
+                                                <input type="text" id="pcc_password" name="" class="form-control form-control-sm" placeholder="Password">
                                             </div>
                                         </div>
                                     </div>
