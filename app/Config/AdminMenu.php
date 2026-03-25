@@ -31,7 +31,7 @@ class AdminMenu extends BaseConfig
             [
                 'title' => 'Clinicians',
                 'url'   => 'admin/clinicians',
-                'icon'  => 'fa fa-users-cog'
+                'icon'  => 'fa fa-user-md'
             ],
             [
                 'title' => 'Board of Advisors',
@@ -62,7 +62,7 @@ class AdminMenu extends BaseConfig
             ],
             [
                 'title' => 'Agency Providers',
-                'url'   => 'admin/donors',
+                'url'   => 'admin/agencies',
                 'icon'  => 'fa fa-building'
             ],
             [

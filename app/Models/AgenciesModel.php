@@ -3,17 +3,17 @@
 namespace App\Models;
 use CodeIgniter\Model;
  
-class CliniciansModel extends Model
+class AgenciesModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'tbl_clinicians';
+    protected $table            = 'tbl_agencies';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['user_id', 'leads_id', 'profile_pic_url', 'tier', 'name', 'address', 'zip_code', 'email', 'contact_number', 'birthday', 'status', 'type', 'rate', 'agencies', 'client_ids', 'company_worked', 'pcc_username', 'pcc_password', 'handglove_username', 'handglove_password'];
+    protected $allowedFields    = ['name', 'description', 'status'];
 
     // Dates
     protected $useTimestamps = false;
@@ -38,12 +38,4 @@ class CliniciansModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-
-    public $tier_mapping = [
-        10 => 'Junior',
-        20 => 'Reliable',
-        30 => 'Senior',
-    ];
-
 }

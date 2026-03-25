@@ -1,0 +1,370 @@
+<?php
+
+namespace App\Controllers\Admin;
+
+use App\Controllers\BaseController;
+use App\Models\CliniciansModel;
+use App\Models\ClinicianTypesModel;
+use App\Models\ProvidersModel;
+use App\Models\AgenciesModel;
+use App\Models\FacilityModel;
+use App\Models\ClinicianPccModel;
+use App\Models\UserModel;
+
+class Clinicians extends BaseController
+{
+    public function index()
+    {
+        $data['page_title'] = "Clinicians";
+        $data['session'] = session();
+        $data['styles'] = [
+            'plugins/datatables',
+        ];
+        $data['scripts'] = [
+            'https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.2/datatables.min.js',
+        ];
+
+        return view('admin/clinicians/index', $data);
+    }
+
+    public function create()
+    {
+        $clinicianModel = new CliniciansModel();
+        $typesModel = new ClinicianTypesModel();
+        $agenciesModel = new AgenciesModel();
+        $facilityModel = new FacilityModel();
+
+        $data['types'] = $typesModel->where('status', 1)->findAll();
+        $data['agencies'] = $agenciesModel->findAll();
+        $data['facilities'] = $facilityModel->findAll();
+        
+        $data['tiers'] = $clinicianModel->tier_mapping;
+        $data['page_title'] = "Add Clinician";
+        $data['session'] = session();
+
+        $data['styles'] = [
+            COMPILED_ASSETS_PATH . 'css/components/bootstrap-select',
+            COMPILED_ASSETS_PATH . 'css/components/dropzone'
+        ];
+        $data['scripts'] = [
+            ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js',
+            ASSETS_URL . 'js/admin/clinicians.js',
+        ];
+
+        return view('admin/clinicians/create', $data);
+    }
+
+    public function store()
+    {
+        $model = new CliniciansModel();
+        //add validation for name, email, address, zip_code, profile_pic, contact_number, type, tier
+        $rules = [
+            'name'     => 'required',
+            'email'    => 'required|valid_email|is_unique[tbl_clinicians.email]',
+            'contact_number' => 'required',
+            'type' => 'required',
+            'tier' => 'required',
+            'profile_pic_path' => 'required',
+            'address' => 'required',
+            'zip_code' => 'required',
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $this->validator->getErrors()
+            ]);
+        }
+        
+        $data = [
+            'name'           => $this->request->getPost('name'),
+            'email'          => $this->request->getPost('email'),
+            'address'        => $this->request->getPost('address'),
+            'zip_code'       => $this->request->getPost('zip_code'),
+            'contact_number' => $this->request->getPost('contact_number'),
+            'status'         => $this->request->getPost('status'),
+            'tier'           => $this->request->getPost('tier'),
+            'type'           => $this->request->getPost('type'),
+            'rate'           => $this->request->getPost('rate'),
+            'agencies'      => implode(",",$this->request->getPost('agencies')),
+            'company_worked' => addslashes(serialize($this->request->getPost('company_work') ?: [])),
+            'handglove_username' => $this->request->getPost('handglove_username'),
+            'handglove_password' => $this->request->getPost('handglove_password'),
+        ];
+
+        // Handle Profile Picture
+        $profilePicPath = $this->request->getPost('profile_pic_path');
+        if (!empty($profilePicPath)) {
+            $data['profile_pic_url'] = base_url($profilePicPath);
+        } else {
+            // Fallback to traditional upload
+            $file = $this->request->getFile('profile_pic_url');
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move(ROOTPATH . 'public/uploads/clinicians', $newName);
+                $data['profile_pic_url'] = base_url('uploads/clinicians/' . $newName);
+            }
+        }
+
+        $clinician_id = $model->insert($data);
+
+        // Save Facility-specific PCC Credentials
+        $pcc_data = $this->request->getPost('pcc');
+        if ($pcc_data && is_array($pcc_data)) {
+            $pccModel = new ClinicianPccModel();
+            foreach ($pcc_data as $facility_id => $creds) {
+                if (!empty($creds['username']) || !empty($creds['password'])) {
+                    $pccModel->insert([
+                        'clinician_id' => $clinician_id,
+                        'facility_id'  => $facility_id,
+                        'username'     => $creds['username'],
+                        'password'     => $creds['password']
+                    ]);
+                }
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'success' => 1,
+            'message_header' => 'Clinician',
+            'message' => 'Clinician added successfully.',
+            'redirect' => base_url('admin/clinicians')
+        ]);
+    }
+
+    public function edit($id)
+    {
+        $model = new CliniciansModel();
+        $typesModel = new ClinicianTypesModel();
+        $agenciesModel = new AgenciesModel();
+        $facilityModel = new FacilityModel();
+
+        $data['clinician'] = $model->find($id);
+        if (!$data['clinician']) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        $data['types'] = $typesModel->where('status', 1)->findAll();
+        $data['agencies'] = $agenciesModel->findAll();
+        $data['facilities'] = $facilityModel->findAll();
+        $data['tiers'] = $model->tier_mapping;
+
+        $data['clinician']['agencies'] = explode(',', $data['clinician']['agencies']);
+
+        $pccModel = new ClinicianPccModel();
+        $pcc_creds = $pccModel->where('clinician_id', $id)->findAll();
+        $data['pcc_credentials'] = [];
+        foreach ($pcc_creds as $cred) {
+            $data['pcc_credentials'][$cred['facility_id']] = $cred;
+        }
+
+        $data['company_worked'] = unserialize(stripslashes($data['clinician']['company_worked'] ?? ''));
+        if (!$data['company_worked']) {
+            $data['company_worked'] = [];
+        }
+
+
+        $data['styles'] = [
+            COMPILED_ASSETS_PATH . 'css/components/bootstrap-select',
+            COMPILED_ASSETS_PATH . 'css/components/dropzone'
+        ];
+        $data['scripts'] = [
+            ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js',
+            ASSETS_URL . 'js/admin/clinicians.js',
+        ];
+
+        $data['page_title'] = "Edit Clinician";
+        $data['session'] = session();
+        return view('admin/clinicians/edit', $data);
+    }
+
+    public function update($id)
+    {
+        $model = new CliniciansModel();
+
+        $rules = [
+            'name'     => 'required',
+            'email'    => "required|valid_email|is_unique[tbl_clinicians.email,id,$id]",
+            'contact_number' => 'required',
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $this->validator->getErrors()
+            ]);
+        }
+
+        $data = [
+            'name'           => $this->request->getPost('name'),
+            'email'          => $this->request->getPost('email'),
+            'address'        => $this->request->getPost('address'),
+            'zip_code'       => $this->request->getPost('zip_code'),
+            'contact_number' => $this->request->getPost('contact_number'),
+            'status'         => $this->request->getPost('status'),
+            'tier'           => $this->request->getPost('tier'),
+            'type'           => $this->request->getPost('type'),
+            'rate'           => $this->request->getPost('rate'),
+            'agencies'      => implode(",",$this->request->getPost('agencies')),
+            'company_worked' => serialize($this->request->getPost('company_work') ?: []),
+            'handglove_username' => $this->request->getPost('handglove_username'),
+            'handglove_password' => $this->request->getPost('handglove_password'),
+        ];
+
+        // Handle Profile Picture
+        $profilePicPath = $this->request->getPost('profile_pic_path');
+        if (!empty($profilePicPath)) {
+            $data['profile_pic_url'] = base_url($profilePicPath);
+        } else {
+            // Fallback to traditional upload
+            $file = $this->request->getFile('profile_pic');
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move(ROOTPATH . 'public/uploads/clinicians', $newName);
+                $data['profile_pic_url'] = base_url('uploads/clinicians/' . $newName);
+            }
+        }
+
+        $model->update($id, $data);
+
+        // Update Facility-specific PCC Credentials
+        $pccModel = new ClinicianPccModel();
+        $pccModel->where('clinician_id', $id)->delete();
+        $pcc_data = $this->request->getPost('pcc');
+        if ($pcc_data && is_array($pcc_data)) {
+            foreach ($pcc_data as $facility_id => $creds) {
+                if (!empty($creds['username']) || !empty($creds['password'])) {
+                    $pccModel->insert([
+                        'clinician_id' => $id,
+                        'facility_id'  => $facility_id,
+                        'username'     => $creds['username'],
+                        'password'     => $creds['password']
+                    ]);
+                }
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'success' => 1,
+            'message_header' => 'Clinician',
+            'message' => 'Clinician updated successfully.',
+            'redirect' => base_url('admin/clinicians')
+        ]);
+    }
+
+    public function delete($id)
+    {
+        $model = new CliniciansModel();
+        // Check if there's an isDeleted column, otherwise just delete
+        $model->delete($id);
+
+        return redirect()->to('admin/clinicians')->with('message', 'Clinician deleted successfully.');
+    }
+
+    public function list()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Invalid request.']);
+        }
+
+        $model = new CliniciansModel();
+        $clinicians = $model->select('tbl_clinicians.*, tbl_clinician_types.name as type_name')
+                           ->join('tbl_clinician_types', 'tbl_clinician_types.id = tbl_clinicians.type', 'left')
+                           ->orderBy('tbl_clinicians.id', 'DESC')
+                           ->findAll();
+
+        $formattedData = [];
+        foreach ($clinicians as $clinician) {
+            $statusBadge = $clinician['status'] == 1 ? '<span class="badge bg-success text-white">Active</span>' : '<span class="badge bg-danger">Inactive</span>';
+            $formattedData[] = [
+                sprintf('<img src="%s" class="rounded-circle" width="40" height="40" onerror="this.src=\'%s\'">', $clinician['profile_pic_url'] ?: base_url('assets/img/blank-img.png'), base_url('assets/img/blank-img.png')),
+                sprintf('<div><strong>%s</strong></div>', $clinician['name'] ?: 'N/A').
+                sprintf('<div><small><i class="fas fa-envelope"></i> %s</small></div>', $clinician['email'] ?: 'N/A').
+                sprintf('<div><small><i class="fas fa-phone"></i> %s</small></div>', $clinician['contact_number'] ?: 'N/A'),
+                sprintf('<div>%s</div>', $clinician['type_name'] ?? 'N/A'),
+                $statusBadge,
+                sprintf(
+                    '<div class="text-center">
+                        <a href="%s" class="btn btn-sm btn-info text-white" title="Edit"><i class="fas fa-edit"></i></a>
+                        <a href="%s" class="btn btn-sm btn-warning text-white" title="Send Reset Password" onclick="return confirm(\'Send password reset email to this clinician?\')"><i class="fas fa-key"></i></a>
+                        <a href="%s" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm(\'Are you sure?\')"><i class="fas fa-trash"></i></a>
+                    </div>',
+                    base_url('admin/clinicians/edit/' . $clinician['id']),
+                    base_url('admin/clinicians/send-reset-password/' . $clinician['id']),
+                    base_url('admin/clinicians/delete/' . $clinician['id'])
+                )
+            ];
+        }
+
+        return $this->response->setJSON([
+            'success' => 1,
+            'data' => $formattedData
+        ]);
+    }
+
+    public function sendResetPassword($id)
+    {
+        $clinicianModel = new CliniciansModel();
+        $userModel = new UserModel();
+
+        $clinician = $clinicianModel->find($id);
+        if (!$clinician) {
+            return redirect()->to('admin/clinicians')->with('error', 'Clinician not found.');
+        }
+
+        $user = $userModel->where('email', $clinician['email'])->first();
+        if (!$user) {
+            return redirect()->to('admin/clinicians')->with('error', 'Associated user account not found.');
+        }
+
+        $token = generate_token() . '-' . $user['id'];
+        $url   = generate_url("login", "reset-password", $token);
+        $link  = "<a href='" .  $url . "'>Click here to reset your password</a>";
+
+        $data = ['token' => $token, 'token_active' => 1, 'token_datetime' => getServerTimestamp()];
+        $userModel->where('id', $user['id'])->set($data)->update();
+
+        $email = \Config\Services::email();
+        $item = $user;
+        $item['link'] = $link;
+
+        $template = view("login/email_forgot_password", ['session' => session(), 'item' => $item]);
+
+        $email->setTo($user['email']);
+        $email->setSubject('Password Reset');
+        $email->setMessage($template);
+
+        if ($email->send()) {
+            return redirect()->to('admin/clinicians')->with('message', 'Password reset email sent successfully.');
+        } else {
+            return redirect()->to('admin/clinicians')->with('error', 'Failed to send password reset email.');
+        }
+    }
+
+    public function upload()
+    {
+        $file = $this->request->getFile('file');
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $newName = $file->getRandomName();
+            $targetPath = 'uploads/clinicians';
+            
+            if (!is_dir(FCPATH . $targetPath)) {
+                mkdir(FCPATH . $targetPath, 0777, true);
+            }
+
+            $file->move(FCPATH . $targetPath, $newName);
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'path' => $targetPath . '/' . $newName,
+                'url' => base_url($targetPath . '/' . $newName)
+            ]);
+        }
+
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Upload failed.']);
+    }
+}

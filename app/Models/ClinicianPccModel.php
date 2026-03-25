@@ -1,22 +1,19 @@
 <?php
 
 namespace App\Models;
+
 use CodeIgniter\Model;
- 
-class CliniciansModel extends Model
+
+class ClinicianPccModel extends Model
 {
-    protected $DBGroup          = 'default';
-    protected $table            = 'tbl_clinicians';
+    protected $table            = 'tbl_clinician_pcc_credentials';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['user_id', 'leads_id', 'profile_pic_url', 'tier', 'name', 'address', 'zip_code', 'email', 'contact_number', 'birthday', 'status', 'type', 'rate', 'agencies', 'client_ids', 'company_worked', 'pcc_username', 'pcc_password', 'handglove_username', 'handglove_password'];
-
-    // Dates
-    protected $useTimestamps = false;
+    protected $allowedFields    = ['clinician_id', 'facility_id', 'username', 'password'];
+    protected $useTimestamps    = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -38,12 +35,4 @@ class CliniciansModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-
-    public $tier_mapping = [
-        10 => 'Junior',
-        20 => 'Reliable',
-        30 => 'Senior',
-    ];
-
 }

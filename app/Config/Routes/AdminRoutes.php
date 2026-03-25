@@ -67,6 +67,28 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->post('list', 'Users::list');
     });
 
+    $routes->group('agencies', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'Agencies::index');
+        $routes->get('create', 'Agencies::create');
+        $routes->post('store', 'Agencies::store');
+        $routes->get('edit/(:num)', 'Agencies::edit/$1');
+        $routes->post('update/(:num)', 'Agencies::update/$1');
+        $routes->get('delete/(:num)', 'Agencies::delete/$1');
+        $routes->post('list', 'Agencies::list');
+    });
+
+    $routes->group('clinicians', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'Clinicians::index');
+        $routes->get('create', 'Clinicians::create');
+        $routes->post('store', 'Clinicians::store');
+        $routes->get('edit/(:num)', 'Clinicians::edit/$1');
+        $routes->post('update/(:num)', 'Clinicians::update/$1');
+        $routes->get('delete/(:num)', 'Clinicians::delete/$1');
+        $routes->get('send-reset-password/(:num)', 'Clinicians::sendResetPassword/$1');
+        $routes->post('upload', 'Clinicians::upload');
+        $routes->post('list', 'Clinicians::list');
+    });
+
     $routes->group('invoices', ['filter' => 'adminAuth'], function ($routes) {
         $routes->get('/', 'Invoices::index');
         $routes->get('view/(:num)', 'Invoices::view/$1');
