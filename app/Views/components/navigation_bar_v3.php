@@ -89,7 +89,7 @@
                 </div>
                 <ul class="menu-right-content">
                     <li>
-                        <a href="#" class="theme-btn-one">Appointment</a>
+                        <a href="#" class="theme-btn-one" data-toggle="modal" data-target="#demoModal">Appointment</a>
                         <a href="<?php echo base_url('login'); ?>" class="theme-link p-3">Portal Login</a>
                     </li>
                 </ul>
@@ -113,7 +113,7 @@
                 </div>
                 <ul class="menu-right-content pull-right clearfix">
                     <li>
-                        <a href="index.html" class="theme-btn-one">Appointment</a>
+                        <a href="#" class="theme-btn-one" data-toggle="modal" data-target="#demoModal">Appointment</a>
                         <a href="<?php echo base_url('login'); ?>" class="theme-link p-3">Portal Login</a>
                     </li>
                 </ul>

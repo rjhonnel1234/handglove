@@ -104,7 +104,7 @@ class Demo extends BaseController
     
     
                 if($id){
-                    $email = service('email');
+                    $email = \Config\Services::email();
                     $email->setSubject('Demo OTP');
                     $email->setTo($email_address);
                     $body = '
@@ -119,7 +119,7 @@ class Demo extends BaseController
                     ';
                     $email->setMessage($body);
                     $response = $email->send();
-                    $response = true;
+                    // $response = true;
                     if($response){
                         $data['success'] = true;
                         $data['message'] = 'OTP Sent';

@@ -28,17 +28,17 @@ class Email extends BaseConfig
     /**
      * SMTP Server Hostname
      */
-    public string $SMTPHost = 'smtp.mailersend.net';
+    public string $SMTPHost = 'mail.handglove.net';
 
     /**
      * SMTP Username
      */
-    public string $SMTPUser = 'MS_wdWZ7J@handglove.net';
+    public string $SMTPUser = 'admin@handglove.net';
 
     /**
      * SMTP Password
      */
-    public string $SMTPPass = 'mssp.hk4ZmC1.k68zxl2368egj905.j4GxktW';
+    public string $SMTPPass = 'B0@[9QqYqXm}';
 
     /**
      * SMTP Port
