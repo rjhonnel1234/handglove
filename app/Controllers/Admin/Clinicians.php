@@ -77,6 +77,10 @@ class Clinicians extends BaseController
             ]);
         }
         
+        $agencies = "";
+        if(!empty($this->request->getPost('agencies'))){
+            $agencies = implode(",",$this->request->getPost('agencies'));
+        }
         $data = [
             'name'           => $this->request->getPost('name'),
             'email'          => $this->request->getPost('email'),
@@ -87,7 +91,7 @@ class Clinicians extends BaseController
             'tier'           => $this->request->getPost('tier'),
             'type'           => $this->request->getPost('type'),
             'rate'           => $this->request->getPost('rate'),
-            'agencies'      => implode(",",$this->request->getPost('agencies')),
+            'agencies'      => $agencies,
             'company_worked' => addslashes(serialize($this->request->getPost('company_work') ?: [])),
             'handglove_username' => $this->request->getPost('email'),
             'handglove_password' => $this->request->getPost('handglove_password'),
@@ -231,7 +235,10 @@ class Clinicians extends BaseController
                 'errors' => $this->validator->getErrors()
             ]);
         }
-
+        $agencies = "";
+        if(!empty($this->request->getPost('agencies'))){
+            $agencies = implode(",",$this->request->getPost('agencies'));
+        }
         $data = [
             'name'           => $this->request->getPost('name'),
             'email'          => $this->request->getPost('email'),
@@ -242,7 +249,7 @@ class Clinicians extends BaseController
             'tier'           => $this->request->getPost('tier'),
             'type'           => $this->request->getPost('type'),
             'rate'           => $this->request->getPost('rate'),
-            'agencies'      => implode(",",$this->request->getPost('agencies')),
+            'agencies'      => $agencies,
             'company_worked' => serialize($this->request->getPost('company_work') ?: []),
             'handglove_username' => $this->request->getPost('email'),
             'handglove_password' => $this->request->getPost('handglove_password'),
