@@ -306,7 +306,7 @@
                                     </figure>
                                     <h4>Aide</h4>
                                 </div>
-                                <div class="link"><a href="direct-hire.html">GNA / CNA / CMA / GNA </a></div>
+                                <div class="link"><a href="direct-hire.html">GNA / CNA / CMA </a></div>
                             </div>
                             <div class="overlay-content">
                                 <p>Explain to you how this idea denouncing pleasure & praising pain was born.

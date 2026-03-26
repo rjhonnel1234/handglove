@@ -69,6 +69,7 @@ class Home extends BaseController
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/plugins/jquery.steps.min.js',
                 ASSETS_URL . 'js/plugins/jquery.validate.js',
+                ASSETS_URL . 'js/plugins/tilt.js',
                 ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
                 ASSETS_URL . 'js/pages/home.min.js',
