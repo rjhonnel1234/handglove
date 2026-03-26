@@ -113,7 +113,7 @@
                     <input type="hidden" name="shift_date" id="selected-date">
                     <div id="schedule-dropzone" class="dropzone">
                         <div class="dz-message" data-dz-message>
-                            <span>Drag & Drop Image Schedule here (PNG, JPG, JPEG) or click to upload</span>
+                            <span>Drag & Drop PDF Schedule here (PDF) or click to upload</span>
                         </div>
                     </div>
                 </div>

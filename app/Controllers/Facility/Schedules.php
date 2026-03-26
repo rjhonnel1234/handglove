@@ -519,10 +519,10 @@ class Schedules extends BaseController
 
         $validationRule = [
             'file' => [
-                'label' => 'Image File',
+                'label' => 'PDF File',
                 'rules' => [
                     'uploaded[file]',
-                    'mime_in[file,image/png,image/jpeg,image/jpg]',
+                    'mime_in[file,application/pdf]',
                     'max_size[file,10240]', // 10MB
                 ],
             ],
@@ -784,7 +784,7 @@ class Schedules extends BaseController
             return $this->response->setJSON(['success' => 0, 'message' => 'File not found on server']);
         }
 
-        $parsedData = $this->parse_schedule_image($filePath);
+        $parsedData = $this->parse_schedule_pdf($filePath);
 
         return $this->response->setJSON([
             'success' => 1,
@@ -793,18 +793,17 @@ class Schedules extends BaseController
         ]);
     }
 
-    private function parse_schedule_image($filePath)
+    //do not use OCR, try to use php pdf parser
+    private function parse_schedule_pdf($filePath)
     {
         $extractedData = [
             'date' => null,
             'units' => []
         ];
-        try {
-            // Use Tesseract OCR to extract text from the image
-            $ocr = new \thiagoalessio\TesseractOCR\TesseractOCR($filePath);
-            $text = $ocr->run();
 
-            $lines = explode("\n", $text);
+        try {
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf    = $parser->parseFile($filePath);
             
             $currentUnit = 'Default';
             $currentShift = 'Unassigned';
@@ -813,55 +812,60 @@ class Schedules extends BaseController
             $positions = ['RN', 'LPN', 'GNA', 'UM', 'DON', 'ADON', 'Supervisor', 'Orientee', 'CNA', 'CMA'];
             $positionRegex = '/\b(' . implode('|', $positions) . ')\b/i';
 
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (empty($line)) continue;
+            foreach ($pdf->getPages() as $page) {
+                $text = $page->getText();
+                $lines = explode("\n", $text);
 
-                // 1. Detect Date (e.g., 2026-02-18)
-                if (!$extractedData['date'] && preg_match('/(\d{4}-\d{2}-\d{2})/', $line, $matches)) {
-                    $extractedData['date'] = $matches[1];
-                    continue;
-                }
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (empty($line)) continue;
 
-                // 2. Detect Unit Headers (e.g., Unit 1, Unit 2, Memory Care, Other Staff)
-                if (preg_match('/(Unit\s*\d+|Memory\s*Care|Other\s*Staff)/i', $line, $matches)) {
-                    $currentUnit = ucwords(strtolower($matches[0]));
-                    if (!isset($extractedData['units'][$currentUnit])) {
-                        $extractedData['units'][$currentUnit] = [];
+                    // 1. Detect Date (e.g., 2026-02-18)
+                    if (!$extractedData['date'] && preg_match('/(\d{4}-\d{2}-\d{2})/', $line, $matches)) {
+                        $extractedData['date'] = $matches[1];
+                        continue;
                     }
-                    continue;
-                }
 
-                // 3. Detect Shift Headers (e.g., Day Shift, Evening Shift, Night Shift)
-                if (preg_match('/(Day|Evening|Night)\s*Shift/i', $line, $matches)) {
-                    $currentShift = ucwords(strtolower($matches[1]));
-                    continue;
-                }
+                    // 2. Detect Unit Headers (e.g., Unit 1, Unit 2, Memory Care, Other Staff)
+                    if (preg_match('/(Unit\s*\d+|Memory\s*Care|Other\s*Staff)/i', $line, $matches)) {
+                        $currentUnit = ucwords(strtolower($matches[0]));
+                        if (!isset($extractedData['units'][$currentUnit])) {
+                            $extractedData['units'][$currentUnit] = [];
+                        }
+                        continue;
+                    }
 
-                // 4. Extract Staff Rows (Name and Position)
-                // Filter out header row keywords
-                if (preg_match('/^(Name|Other|Position)$/i', $line)) continue;
+                    // 3. Detect Shift Headers (e.g., Day Shift, Evening Shift, Night Shift)
+                    if (preg_match('/(Day|Evening|Night)\s*Shift/i', $line, $matches)) {
+                        $currentShift = ucwords(strtolower($matches[1]));
+                        continue;
+                    }
 
-                // If a line contains a position, try to extract name
-                if (preg_match($positionRegex, $line, $posMatches)) {
-                    $pos = $posMatches[1];
-                    // Name is typically before the position or on the same line
-                    // We'll clean the line to extract the name
-                    $name = trim(str_ireplace([$pos, 'Other', 'Name', 'Position'], '', $line));
-                    $name = preg_replace('/[^a-zA-Z\s,]/', '', $name); // Basic name cleaning
-                    
-                    if (!empty($name)) {
-                        $extractedData['units'][$currentUnit][$currentShift][] = [
-                            'name' => trim($name),
-                            'position' => strtoupper($pos)
-                        ];
+                    // 4. Extract Staff Rows (Name and Position)
+                    // Filter out header row keywords
+                    if (preg_match('/^(Name|Other|Position)$/i', $line)) continue;
+
+                    // If a line contains a position, try to extract name
+                    if (preg_match($positionRegex, $line, $posMatches)) {
+                        $pos = $posMatches[1];
+                        // Name is typically before the position or on the same line
+                        $name = trim(str_ireplace([$pos, 'Other', 'Name', 'Position'], '', $line));
+                        $name = preg_replace('/[^a-zA-Z\s,]/', '', $name); // Basic name cleaning
+                        
+                        if (!empty($name)) {
+                            $extractedData['units'][$currentUnit][$currentShift][] = [
+                                'name' => trim($name),
+                                'position' => strtoupper($pos)
+                            ];
+                        }
                     }
                 }
             }
         } catch (\Exception $e) {
-            // log_message('error', 'Image OCR Parsing Error: ' . $e->getMessage());
+            log_message('error', 'PDF Parsing Error: ' . $e->getMessage());
         }
 
         return $extractedData;
     }
+    
 }

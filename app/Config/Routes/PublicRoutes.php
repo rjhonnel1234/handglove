@@ -59,6 +59,7 @@ $routes->get('employers', 'Employers::index');
 $routes->get('job-seekers', 'JobSeekers::index');
 $routes->get('leadership', 'Leadership::index');
 $routes->get('resources', 'Resources::index');
+$routes->get('msp', 'Msp::index');
 $routes->get('testimonials', 'Testimonials::index');
 $routes->get('how-it-works', 'HowItWorks::index');
 $routes->get('industries', 'Industries::index');
