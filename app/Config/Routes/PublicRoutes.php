@@ -38,8 +38,9 @@ $routes->get('/jobs', 'Jobs::index');
 $routes->post('/jobs/apply', 'Jobs::apply');
 $routes->post('/jobs/apply_register', 'Jobs::apply_register_clinician');
 $routes->get('/apply', 'Apply::index');
-$routes->get('/board-of-directors', 'BoardOfDirectors::index');
-$routes->get('/awards', 'Donors::index');
+$routes->get('/faqs', 'Faqs::index');
+$routes->get('/board-of-advisors', 'BoardOfDirectors::index');
+$routes->get('/awards', 'Awards::index');
 $routes->get('/awards/pdf/(:num)', 'Clinician\Profile::generate_award_pdf/$1');
 $routes->get('/claim-facility', 'ClaimFacility::index');
 

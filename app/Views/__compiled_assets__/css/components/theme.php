@@ -15412,4 +15412,18 @@ div#mCSB_1_container{
 .mobile-menu .menu-backdrop{
   background: #526d97;
 }
+#bod-companies .team-block-one .inner-box .image-box{
+  box-shadow: unset;
+  text-align: center;
+}
+#bod-companies .team-block-one .inner-box .image-box img{
+  width: 60%;
+}
+#bod-companies .team-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
 </style>

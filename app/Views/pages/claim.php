@@ -1,9 +1,28 @@
 <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js" type="module"></script>
-<div id="claim" class="main-pages">
+
+<!--Page Title-->
+<section class="page-title" style="background-image: url(assets/images/background/page-title-2.jpg);">
+    <div class="pattern-layer" style="background-image: url(assets/images/shape/pattern-35.png);"></div>
+    <div class="auto-container">
+        <div class="content-box">
+            <div class="title-box centred">
+                <h1>Claim Your Facility</h1>
+                <!-- <p>Thanks to our team, it is now possible for us to get the finest & services</p> -->
+            </div>
+            <ul class="bread-crumb clearfix">
+                <li><a href="index.html">Home</a></li>
+                <li>Claim Your Facility</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!--End Page Title-->
+
+
+<div id="claim" class="main-pages d-flex align-items-center" style="min-height: 50vh;">
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center" id="claim-container">
-                <h1>Claim Your Facility</h1>
                 <div class="claim-form">
                     <div id="claim-progress" class="progress">
                         <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>

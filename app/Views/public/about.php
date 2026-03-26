@@ -1,6 +1,6 @@
 
-<section class="page-title" style="background-image: url(<?= ASSETS_URL ?>img/background/page-title.jpg);">
-    <div class="pattern-layer" style="background-image: url(<?= ASSETS_URL ?>img/shape/pattern-35.png);"></div>
+<section class="page-title" style="">
+    <div class="pattern-layer" style="background-image: url(<?= IMG_URL ?>shape/pattern-35.png);"></div>
     <div class="auto-container">
         <div class="content-box">
             <div class="title-box centred">
@@ -20,7 +20,7 @@
             <div class="col-lg-6 col-md-12 col-sm-12 image-column">
                 <div id="image_block_1">
                     <div class="image-box js-tilt">
-                        <figure class="image"><img src="<?= ASSETS_URL ?>img/resource/about-2.jpg" alt=""></figure>
+                        <figure class="image"><img src="<?= IMG_URL ?>resource/about-2.jpg" alt=""></figure>
                         <div class="content-box">
                             <i class="flaticon-work-team"></i>
                             <h4>Connect with clinicians ready to work per diem shifts</h4>

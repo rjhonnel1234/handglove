@@ -34,7 +34,9 @@
                                 <figure class="icon-box"><img src="/assets/img/icons/icon-39.png" alt=""></figure>
                                 <div class="inner">
                                     <h4>Location</h4>
-                                    <p>United States <br />866 Wilshire, 2nd Street <br />Los Angeles 90024.</p>
+                                    <p>20 E Charles St.<br>
+                                        ste 403 #2515<br>
+                                        Baltimore 21201</p>
                                 </div>
                             </li>
                             <li>

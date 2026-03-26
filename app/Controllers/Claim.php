@@ -21,7 +21,7 @@ class Claim extends BaseController
         $data['countries'] = $countriesModel->where('id', 233)->findAll();
         $data['states'] = $statesModel->where('country_id', 233)->findAll();
 
-        return view('components/header', array(
+        return view('components/header_v3', array(
             'title' => 'Claim Your Facility | Handglove',
             'description' => 'Claim your facility and start managing your business profile.',
             'url' => base_url('claim'),
@@ -44,7 +44,9 @@ class Claim extends BaseController
                 COMPILED_ASSETS_PATH . 'css/components/jquery-steps',
                 COMPILED_ASSETS_PATH . 'css/components/buttons',
                 COMPILED_ASSETS_PATH . 'css/components/navigation_bar',
+                COMPILED_ASSETS_PATH . 'css/components/colors',
                 COMPILED_ASSETS_PATH . 'css/components/footer',
+                COMPILED_ASSETS_PATH . 'css/components/theme',
                 COMPILED_ASSETS_PATH . 'css/pages/pages'
             )
         ))
@@ -64,10 +66,11 @@ class Claim extends BaseController
                 ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
+                ASSETS_URL . 'js/pages/home.min.js',
                 ASSETS_URL . 'js/pages/claim.min.js',
             )
         ))
-        .view('components/footer');
+        .view('components/footer_v3');
     }
 
     public function generateOTP()

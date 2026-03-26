@@ -32,15 +32,15 @@
                                 </div>
                                 <ul class="links-list clearfix">
                                     <li><a href="<?= base_url('about-us') ?>">About Us</a></li>
-                                    <li><a href="<?= base_url('resources') ?>">Resources</a></li>
-                                    <li><a href="<?= base_url('our-solutions') ?>">Our Solutions</a></li>
-                                    <li><a href="<?= base_url('testimonials') ?>">Testimonials</a></li>
-                                    <li><a href="<?= base_url('employers') ?>">Employers</a></li>
-                                    <li><a href="<?= base_url('how-it-works') ?>">How It’s Work</a></li>
-                                    <li><a href="<?= base_url('job-seekers') ?>">Job Seekers</a></li>
-                                    <li><a href="<?= base_url('industries') ?>">Industries</a></li>
-                                    <li><a href="<?= base_url('leadership') ?>">Leadership</a></li>
+                                    <li><a href="<?= base_url('resources') ?>">Partners</a></li>
+                                    <li><a href="<?= base_url('board-of-advisors') ?>">Board of Advisors</a></li>
+                                    <li><a href="<?= base_url('news') ?>">News / PR</a></li>
                                     <li><a href="<?= base_url('contact-us') ?>">Contact Us</a></li>
+                                    <li><a href="<?= base_url('jobs') ?>">Job Seekers</a></li>
+                                    <li><a href="<?= base_url('awards') ?>">Award / Event</a></li>
+                                    <li><a href="<?= base_url('claim-facility') ?>">Claim your Page</a></li>
+                                    <li><a href="<?= base_url('faqs') ?>">FAQs</a></li>
+                                    <li><a href="<?= base_url('leadership') ?>">Help center</a></li>
                                 </ul>
                             </div>
                         </div>

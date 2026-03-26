@@ -2,24 +2,26 @@
 
 namespace App\Controllers;
 
-class AboutUs extends BaseController
+class Faqs extends BaseController
 {
     public function index()
     {
+        $facilityModel = new \App\Models\FacilityModel();
+        $latestFacilities = $facilityModel->orderBy('id', 'DESC')->limit(4)->find();
 
-        // PAGE HEAD PROCESSING
         return view('components/header_v3', array(
-            'title' => 'Handglove',
-            'description' => 'Water for Every Filipino. 50 years in the pipe manufacturing industry and more than 30 years experience in bulk water supply, water distribution system and wastewater management.',
-            'url' => BASE_URL,
+            'title' => 'MSP | Handglove',
+            'description' => 'Staffing Partners: Reliable & Cost Efficient Recruitment Agency',
+            'url' => BASE_URL . 'resources',
             'keywords' => '',
             'meta' => array(
-                'title' => 'Handglove',
-                'description' => 'Water for Every Filipino. 50 years in the pipe manufacturing industry and more than 30 years experience in bulk water supply, water distribution system and wastewater management.',
+                'title' => 'Resources | Handglove',
+                'description' => 'Staffing Partners: Reliable & Cost Efficient Recruitment Agency',
                 'image' => IMG_URL . ''
             ),
             'styles' => array(
                 'plugins/font_awesome',
+                'plugins/flaticon',
                 COMPILED_ASSETS_PATH . 'css/components/bootstrap',
                 COMPILED_ASSETS_PATH . 'css/components/fontawesome',
                 COMPILED_ASSETS_PATH . 'css/components/owl',
@@ -35,7 +37,9 @@ class AboutUs extends BaseController
                 COMPILED_ASSETS_PATH . 'css/pages/home'
             )
         ))
-        .view('public/about')
+        .view('public/faqs', [
+            'latest_facilities' => $latestFacilities
+        ])
         .view('components/scripts_render', array(
             'scripts' => array(
                 'https://code.jquery.com/jquery-3.5.1.min.js' => array(
@@ -50,7 +54,6 @@ class AboutUs extends BaseController
                 ASSETS_URL . 'js/plugins/scrollbar.js',
                 ASSETS_URL . 'js/components/global.min.js',
                 ASSETS_URL . 'js/plugins/createjs.min.js',
-                ASSETS_URL . 'js/plugins/tilt.js',
                 ASSETS_URL . 'js/plugins/owl.carousel.min.js',
                 ASSETS_URL . 'js/components/navigation_bar.min.js',
                 ASSETS_URL . 'js/pages/home.min.js',
