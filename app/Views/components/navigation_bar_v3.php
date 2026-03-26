@@ -53,7 +53,7 @@
                                 <li class="current"><a href="<?php echo base_url(); ?>">Home</a></li>
                                 <li><a href="<?php echo base_url('about'); ?>">Facility</a></li>
                                 <li><a href="<?php echo base_url('about'); ?>">Clinician</a></li>
-                                <li><a href="<?php echo base_url('about'); ?>">MSP</a></li>
+                                <li><a href="<?php echo base_url('msp'); ?>">MSP</a></li>
                                 <!-- <li class="current"><a href="<?php echo base_url(); ?>">Home</a></li>
                                 <li><a href="<?php echo base_url('about'); ?>">About</a></li>
                                 <li><a href="<?php echo base_url('awards'); ?>">Awards</a></li>
