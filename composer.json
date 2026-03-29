@@ -65,6 +65,12 @@
         "sort-packages": true
     },
     "scripts": {
+        "post-install-cmd": [
+            "php patch-ci4.php"
+        ],
+        "post-update-cmd": [
+            "php patch-ci4.php"
+        ],
         "test": "phpunit"
     }
 }
