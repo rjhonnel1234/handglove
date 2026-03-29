@@ -13,7 +13,15 @@ class LeadsModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['company_name', 'address', 'email', 'contact_number', 'zip_code', 'origin', 'status', 'ref_clinician_id', 'census', 'features', 'provider_id', 'country', 'state', 'booking_date', 'booking_time'];
+    protected $allowedFields    = [
+        'company_name', 'address', 'zip_code', 'email', 'contact_number', 
+        'date', 'time', 'agencies', 'reference', 'supervisor', 
+        'created_datetime', 'status', 'origin', 'shift_type', 'shift_date', 
+        'shift_time_start', 'shift_time_end', 'notes', 'ref_clinician_id', 
+        'census', 'features', 'provider_id', 'country', 'state', 
+        'booking_date', 'booking_time',
+        'presentation_datetime', 'awaiting_contract_datetime', 'on_contract_datetime', 'cancelled_datetime'
+    ];
 
     // Dates
     protected $useTimestamps = false;
@@ -38,4 +46,33 @@ class LeadsModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+
+    public $status_mapping = [
+        0 => 'Cold',
+        10 => 'Presentation',
+        20 => 'Awaiting Contract',
+        50 => 'On Contract',
+        100 => 'Cancelled',
+    ];
+
+    public $origin_mapping = [
+        1 => 'Manual',
+        2 => 'SMS',
+        3 => 'Referral',
+        4 => 'Demo Request',
+        5 => 'Claim',
+    ];
+    
+
+    public $status_badge_color = [
+        0 => 'bg-secondary',
+        10 => 'bg-warning',
+        20 => 'bg-primary',
+        30 => 'bg-warning',
+        40 => 'bg-warning',
+        50 => 'bg-success',
+        100 => 'bg-danger',
+    ];
+
 }

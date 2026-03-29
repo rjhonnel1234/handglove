@@ -358,12 +358,13 @@ class Clinicians extends BaseController
                 sprintf(
                     '<div class="text-center">
                         <a href="%s" class="btn btn-sm btn-info text-white" title="Edit"><i class="fas fa-edit"></i></a>
+                        <a href="javascript:void(0)" class="btn btn-sm btn-dark text-white upload-credentials" data-id="%s" data-name="%s" title="Upload Credentials"><i class="fas fa-upload"></i></a>
                         <a href="%s" class="btn btn-sm btn-warning text-white" title="Send Reset Password" onclick="return confirm(\'Send password reset email to this clinician?\')"><i class="fas fa-key"></i></a>
-                        <a href="%s" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm(\'Are you sure?\')"><i class="fas fa-trash"></i></a>
                     </div>',
                     base_url('admin/clinicians/edit/' . $clinician['id']),
+                    $clinician['id'],
+                    addslashes($clinician['name']),
                     base_url('admin/clinicians/send-reset-password/' . $clinician['id']),
-                    base_url('admin/clinicians/delete/' . $clinician['id'])
                 )
             ];
         }
@@ -435,6 +436,66 @@ class Clinicians extends BaseController
             pe($email->printDebugger());
             return redirect()->to('admin/clinicians')->with('error', 'Failed to send password reset email.');
         }
+    }
+
+    public function get_credentials()
+    {
+        $clinician_id = $this->request->getGet('clinician_id');
+        if (!$clinician_id) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Missing Clinician ID']);
+        }
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('tbl_credential_types t');
+        $builder->select('t.id as type_id, t.name as type_name, c.filename, c.file_path, c.id as credential_record_id');
+        $builder->join('tbl_clinician_credentials c', "c.credential_id = t.id AND c.clinician_id = $clinician_id", 'left');
+        $builder->where('t.status', 1);
+        $result = $builder->get()->getResultArray();
+
+        return $this->response->setJSON(['status' => 'success', 'data' => $result]);
+    }
+
+    public function upload_credential()
+    {
+        $clinician_id = $this->request->getPost('clinician_id');
+        $credential_id = $this->request->getPost('credential_id');
+        $file = $this->request->getFile('file');
+
+        if (!$clinician_id || !$credential_id || !$file || !$file->isValid()) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid request or file.']);
+        }
+
+        $newName = $file->getRandomName();
+        $targetPath = 'uploads/credentials';
+        
+        if (!is_dir(FCPATH . $targetPath)) {
+            mkdir(FCPATH . $targetPath, 0777, true);
+        }
+
+        $file->move(FCPATH . $targetPath, $newName);
+        $filePath = $targetPath . '/' . $newName;
+
+        $model = new \App\Models\ClinicianCredentialsModel();
+        $existing = $model->where(['clinician_id' => $clinician_id, 'credential_id' => $credential_id])->first();
+
+        $data = [
+            'clinician_id' => $clinician_id,
+            'credential_id' => $credential_id,
+            'filename' => $file->getClientName(),
+            'file_path' => $filePath
+        ];
+
+        if ($existing) {
+            $model->update($existing['id'], $data);
+        } else {
+            $model->insert($data);
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Credential uploaded successfully.',
+            'file_path' => base_url($filePath)
+        ]);
     }
 
     public function upload()

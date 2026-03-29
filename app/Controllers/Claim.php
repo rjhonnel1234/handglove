@@ -6,6 +6,7 @@ use App\Models\ProvidersModel;
 use App\Models\CountriesModel;
 use App\Models\StatesModel;
 use App\Models\LeadsModel;
+use App\Models\UserTypesModel;
 use App\Models\LeadsManagementModel;
 use App\Models\UserModel;
 
@@ -20,6 +21,9 @@ class Claim extends BaseController
         $data['providers'] = $providerModel->findAll();
         $data['countries'] = $countriesModel->where('id', 233)->findAll();
         $data['states'] = $statesModel->where('country_id', 233)->findAll();
+
+        $userTypesModel = new UserTypesModel();
+        $data['user_types'] = $userTypesModel->where('is_management', 1)->orderBy('name', 'ASC')->findAll();
 
         return view('components/header_v3', array(
             'title' => 'Claim Your Facility | Handglove',
@@ -83,9 +87,9 @@ class Claim extends BaseController
         if ($this->request->isAJAX()) {
             $email_address = $this->request->getPost('email');
 
-            // $userModel = new UserModel;
-            // $checkEmail = $userModel->where('email', $email_address)->countAllResults();
-            $checkEmail = 0;
+            $userModel = new UserModel;
+            $checkEmail = $userModel->where('email', $email_address)->countAllResults();
+            // $checkEmail = 0;
             if($checkEmail > 0){
                 $data['message'] = 'Email already exists.';
             }else{
@@ -221,7 +225,7 @@ class Claim extends BaseController
                 $management = [
                     'leads_id' => $leadID,
                     'name' => $this->request->getPost('first_name') . ' ' . $this->request->getPost('last_name'),
-                    'position' => $this->request->getPost('position'),
+                    'user_type' => $this->request->getPost('position'),
                     'email' => $this->request->getPost('email_address'),
                     'contact_number' => $this->request->getPost('contact_number')
                 ];

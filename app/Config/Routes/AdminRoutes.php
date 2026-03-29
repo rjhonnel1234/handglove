@@ -87,6 +87,26 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->post('list', 'ClinicianTypes::list');
     });
 
+    $routes->group('institutions', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'Institutions::index');
+        $routes->get('create', 'Institutions::create');
+        $routes->post('store', 'Institutions::store');
+        $routes->get('edit/(:num)', 'Institutions::edit/$1');
+        $routes->post('update/(:num)', 'Institutions::update/$1');
+        $routes->get('delete/(:num)', 'Institutions::delete/$1');
+        $routes->post('list', 'Institutions::list');
+    });
+
+    $routes->group('credential-types', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'CredentialTypes::index');
+        $routes->get('create', 'CredentialTypes::create');
+        $routes->post('store', 'CredentialTypes::store');
+        $routes->get('edit/(:num)', 'CredentialTypes::edit/$1');
+        $routes->post('update/(:num)', 'CredentialTypes::update/$1');
+        $routes->get('delete/(:num)', 'CredentialTypes::delete/$1');
+        $routes->post('list', 'CredentialTypes::list');
+    });
+
     $routes->group('clinicians', ['filter' => 'adminAuth'], function ($routes) {
         $routes->get('', 'Clinicians::index');
         $routes->get('create', 'Clinicians::create');
@@ -98,6 +118,8 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->post('upload', 'Clinicians::upload');
         $routes->get('get-pcc-credentials', 'Clinicians::get_pcc_credentials');
         $routes->post('toggle-user-status', 'Clinicians::toggle_user_status');
+        $routes->get('get-credentials', 'Clinicians::get_credentials');
+        $routes->post('upload-credential', 'Clinicians::upload_credential');
         $routes->post('list', 'Clinicians::list');
     });
 
@@ -128,5 +150,51 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->get('/', 'Shifts::index');
         $routes->post('list', 'Shifts::list');
         $routes->get('resources', 'Shifts::resources');
+    });
+
+    $routes->group('leads', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'Leads::index');
+        $routes->get('create', 'Leads::create');
+        $routes->post('store', 'Leads::store');
+        $routes->get('view/(:num)', 'Leads::view/$1');
+        $routes->get('edit/(:num)', 'Leads::edit/$1');
+        $routes->post('update/(:num)', 'Leads::update/$1');
+        $routes->get('delete/(:num)', 'Leads::delete/$1');
+        $routes->post('list', 'Leads::list');
+        $routes->post('updateStatus', 'Leads::updateStatus');
+    });
+
+    $routes->group('facilities', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'Facilities::index');
+        $routes->get('create', 'Facilities::create');
+        $routes->post('store', 'Facilities::store');
+        $routes->get('edit/(:num)', 'Facilities::edit/$1');
+        $routes->post('update/(:num)', 'Facilities::update/$1');
+        $routes->get('delete/(:num)', 'Facilities::delete/$1');
+        $routes->post('list', 'Facilities::list');
+        $routes->post('upload', 'Facilities::upload');
+
+        // New Routes for Details & Sub-Management
+        $routes->get('details/(:num)', 'Facilities::details/$1');
+        
+        // Units
+        $routes->post('units/list/(:num)', 'Facilities::units_list/$1');
+        $routes->get('units/create/(:num)', 'Facilities::units_create/$1');
+        $routes->post('units/store', 'Facilities::units_store');
+        $routes->get('units/edit/(:num)', 'Facilities::units_edit/$1');
+        $routes->post('units/update/(:num)', 'Facilities::units_update/$1');
+        $routes->get('units/delete/(:num)', 'Facilities::units_delete/$1');
+
+        // Personnel
+        $routes->post('personnel/list/(:num)', 'Facilities::personnel_list/$1');
+        $routes->get('personnel/create/(:num)', 'Facilities::personnel_create/$1');
+        $routes->post('personnel/store', 'Facilities::personnel_store');
+        $routes->get('personnel/edit/(:num)', 'Facilities::personnel_edit/$1');
+        $routes->post('personnel/update/(:num)', 'Facilities::personnel_update/$1');
+        $routes->get('personnel/delete/(:num)', 'Facilities::personnel_delete/$1');
+
+        // Lists for Shifts, Invoices, Receipts
+        $routes->post('shifts/list/(:num)', 'Facilities::shifts_list/$1');
+        $routes->post('invoices/list/(:num)', 'Facilities::invoices_list/$1');
     });
 });

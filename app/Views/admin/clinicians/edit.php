@@ -1,7 +1,7 @@
 <?= $this->extend('admin/includes/layout') ?>
 
 <?= $this->section('content') ?>
-<div class="container-fluid px-4">
+<div class="container-fluid">
     <div class="heading mb-4">
         <h2>Clinicians</h2>
         <div class="kicker-bottom">Edit Clinician</div>
@@ -254,7 +254,7 @@
 
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-primary px-4">Update Clinician</button>
+                <button type="submit" class="btn thm-btn px-4 mr-2">Update Clinician</button>
                 <a href="<?= base_url('admin/clinicians') ?>" class="btn btn-outline-secondary px-4">Reset</a>
             </div>
         </div>

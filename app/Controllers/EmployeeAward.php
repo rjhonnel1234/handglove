@@ -108,7 +108,7 @@ class EmployeeAward extends BaseController
 
                 $item = [
                     'leads_id' => $leads_id,
-                    'position' => 'Supervisor',
+                    'user_type' => 1,
                     'name' => $supervisor_name,
                     'email' => $supervisor_email,
                     'contact_number' => $supervisor_contact_number,

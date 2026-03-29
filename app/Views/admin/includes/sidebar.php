@@ -43,6 +43,8 @@
 <?php if($isAdmin): ?>
 <ul class="admin_nav">
     <li class="section-nav">Admin</li>
+    <li><a href="<?= base_url('admin/facilities') ?>"><i class="fa fa-hospital"></i>Facilities</a></li>
+    <li><a href="<?= base_url('admin/leads') ?>"><i class="fa fa-bullhorn"></i>Leads</a></li>
     <li><a href="<?= base_url('admin/donors') ?>"><i class="fa fa-hospital-user"></i>Facility Personnel</a></li>
     <li><a href="<?= base_url('admin/roles') ?>"><i class="fa fa-user-shield"></i>Roles</a></li>
     <li><a href="<?= base_url('admin/users') ?>"><i class="fa fa-user"></i>Users</a></li>

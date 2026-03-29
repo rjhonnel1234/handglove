@@ -182,12 +182,10 @@
                                 <div class="form-group">
                                     <label for="" class="label-parent">Your position in the company?</label>
                                     <select name="position" id="position" class="form-control required" data-title="Select your position">
-                                        <option value="DON">DON</option>
-                                        <option value="HR">HR</option>
-                                        <option value="Admin">Admin</option>
-                                        <option value="Scheduler">Scheduler</option>
-                                        <option value="Supervisor">Supervisor</option>
-                                        <option value="Other">Other</option>
+                                        <?php foreach($user_types as $user_type){ ?>
+                                            <option value="<?php echo $user_type['id']; ?>"><?php echo $user_type['name']; ?></option>
+                                        <?php } ?>
+                                        <option value="8">Other</option>
                                     </select>
                                 </div>
                             </section>

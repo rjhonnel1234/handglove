@@ -13,7 +13,7 @@ class FacilityModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['leads_id', 'company_logo', 'company_name', 'company_address', 'zip_code', 'company_email', 'company_number', 'agencies'];
+    protected $allowedFields    = ['leads_id', 'provider_id', 'company_logo', 'company_name', 'company_address', 'zip_code', 'company_email', 'company_number', 'agencies', 'created_datetime', 'status', 'timezone', 'census', 'country_id', 'state_id'];
 
     // Dates
     protected $useTimestamps = false;
@@ -38,4 +38,15 @@ class FacilityModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+
+    public $status_mapping = [
+        0 => 'Inactive',
+        10 => 'Active',
+    ];
+
+    public $status_badge_color = [
+        0 => 'bg-danger',
+        10 => 'bg-success',
+    ];
 }

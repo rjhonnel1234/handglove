@@ -1,0 +1,46 @@
+<?= $this->extend('admin/includes/layout') ?>
+
+<?= $this->section('content') ?>
+<div class="container-fluid">
+    <div class="heading d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Institutions</h2>
+            <div class="kicker-bottom">Manage Healthcare Institutions</div>
+        </div>
+        <a href="<?= base_url('admin/institutions/create') ?>" class="btn thm-btn">Add Institution</a>
+    </div>
+
+    <?php if(session()->getFlashdata('message')):?>
+        <div class="alert alert-success">
+            <?= session()->getFlashdata('message') ?>
+        </div>
+    <?php endif;?>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="institutionsTable" width="100%" cellspacing="0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="150" class="text-left">CCN</th>
+                            <th class="text-left">Name</th>
+                            <th class="text-center" width="150">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- DataTables will populate this -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<?= $this->endSection() ?>
+
+<?= $this->section('customJS') ?>
+<script type="text/javascript">
+    const csrfName = '<?= csrf_token() ?>';
+    const csrfHash = '<?= csrf_hash() ?>';
+    const base_url = '<?= base_url() ?>';
+</script>
+<?= $this->endSection() ?>

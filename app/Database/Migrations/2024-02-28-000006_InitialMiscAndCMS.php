@@ -378,9 +378,9 @@ class InitialMiscAndCMS extends Migration
                 'type'       => 'INT',
                 'constraint' => 11,
             ],
-            'position' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 256,
+            'user_type' => [
+                'type'       => 'INT',
+                'constraint' => 12,
             ],
             'name' => [
                 'type'       => 'VARCHAR',
@@ -397,7 +397,7 @@ class InitialMiscAndCMS extends Migration
             'contact_number' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 256,
-            ],
+            ]
         ]);
         $this->forge->addKey('id', true);
         $this->forge->createTable('tbl_leads_management');

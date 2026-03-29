@@ -69,6 +69,11 @@ class InitialAuthAndRoles extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => 512,
             ],
+            'is_management' => [
+                'type' => 'TINYINT',
+                'constraint' => 1,
+                'default'    => 0,
+            ]
         ]);
         $this->forge->addKey('id', true);
         $this->forge->createTable('tbl_user_types');

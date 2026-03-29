@@ -6,6 +6,7 @@ use App\Models\ProvidersModel;
 use App\Models\CountriesModel;
 use App\Models\StatesModel;
 use App\Models\LeadsModel;
+use App\Models\UserTypesModel;
 use App\Models\LeadsManagementModel;
 use App\Models\UserModel;
 
@@ -16,6 +17,9 @@ class Demo extends BaseController
         $providerModel = new ProvidersModel;
         $statesModel = new StatesModel;
         $countriesModel = new CountriesModel;
+
+        $userTypesModel = new UserTypesModel();
+        $data['user_types'] = $userTypesModel->where('is_management', 1)->orderBy('name', 'ASC')->findAll();
 
         $data['providers'] = $providerModel->findAll();
         $data['countries'] = $countriesModel->where('id', 233)->findAll();
@@ -302,7 +306,7 @@ class Demo extends BaseController
                 $management = [
                     'leads_id' => $leadID,
                     'name' => $this->request->getPost('first_name') . ' ' . $this->request->getPost('last_name'),
-                    'position' => $this->request->getPost('position'),
+                    'user_type' => $this->request->getPost('position'),
                     'email' => $this->request->getPost('email_address'),
                     'contact_number' => $this->request->getPost('contact_number')
                 ];

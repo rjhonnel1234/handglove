@@ -1,7 +1,7 @@
 <?= $this->extend('admin/includes/layout') ?>
 
 <?= $this->section('content') ?>
-<div class="container-fluid px-4">
+<div class="container-fluid">
     <div class="heading d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2>Clinician Types</h2>

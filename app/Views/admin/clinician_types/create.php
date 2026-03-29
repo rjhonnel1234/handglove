@@ -1,7 +1,7 @@
 <?= $this->extend('admin/includes/layout') ?>
 
 <?= $this->section('content') ?>
-<div class="container-fluid px-4">
+<div class="container-fluid">
     <div class="heading mb-4">
         <h2>Clinician Types</h2>
         <div class="kicker-bottom">Add New Clinician Type</div>

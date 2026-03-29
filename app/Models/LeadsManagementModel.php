@@ -13,7 +13,7 @@ class LeadsManagementModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['leads_id', 'name', 'position', 'is_approver', 'email', 'contact_number'];
+    protected $allowedFields    = ['leads_id', 'name', 'user_type', 'is_approver', 'email', 'contact_number'];
 
     // Dates
     protected $useTimestamps = false;

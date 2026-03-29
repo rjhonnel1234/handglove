@@ -67,12 +67,12 @@ class AdminMenu extends BaseConfig
             ],
             [
                 'title' => 'Credential Types',
-                'url'   => 'admin/donors',
+                'url'   => 'admin/credential-types',
                 'icon'  => 'fa fa-certificate'
             ],
             [
                 'title' => 'Institutions',
-                'url'   => 'admin/donors',
+                'url'   => 'admin/institutions',
                 'icon'  => 'fa fa-hospital-alt'
             ],
             [
