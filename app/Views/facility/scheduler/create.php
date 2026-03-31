@@ -20,7 +20,7 @@
                                             <?php 
                                             $shifts = [
                                                 'Day' => '07:00 AM - 03:00 PM',
-                                                'Mid' => '03:00 PM - 11:00 PM',
+                                                'Evening' => '03:00 PM - 11:00 PM',
                                                 'Night' => '11:00 PM - 07:00 AM'
                                             ];
                                             foreach($shifts as $name => $time): 

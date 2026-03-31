@@ -15,6 +15,7 @@ $routes->group("facility", ["namespace" => "App\Controllers"], function ($routes
         $routes->post('upload', 'Schedules::upload');
         $routes->post('list', 'Schedules::list');
         $routes->get('parse/(:num)', 'Schedules::parse/$1');
+        $routes->get('preview/(:num)', 'Schedules::preview/$1');
         $routes->get('add', 'Schedules::add');
         $routes->get('view', 'Schedules::view');
         $routes->get('download/(:num)', 'Schedules::download/$1');

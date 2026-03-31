@@ -8,16 +8,18 @@
         align-items: center;
         justify-content: center;
     }
+
     .dropzone .dz-message {
         font-weight: 400;
         color: #6c757d;
     }
+
     .dropzone .dz-message span {
         font-size: 16px;
     }
 </style>
 <?php
-    echo view('facility/includes/profile_banner');
+echo view('facility/includes/profile_banner');
 ?>
 
 <div id="profile-bios">
@@ -98,12 +100,47 @@
     </div>
 </div>
 
+<script>
+    (function() {
+        var redirectCheck = setInterval(function() {
+            if (typeof Dropzone !== 'undefined' && Dropzone.instances && Dropzone.instances.length > 0) {
+                var found = false;
+                Dropzone.instances.forEach(function(dz) {
+                    if (dz.element && dz.element.id === 'schedule-dropzone') {
+                        // Remove existing success handlers if any to avoid duplicates
+                        dz.off("success"); 
+                        dz.on("success", function(file, response) {
+                            var res = response;
+                            if (typeof response === 'string') {
+                                try { res = JSON.parse(response); } catch(e) { console.error('JSON parse error', e); }
+                            }
+                            console.log('Upload response:', res);
+                            if (res.success && res.redirect) {
+                                window.location.href = res.redirect;
+                            } else if (res.message && typeof toastr !== 'undefined') {
+                                toastr.success(res.message);
+                            }
+                        });
+                        found = true;
+                    }
+                });
+                if (found) clearInterval(redirectCheck);
+            }
+        }, 500);
+        
+        // Stop checking after 10 seconds to avoid infinite loop if modal isn't opened
+        setTimeout(function() { clearInterval(redirectCheck); }, 10000);
+    })();
+</script>
+
 <!-- Upload Schedule Modal -->
-<div class="modal fade" id="uploadScheduleModal" tabindex="-1" role="dialog" aria-labelledby="uploadScheduleModalLabel" aria-hidden="true">
+<div class="modal fade" id="uploadScheduleModal" tabindex="-1" role="dialog" aria-labelledby="uploadScheduleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document" style="max-width: 600px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadScheduleModalLabel">Upload Schedule for <span id="selected-date-display"></span></h5>
+                <h5 class="modal-title" id="uploadScheduleModalLabel">Upload Schedule for <span
+                        id="selected-date-display"></span></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

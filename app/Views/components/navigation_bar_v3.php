@@ -1,4 +1,3 @@
-
 <!-- main header -->
 <header class="main-header">
     <div class="header-top">
@@ -38,7 +37,8 @@
                 <div class="menu-area clearfix">
                     <figure class="logo-box">
                         <a href="<?php echo base_url(); ?>">
-                            <img src="<?php echo base_url('assets/img/handglove-logo.png'); ?>" alt="" width="100"> Handglove
+                            <img src="<?php echo base_url('assets/img/handglove-logo.png'); ?>" alt="" width="100">
+                            Handglove
                         </a>
                     </figure>
                     <!--Mobile Navigation Toggler-->
@@ -52,7 +52,7 @@
                             <ul class="navigation clearfix">
                                 <li class="current"><a href="<?php echo base_url(); ?>">Home</a></li>
                                 <li><a href="<?php echo base_url('about'); ?>">Facility</a></li>
-                                <li><a href="<?php echo base_url('about'); ?>">Clinician</a></li>
+                                <li><a href="<?php echo base_url('clinician'); ?>">Clinician</a></li>
                                 <li><a href="<?php echo base_url('msp'); ?>">MSP</a></li>
                                 <!-- <li class="current"><a href="<?php echo base_url(); ?>">Home</a></li>
                                 <li><a href="<?php echo base_url('about'); ?>">About</a></li>
@@ -104,7 +104,8 @@
                 <div class="menu-area">
                     <figure class="logo-box">
                         <a href="<?php echo base_url(); ?>">
-                            <img src="<?php echo base_url('assets/img/handglove-logo.png'); ?>" alt="" width="100"> Handglove
+                            <img src="<?php echo base_url('assets/img/handglove-logo.png'); ?>" alt="" width="100">
+                            Handglove
                         </a>
                     </figure>
                     <nav class="main-menu clearfix">
@@ -127,7 +128,8 @@
     <div class="menu-backdrop"></div>
     <div class="close-btn"><i class="fas fa-times"></i></div>
     <nav class="menu-box">
-        <div class="nav-logo"><a href="<?php echo base_url(); ?>"><img src="assets/images/logo-2.png" alt="" title=""></a>
+        <div class="nav-logo"><a href="<?php echo base_url(); ?>"><img src="assets/images/logo-2.png" alt=""
+                    title=""></a>
         </div>
         <div class="menu-outer">
             <!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header-->

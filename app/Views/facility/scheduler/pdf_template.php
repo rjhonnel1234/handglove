@@ -10,7 +10,7 @@
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             font-size: 10pt;
-            color: #333;
+            color: #000;
             margin: 0;
             padding: 0;
         }
@@ -42,30 +42,32 @@
             clear: both;
         }
         .unit-section {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             page-break-inside: avoid;
         }
         .unit-title {
             text-align: center;
-            font-size: 18pt;
+            font-size: 22pt;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #000;
+            color: #333;
         }
         .schedule-table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
+            border: 1px solid #000;
         }
         .schedule-table th {
-            background-color: #f2f2f2;
-            border: 1px solid #999;
-            padding: 5px;
+            background-color: #fff;
+            border: 1px solid #000;
+            padding: 8px;
             text-align: center;
             font-weight: bold;
+            font-size: 11pt;
         }
         .schedule-table td {
-            border: 1px solid #999;
+            border: 1px solid #000;
             vertical-align: top;
             padding: 0;
         }
@@ -77,34 +79,46 @@
             border-collapse: collapse;
         }
         .inner-table th {
-            background-color: transparent;
-            border: none;
-            border-bottom: 1px solid #ccc;
-            font-size: 8pt;
-            padding: 3px;
+            background-color: #fff;
+            border-bottom: 1px solid #000;
+            border-right: 1px solid #000;
+            font-size: 9pt;
+            padding: 4px;
+            text-align: left;
+        }
+        .inner-table th:last-child {
+            border-right: none;
         }
         .inner-table td {
-            border: none;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #000;
             padding: 4px 6px;
             font-size: 9pt;
-            line-height: 1.2;
+            line-height: 1.4;
         }
-        .col-name { width: 50%; }
-        .col-other { width: 20%; }
+        .inner-table td:last-child {
+            border-right: none;
+        }
+        .inner-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .col-name { width: 45%; }
+        .col-other { width: 25%; }
         .col-pos { width: 30%; text-align: right; }
         
         .staff-name {
-            font-weight: bold;
+            font-weight: normal;
         }
         .staff-pos {
-            font-size: 8pt;
-            color: #444;
+            font-size: 9pt;
+            font-weight: normal;
         }
         .empty-notice {
             text-align: center;
             color: #999;
             font-style: italic;
-            padding: 15px;
+            padding: 20px;
             font-size: 9pt;
         }
     </style>
@@ -155,7 +169,7 @@
                                         <?php foreach ($groupedAssignments[$unitId]['day'] as $staff): ?>
                                             <tr>
                                                 <td class="col-name"><span class="staff-name"><?= htmlspecialchars($staff['first_name'] . ' ' . $staff['last_name']) ?></span></td>
-                                                <td class="col-other"></td>
+                                                <td class="col-other"><?= htmlspecialchars($staff['role_detail'] ?? '') ?></td>
                                                 <td class="col-pos"><span class="staff-pos"><?= htmlspecialchars($staff['clinician_type_name']) ?></span></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -179,7 +193,7 @@
                                         <?php foreach ($groupedAssignments[$unitId]['mid'] as $staff): ?>
                                             <tr>
                                                 <td class="col-name"><span class="staff-name"><?= htmlspecialchars($staff['first_name'] . ' ' . $staff['last_name']) ?></span></td>
-                                                <td class="col-other"></td>
+                                                <td class="col-other"><?= htmlspecialchars($staff['role_detail'] ?? '') ?></td>
                                                 <td class="col-pos"><span class="staff-pos"><?= htmlspecialchars($staff['clinician_type_name']) ?></span></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -203,7 +217,7 @@
                                         <?php foreach ($groupedAssignments[$unitId]['night'] as $staff): ?>
                                             <tr>
                                                 <td class="col-name"><span class="staff-name"><?= htmlspecialchars($staff['first_name'] . ' ' . $staff['last_name']) ?></span></td>
-                                                <td class="col-other"></td>
+                                                <td class="col-other"><?= htmlspecialchars($staff['role_detail'] ?? '') ?></td>
                                                 <td class="col-pos"><span class="staff-pos"><?= htmlspecialchars($staff['clinician_type_name']) ?></span></td>
                                             </tr>
                                         <?php endforeach; ?>

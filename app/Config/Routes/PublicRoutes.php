@@ -6,9 +6,9 @@
 $routes->get('/', 'Home::index');
 $routes->set404Override('App\Controllers\NotFound::index');
 
-$routes->get('/login', 'Login::index',['filter' => 'authenticate']);
-$routes->get('/login/reset-password/(:segment)', 'Login::reset_password/$1',['filter' => 'authenticate']);
-$routes->post('/login/change-password/', 'Login::change_password',['filter' => 'authenticate']);
+$routes->get('/login', 'Login::index', ['filter' => 'authenticate']);
+$routes->get('/login/reset-password/(:segment)', 'Login::reset_password/$1', ['filter' => 'authenticate']);
+$routes->post('/login/change-password/', 'Login::change_password', ['filter' => 'authenticate']);
 
 $routes->group("notifications", ["namespace" => "App\Controllers", "filter" => "userAuth"], function ($routes) {
     $routes->get('', 'NotificationsController::index');
@@ -18,8 +18,8 @@ $routes->group("notifications", ["namespace" => "App\Controllers", "filter" => "
     $routes->post('mark_read/(:num)', 'NotificationsController::mark_read/$1');
 });
 
-$routes->match(['post'], '/login', 'Login::index',['filter' => 'authenticate']);
-$routes->match(['post', 'get'], '/login/forgot-password', 'Login::forgot_password',['filter' => 'authenticate']);
+$routes->match(['post'], '/login', 'Login::index', ['filter' => 'authenticate']);
+$routes->match(['post', 'get'], '/login/forgot-password', 'Login::forgot_password', ['filter' => 'authenticate']);
 $routes->get('login/logout', 'Login::logout');
 
 $routes->get('demo-request', 'Demo::index');
@@ -44,7 +44,7 @@ $routes->get('/awards', 'Awards::index');
 $routes->get('/awards/pdf/(:num)', 'Clinician\Profile::generate_award_pdf/$1');
 $routes->get('/claim-facility', 'ClaimFacility::index');
 
-$routes->group('claim', function($routes){
+$routes->group('claim', function ($routes) {
     $routes->get('/', 'Claim::index');
     $routes->post('generateOTP', 'Claim::generateOTP');
     $routes->post('verifyOTP', 'Claim::verifyOTP');
@@ -61,6 +61,7 @@ $routes->get('job-seekers', 'JobSeekers::index');
 $routes->get('leadership', 'Leadership::index');
 $routes->get('resources', 'Resources::index');
 $routes->get('msp', 'Msp::index');
+$routes->get('clinician', 'Clinician::index');
 $routes->get('testimonials', 'Testimonials::index');
 $routes->get('how-it-works', 'HowItWorks::index');
 $routes->get('industries', 'Industries::index');

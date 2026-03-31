@@ -19,6 +19,8 @@ class Schedules extends BaseController
     protected $facilityModel;
     protected $shiftsModel;
     protected $shiftCliniciansModel;
+    protected $facilityOnboardingSettingsModel;
+    protected $clinicianTypesModel;
     protected $session;
 
     public function __construct()
@@ -30,6 +32,8 @@ class Schedules extends BaseController
         $this->facilityModel = new FacilityModel();
         $this->shiftsModel = new \App\Models\ShiftsModel();
         $this->shiftCliniciansModel = new \App\Models\ShiftCliniciansModel();
+        $this->facilityOnboardingSettingsModel = new \App\Models\FacilityOnboardingSettingsModel();
+        $this->clinicianTypesModel = new \App\Models\ClinicianTypesModel();
         $this->session = session();
     }
 
@@ -84,18 +88,18 @@ class Schedules extends BaseController
             ],
             'session' => $this->session
         ])
-        . view('facility/scheduler/view', $data)
-        . view('components/scripts_render', [
-            'scripts' => [
-                'https://code.jquery.com/jquery-3.5.1.min.js',
-                ASSETS_URL . 'js/plugins/popper.min.js',
-                ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
-                ASSETS_URL . 'js/components/global.min.js',
-                ASSETS_URL . 'js/components/navigation_bar.min.js',
-                ASSETS_URL . 'js/components/notifications.min.js',
-                ASSETS_URL . 'js/pages/facility/scheduler/facility_scheduler_form.min.js',
-            ]
-        ]);
+            . view('facility/scheduler/view', $data)
+            . view('components/scripts_render', [
+                'scripts' => [
+                    'https://code.jquery.com/jquery-3.5.1.min.js',
+                    ASSETS_URL . 'js/plugins/popper.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
+                    ASSETS_URL . 'js/components/global.min.js',
+                    ASSETS_URL . 'js/components/navigation_bar.min.js',
+                    ASSETS_URL . 'js/components/notifications.min.js',
+                    ASSETS_URL . 'js/pages/facility/scheduler/facility_scheduler_form.min.js',
+                ]
+            ]);
     }
 
     public function add()
@@ -106,10 +110,10 @@ class Schedules extends BaseController
 
         $facilityId = $this->session->get('facility_id');
         $date = $this->request->getGet('date') ?: date('Y-m-d');
-        
+
         $facility = $this->facilityModel->find($facilityId);
         $units = $this->facilityUnitsModel->where('client_id', $facilityId)->findAll();
-        
+
         // Fetch staff with type 7
         $personnel = $this->clientPersonnelModel
             ->select('tbl_client_personnel.*, tbl_clinician_types.name as clinician_type_name')
@@ -170,20 +174,20 @@ class Schedules extends BaseController
             ],
             'session' => $this->session
         ])
-        . view('facility/scheduler/create', $data)
-        . view('components/scripts_render', [
-            'scripts' => [
-                'https://code.jquery.com/jquery-3.5.1.min.js',
-                ASSETS_URL . 'js/plugins/popper.min.js',
-                ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
-                ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
-                ASSETS_URL . 'js/components/global.min.js',
-                ASSETS_URL . 'js/components/navigation_bar.min.js',
-                ASSETS_URL . 'js/plugins/toastr.min.js',
-                ASSETS_URL . 'js/pages/facility/scheduler/facility_scheduler_form.min.js',
-            ]
-        ])
-        . view('components/footer');
+            . view('facility/scheduler/create', $data)
+            . view('components/scripts_render', [
+                'scripts' => [
+                    'https://code.jquery.com/jquery-3.5.1.min.js',
+                    ASSETS_URL . 'js/plugins/popper.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
+                    ASSETS_URL . 'js/components/global.min.js',
+                    ASSETS_URL . 'js/components/navigation_bar.min.js',
+                    ASSETS_URL . 'js/plugins/toastr.min.js',
+                    ASSETS_URL . 'js/pages/facility/scheduler/facility_scheduler_form.min.js',
+                ]
+            ])
+            . view('components/footer');
     }
 
     public function save_manual()
@@ -193,45 +197,95 @@ class Schedules extends BaseController
         }
 
         $facilityId = $this->session->get('facility_id');
-        $date = $this->request->getPost('schedule_date');
-        $unitsSchedule = $this->request->getPost('units_schedule');
+        $date = $this->request->getPost('date') ?: $this->request->getPost('schedule_date');
+        $uploadId = $this->request->getPost('upload_id');
+        $isConversion = $this->request->getPost('is_conversion');
+        $convertedData = $this->request->getPost('converted_data');
+        $assignments = $this->request->getPost('assignments'); // From preview page (old way)
+        $unitsSchedule = $this->request->getPost('units_schedule'); // From manual page
 
-        if (!$date || !is_array($unitsSchedule)) {
-            return $this->response->setJSON(['success' => 0, 'message' => 'Missing required data']);
-        }
-        // Add entry to client_schedules_upload if it doesn't exist
-        // This ensures the calendar recognizes a schedule exists for this date
-        $uploadExists = $this->clientScheduleUploadModel->where([
-            'client_id' => $facilityId,
-            'schedule_date' => $date
-        ])->first();
-
-        if ($uploadExists && $uploadExists['status'] == 20) {
-            return $this->response->setJSON(['success' => 0, 'message' => 'This schedule is synchronized as shifts and can no longer be edited.']);
+        if (!$date) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Missing required date']);
         }
 
-        if (!$uploadExists) {
-            $this->clientScheduleUploadModel->insert([
-                'client_id' => $facilityId,
-                'schedule_date' => $date,
-                'uploaded_by' => $this->session->get('id'),
-                'file_path' => '',
-                'filename' => '',
-                'status' => 10
-            ]);
-        }
-        foreach ($unitsSchedule as $unitId => $shifts) {
-            foreach ($shifts as $shiftName => $staff) {
-                foreach ($staff as $personnelId) {
-                    $exists = $this->clientScheduleDetailsModel->where([
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        // 1. Handle Conversion Logic (Automated PDF to Schedule)
+        if ($isConversion && $convertedData) {
+            $unitsData = json_decode($convertedData, true);
+            if (!is_array($unitsData)) {
+                return $this->response->setJSON(['success' => 0, 'message' => 'Invalid conversion data format.']);
+            }
+
+            // Clear existing schedule details for this date to ensure 1:1 sync with PDF
+            $this->clientScheduleDetailsModel->where(['client_id' => $facilityId, 'schedule_date' => $date])->delete();
+
+            foreach ($unitsData as $uData) {
+                $unitName = trim($uData['name']);
+                if (empty($unitName))
+                    continue;
+
+                // Find or Create Unit
+                $unit = $this->facilityUnitsModel->where(['client_id' => $facilityId, 'name' => $unitName])->first();
+                if (!$unit) {
+                    $unitId = $this->facilityUnitsModel->insert([
                         'client_id' => $facilityId,
-                        'unit_id' => $unitId,
-                        'personnel_id' => $personnelId,
-                        'schedule_date' => $date,
-                        'shift_name' => $shiftName
-                    ])->first();
+                        'name' => $unitName,
+                        'description' => 'Automatically created from PDF upload'
+                    ]);
+                } else {
+                    $unitId = $unit['id'];
+                }
 
-                    if (!$exists) {
+                foreach ($uData['shifts'] as $shiftName => $staffArray) {
+                    foreach ($staffArray as $staff) {
+                        $name = trim($staff['name'] ?? '');
+                        $position = trim($staff['position'] ?? '');
+                        if (empty($name))
+                            continue;
+
+                        // Find or Create Clinician Type
+                        $cType = $this->clinicianTypesModel->where('name', $position)->first();
+                        if (!$cType && !empty($position)) {
+                            $cTypeId = $this->clinicianTypesModel->insert([
+                                'name' => $position,
+                                'status' => 1,
+                                'grouping' => ''
+                            ]);
+                        } else {
+                            $cTypeId = $cType ? $cType['id'] : 0;
+                        }
+
+                        // Split Name
+                        $nameParts = explode(' ', $name);
+                        $fName = $nameParts[0] ?? 'Unknown';
+                        $lName = count($nameParts) > 1 ? trim(implode(' ', array_slice($nameParts, 1))) : '';
+
+                        // Find or Create Personnel
+                        $personnel = $this->clientPersonnelModel->where([
+                            'client_id' => $facilityId,
+                            'first_name' => $fName,
+                            'last_name' => $lName
+                        ])->first();
+
+                        if (!$personnel) {
+                            $personnelId = $this->clientPersonnelModel->insert([
+                                'client_id' => $facilityId,
+                                'type' => 7, // Facility staff
+                                'first_name' => $fName,
+                                'last_name' => $lName,
+                                'status' => 1,
+                                'clinician_type' => $cTypeId,
+                                'email' => '',
+                                'contact_number' => ''
+                            ]);
+                        } else {
+                            $personnelId = $personnel['id'];
+                            // Optional: Update clinician_type if it was changed/unknown?
+                        }
+
+                        // Create Schedule Detail
                         $this->clientScheduleDetailsModel->insert([
                             'client_id' => $facilityId,
                             'unit_id' => $unitId,
@@ -243,9 +297,97 @@ class Schedules extends BaseController
                     }
                 }
             }
+
+            // Sync original upload record status to 10 (Pending)
+            if ($uploadId) {
+                $this->clientScheduleUploadModel->update($uploadId, ['status' => 10]);
+            }
+        } else {
+            // ORIGINAL MANUAL SAVE LOGIC (Retained for backwards compatibility)
+            if ($uploadId) {
+                // Finalizing a PDF upload (old way)
+                $uploadExists = $this->clientScheduleUploadModel->find($uploadId);
+                if ($uploadExists && $uploadExists['client_id'] == $facilityId) {
+                    $this->clientScheduleUploadModel->update($uploadId, ['status' => 20]);
+                }
+            }
+
+            // Handle Assignments (from Preview - old way)
+            if (is_array($assignments)) {
+                foreach ($assignments as $unitId => $shifts) {
+                    foreach ($shifts as $shiftName => $staffArray) {
+                        foreach ($staffArray as $staffJson) {
+                            $staff = json_decode($staffJson, true);
+                            if (!$staff)
+                                continue;
+
+                            $name = $staff['name'];
+                            $nameParts = explode(' ', $name);
+                            $fName = $nameParts[0] ?? 'Unknown';
+                            $lName = count($nameParts) > 1 ? trim(implode(' ', array_slice($nameParts, 1))) : '';
+
+                            $personnel = $this->clientPersonnelModel->where(['client_id' => $facilityId, 'first_name' => $fName, 'last_name' => $lName])->first();
+                            if (!$personnel) {
+                                $pType = $this->clinicianTypesModel->where('name', $staff['position'])->first();
+                                $pTypeId = $pType ? $pType['id'] : 0;
+                                $personnelId = $this->clientPersonnelModel->insert([
+                                    'client_id' => $facilityId,
+                                    'type' => 7,
+                                    'first_name' => $fName,
+                                    'last_name' => $lName,
+                                    'status' => 1,
+                                    'clinician_type' => $pTypeId
+                                ]);
+                            } else {
+                                $personnelId = $personnel['id'];
+                            }
+
+                            $exists = $this->clientScheduleDetailsModel->where(['client_id' => $facilityId, 'unit_id' => $unitId, 'personnel_id' => $personnelId, 'schedule_date' => $date, 'shift_name' => $shiftName])->first();
+                            if (!$exists) {
+                                $this->clientScheduleDetailsModel->insert([
+                                    'client_id' => $facilityId,
+                                    'unit_id' => $unitId,
+                                    'personnel_id' => $personnelId,
+                                    'schedule_date' => $date,
+                                    'shift_name' => $shiftName,
+                                    'shift_time' => $this->getShiftTimeRange($shiftName)
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Handle units_schedule (from Manual Add)
+            if (is_array($unitsSchedule)) {
+                foreach ($unitsSchedule as $unitId => $shifts) {
+                    foreach ($shifts as $shiftName => $staffIds) {
+                        foreach ($staffIds as $personnelId) {
+                            $exists = $this->clientScheduleDetailsModel->where(['client_id' => $facilityId, 'unit_id' => $unitId, 'personnel_id' => $personnelId, 'schedule_date' => $date, 'shift_name' => $shiftName])->first();
+                            if (!$exists) {
+                                $this->clientScheduleDetailsModel->insert([
+                                    'client_id' => $facilityId,
+                                    'unit_id' => $unitId,
+                                    'personnel_id' => $personnelId,
+                                    'schedule_date' => $date,
+                                    'shift_name' => $shiftName,
+                                    'shift_time' => $this->getShiftTimeRange($shiftName)
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        return $this->response->setJSON(['success' => 1, 'message' => 'All unit schedules saved successfully']);
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Failed to save schedule']);
+        }
+
+        $msg = ($isConversion) ? 'Schedule converted and saved successfully' : 'Schedule saved successfully';
+        return $this->response->setJSON(['success' => 1, 'message' => $msg]);
     }
 
     public function save_as_shifts()
@@ -282,7 +424,7 @@ class Schedules extends BaseController
             // $shiftType = $assignment['clinician_type'];
             $unitId = $assignment['unit_id'];
             $shiftName = strtolower($assignment['shift_name']);
-            
+
             $startTime = '';
             $endTime = '';
             $endDate = $date;
@@ -293,6 +435,7 @@ class Schedules extends BaseController
                     $endTime = '15:00:00';
                     break;
                 case 'mid':
+                case 'evening':
                     $startTime = '15:00:00';
                     $endTime = '23:00:00';
                     break;
@@ -306,7 +449,7 @@ class Schedules extends BaseController
             //get average_rate column on facility onboarding settings
             $onboarding = $this->facilityOnboardingSettingsModel->where('client_id', $facilityId)->first();
             $averageRate = ($onboarding && !empty($onboarding['average_rate'])) ? $onboarding['average_rate'] : 0;
- 
+
             // Check if a shift already exists for this unit, date, time, and type
             $shift = $this->shiftsModel->where([
                 'client_id' => $facilityId,
@@ -370,10 +513,15 @@ class Schedules extends BaseController
     private function getShiftTimeRange($shiftName)
     {
         switch (strtolower($shiftName)) {
-            case 'day': return '07:00 AM - 03:00 PM';
-            case 'mid': return '03:00 PM - 11:00 PM';
-            case 'night': return '11:00 PM - 07:00 AM';
-            default: return '';
+            case 'day':
+                return '07:00 AM - 03:00 PM';
+            case 'mid':
+            case 'evening':
+                return '03:00 PM - 11:00 PM';
+            case 'night':
+                return '11:00 PM - 07:00 AM';
+            default:
+                return '';
         }
     }
 
@@ -406,11 +554,11 @@ class Schedules extends BaseController
                     'tbl_shifts.start_date' => $date
                 ])
                 ->findAll();
-            
+
             // Map the data for consistent frontend usage
             foreach ($schedules as &$s) {
                 $s['id'] = null; // No record ID for deletion since these are from shifts
-                
+
                 // Name resolution
                 if ($s['clinician_id'] > 0) {
                     $nameParts = explode(' ', $s['clinician_name']);
@@ -438,7 +586,7 @@ class Schedules extends BaseController
             }
 
             // Sort by clinician type grouping (nurse first and then gna), then clinician type name
-            usort($schedules, function($a, $b) {
+            usort($schedules, function ($a, $b) {
                 if (($a['clinician_type_group'] ?? '') !== ($b['clinician_type_group'] ?? '')) {
                     return strcmp($b['clinician_type_group'] ?? '', $a['clinician_type_group'] ?? ''); // DESC
                 }
@@ -464,10 +612,10 @@ class Schedules extends BaseController
         $isLocked = ($isPast || ($upload && $upload['status'] == 20));
 
         return $this->response->setJSON([
-            'success' => 1, 
+            'success' => 1,
             'data' => $schedules,
             'is_locked' => $isLocked
-        ]);    
+        ]);
     }
 
     public function delete_personnel()
@@ -499,7 +647,7 @@ class Schedules extends BaseController
         }
 
         $facilityId = $this->session->get('facility_id');
-        
+
         $personnel = $this->clientPersonnelModel
             ->select('tbl_client_personnel.*, tbl_clinician_types.name as clinician_type_name, tbl_clinician_types.grouping as clinician_type_group')
             ->join('tbl_clinician_types', 'tbl_clinician_types.id = tbl_client_personnel.clinician_type', 'left')
@@ -534,36 +682,32 @@ class Schedules extends BaseController
 
         $file = $this->request->getFile('file');
         $shiftDate = $this->request->getPost('shift_date');
-
-        // Check if schedule already exists for this date
-        $existing = $this->clientScheduleUploadModel
-            ->where('client_id', $this->session->get('facility_id'))
-            ->where('schedule_date', $shiftDate)
-            ->first();
-
-        if ($existing) {
-            return $this->response->setJSON(['success' => 0, 'message' => 'A schedule has already been uploaded for this date.']);
-        }
+        $facilityId = $this->session->get('facility_id');
 
         if ($file->isValid() && !$file->hasMoved()) {
-            $newName = $file->getRandomName();
             if (!is_dir(FCPATH . 'uploads/schedules')) {
                 mkdir(FCPATH . 'uploads/schedules', 0777, true);
             }
+
+            $newName = $file->getRandomName();
             $file->move(FCPATH . 'uploads/schedules', $newName);
+            $filePath = 'uploads/schedules/' . $newName;
 
-            $data = [
-                'client_id' => $this->session->get('facility_id'),
-                'schedule_date' => $this->request->getPost('shift_date'),
-                'filename' => $file->getClientName(),
-                'file_path' => 'uploads/schedules/' . $newName,
+            // Create draft upload record
+            $uploadId = $this->clientScheduleUploadModel->insert([
+                'client_id' => $facilityId,
+                'schedule_date' => $shiftDate,
                 'uploaded_by' => $this->session->get('id'),
-                'status' => 10
-            ];
+                'file_path' => $filePath,
+                'filename' => $file->getClientName(),
+                'status' => 5 // For Review
+            ]);
 
-            if ($this->clientScheduleUploadModel->insert($data)) {
-                return $this->response->setJSON(['success' => 1, 'message' => 'Schedule uploaded successfully']);
-            }
+            return $this->response->setJSON([
+                'success' => 1,
+                'message' => 'Schedule uploaded successfully',
+                'redirect' => base_url('facility/schedules/preview/' . $uploadId)
+            ]);
         }
 
         return $this->response->setJSON(['success' => 0, 'message' => 'Failed to upload schedule']);
@@ -581,32 +725,36 @@ class Schedules extends BaseController
         $events = [];
         foreach ($schedules as $schedule) {
             $bg = "#ffeb003b";
-            if($schedule['status'] == 20 || $schedule['status'] == 30){
+            if ($schedule['status'] == 20 || $schedule['status'] == 30) {
                 $bg = "#8fdf82";
             }
 
             $html = '<div class="uploaded-schedule"><i class="fa fa-file-pdf"></i></div>';
             $html .= '<div class="uploaded-schedule-actions">';
-                // Always show download link for official schedules or saved manual ones
-                
-                if($schedule['status'] == 10){
-                    if($schedule['schedule_date'] >= date("Y-m-d")){
-                        $html .= '<a href="javascript:void(0)" class="upload-new-schedule" data-toggle="tooltip" data-placement="top" title="Upload new PDF"><i class="fa fa-upload"></i></a>';
-                    }
-                }
+            // Always show download link for official schedules or saved manual ones
 
-                if($schedule['status'] == 10){
-                    if($schedule['schedule_date'] >= date("Y-m-d")){
-                        $html .= '<a href="'.base_url('facility/schedules/add?date='.$schedule['schedule_date']).'" target="_blank" class="pencil" data-toggle="tooltip" data-placement="top" title="Edit schedule"><i class="fa fa-edit"></i></a>';
-                    }else{
-                        $html .= '<a href="'.base_url('facility/schedules/view?date='.$schedule['schedule_date']).'" target="_blank" class="pencil" data-toggle="tooltip" data-placement="top" title="View schedule"><i class="fa fa-eye"></i></a>';
-                    }
-                }else{
-                    if($schedule['schedule_date'] < date("Y-m-d")){
-                        $html .= '<a href="'.base_url('facility/schedules/download/'.$schedule['id']).'" data-toggle="tooltip" data-placement="top" title="Download PDF"><i class="fa fa-download"></i></a>';
-                    }
-                    $html .= '<a href="'.base_url('facility/schedules/view?date='.$schedule['schedule_date']).'" target="_blank" class="pencil" data-toggle="tooltip" data-placement="top" title="View schedule"><i class="fa fa-eye"></i></a>';
+            if ($schedule['status'] != 5) {
+                if ($schedule['schedule_date'] < date("Y-m-d")) {
+                    $html .= '<a href="' . base_url('facility/schedules/download/' . $schedule['id']) . '" data-toggle="tooltip" data-placement="top" title="Download PDF"><i class="fa fa-download"></i></a>';
                 }
+            }
+
+
+            if ($schedule['status'] == 5) {
+                if ($schedule['schedule_date'] >= date("Y-m-d")) {
+                    $html .= '<a href="' . base_url('facility/schedules/preview/' . $schedule['id']) . '" target="_blank" class="pencil" data-toggle="tooltip" data-placement="top" title="Preview upload"><i class="fa fa-search"></i></a>';
+                } else {
+                    $html .= '<a href="' . base_url('facility/schedules/view?date=' . $schedule['schedule_date']) . '" target="_blank" class="pencil" data-toggle="tooltip" data-placement="top" title="View schedule"><i class="fa fa-eye"></i></a>';
+                }
+            } else if ($schedule['status'] == 10) {
+                if ($schedule['schedule_date'] >= date("Y-m-d")) {
+                    $html .= '<a href="' . base_url('facility/schedules/add?date=' . $schedule['schedule_date']) . '" target="_blank" class="pencil" data-toggle="tooltip" data-placement="top" title="Edit schedule"><i class="fa fa-edit"></i></a>';
+                } else {
+                    $html .= '<a href="' . base_url('facility/schedules/view?date=' . $schedule['schedule_date']) . '" target="_blank" class="pencil" data-toggle="tooltip" data-placement="top" title="View schedule"><i class="fa fa-eye"></i></a>';
+                }
+            } else {
+                $html .= '<a href="' . base_url('facility/schedules/view?date=' . $schedule['schedule_date']) . '" target="_blank" class="pencil" data-toggle="tooltip" data-placement="top" title="View schedule"><i class="fa fa-eye"></i></a>';
+            }
             $html .= '</div>';
 
 
@@ -707,7 +855,7 @@ class Schedules extends BaseController
             }
 
             // Sort
-            usort($assignments, function($a, $b) {
+            usort($assignments, function ($a, $b) {
                 if (($a['clinician_type_group'] ?? '') !== ($b['clinician_type_group'] ?? '')) {
                     return strcmp($b['clinician_type_group'] ?? '', $a['clinician_type_group'] ?? ''); // DESC
                 }
@@ -733,12 +881,19 @@ class Schedules extends BaseController
         foreach ($assignments as $assignment) {
             $unitId = $assignment['unit_id'];
             $shift = strtolower($assignment['shift_name']);
+            if ($shift == 'mid')
+                $shift = 'evening'; // Map to consistent internal key if needed, or keep both
+
             if (!isset($groupedAssignments[$unitId])) {
                 $groupedAssignments[$unitId] = [
                     'day' => [],
                     'mid' => [],
+                    'evening' => [], // Added evening
                     'night' => []
                 ];
+            }
+            if (!isset($groupedAssignments[$unitId][$shift])) {
+                $groupedAssignments[$unitId][$shift] = [];
             }
             $groupedAssignments[$unitId][$shift][] = $assignment;
         }
@@ -766,6 +921,105 @@ class Schedules extends BaseController
             ->setHeader('Content-Type', 'application/pdf')
             ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
             ->setBody($dompdf->output());
+    }
+
+    public function preview($id)
+    {
+        if (!$this->session->get('isLoggedIn') || $this->session->get('facility_id') == 0) {
+            return redirect()->to('/login');
+        }
+
+        $facilityId = $this->session->get('facility_id');
+        $upload = $this->clientScheduleUploadModel->find($id);
+
+        if (!$upload || $upload['client_id'] != $facilityId) {
+            return redirect()->to('/facility/schedules')->with('error', 'Schedule not found or unauthorized.');
+        }
+
+        $filePath = FCPATH . $upload['file_path'];
+        if (!file_exists($filePath)) {
+            return redirect()->to('/facility/schedules')->with('error', 'PDF file not found on server.');
+        }
+
+        $parsedData = $this->parse_schedule_pdf($filePath);
+
+        // Check DB existence for Units and Personnel
+        if (!empty($parsedData['units'])) {
+            foreach ($parsedData['units'] as $unitName => &$shiftData) {
+                // Unit check
+                $unitExists = $this->facilityUnitsModel->where(['client_id' => $facilityId, 'name' => $unitName])->first();
+                $shiftData['db_exists'] = !empty($unitExists);
+
+                // Personnel check
+                foreach (['Day', 'Evening', 'Night'] as $sKey) {
+                    if (!empty($shiftData[$sKey])) {
+                        foreach ($shiftData[$sKey] as &$staff) {
+                            $nameParts = explode(' ', trim($staff['name'] ?? ''));
+                            $fName = $nameParts[0] ?? '';
+                            $lName = (count($nameParts) > 1) ? implode(' ', array_slice($nameParts, 1)) : '';
+
+                            $personExists = $this->clientPersonnelModel->where([
+                                'client_id' => $facilityId,
+                                'first_name' => $fName,
+                                'last_name' => $lName
+                            ])->first();
+                            $staff['db_exists'] = !empty($personExists);
+                        }
+                    }
+                }
+            }
+        }
+
+        $facility = $this->facilityModel->find($facilityId);
+        $clinicianTypes = ($this->clinicianTypesModel ?? new \App\Models\ClinicianTypesModel())->where('status', 1)->findAll();
+
+        $data = [
+            'facility' => $facility,
+            'clinicianTypes' => $clinicianTypes,
+            'selectedDate' => $upload['schedule_date'],
+            'parsedData' => $parsedData,
+            'raw_text' => $parsedData['raw_text'] ?? '',
+            'upload_id' => $id,
+            'session' => $this->session,
+            'page' => 'schedules'
+        ];
+
+        return view('components/header', [
+            'title' => 'PDF Preview',
+            'description' => '',
+            'url' => BASE_URL,
+            'keywords' => '',
+            'meta' => [
+                'title' => 'PDF Preview',
+                'description' => 'Review your uploaded PDF schedule before saving.',
+                'image' => IMG_URL . ''
+            ],
+            'styles' => [
+                'plugins/font_awesome',
+                COMPILED_ASSETS_PATH . 'css/components/bootstrap',
+                COMPILED_ASSETS_PATH . 'css/components/fontawesome',
+                COMPILED_ASSETS_PATH . 'css/components/bootstrap-main',
+                COMPILED_ASSETS_PATH . 'css/components/bootstrap-select',
+                COMPILED_ASSETS_PATH . 'css/components/global',
+                COMPILED_ASSETS_PATH . 'css/components/navigation_bar',
+                COMPILED_ASSETS_PATH . 'css/components/footer',
+                COMPILED_ASSETS_PATH . 'css/pages/facility_scheduler_profile',
+            ],
+            'session' => $this->session
+        ])
+            . view('facility/scheduler/preview', $data)
+            . view('components/scripts_render', [
+                'scripts' => [
+                    'https://code.jquery.com/jquery-3.5.1.min.js',
+                    ASSETS_URL . 'js/plugins/popper.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
+                    ASSETS_URL . 'js/components/global.min.js',
+                    ASSETS_URL . 'js/components/navigation_bar.min.js',
+                    ASSETS_URL . 'js/pages/facility/scheduler/facility_scheduler_preview.min.js',
+                ]
+            ])
+            . view('components/footer');
     }
 
     public function parse($id)
@@ -798,65 +1052,101 @@ class Schedules extends BaseController
     {
         $extractedData = [
             'date' => null,
-            'units' => []
+            'units' => [],
+            'raw_text' => ''
         ];
 
         try {
             $parser = new \Smalot\PdfParser\Parser();
-            $pdf    = $parser->parseFile($filePath);
-            
+            $pdf = $parser->parseFile($filePath);
+            $extractedData['raw_text'] = $pdf->getText();
+
             $currentUnit = 'Default';
-            $currentShift = 'Unassigned';
-            
-            // Known positions to help identify staff rows
-            $positions = ['RN', 'LPN', 'GNA', 'UM', 'DON', 'ADON', 'Supervisor', 'Orientee', 'CNA', 'CMA'];
+            $currentShifts = ['Day', 'Evening', 'Night'];
+            $currentShiftIndex = -1;
+
+            // Known positions and roles to help identify staff rows
+            $positions = ['RN', 'LPN', 'GNA', 'UM', 'DON', 'ADON', 'Supervisor', 'Orientee', 'CNA', 'CMA', 'Wound Nurse'];
             $positionRegex = '/\b(' . implode('|', $positions) . ')\b/i';
 
-            foreach ($pdf->getPages() as $page) {
+            foreach ($pdf->getPages() as $pageIndex => $page) {
                 $text = $page->getText();
                 $lines = explode("\n", $text);
 
                 foreach ($lines as $line) {
                     $line = trim($line);
-                    if (empty($line)) continue;
-
-                    // 1. Detect Date (e.g., 2026-02-18)
-                    if (!$extractedData['date'] && preg_match('/(\d{4}-\d{2}-\d{2})/', $line, $matches)) {
-                        $extractedData['date'] = $matches[1];
+                    if (empty($line))
                         continue;
+                    // 1. Detect Date (e.g., 2026-02-18 or 02/18/2026)
+                    if (!$extractedData['date']) {
+                        if (preg_match('/(\d{4}-\d{2}-\d{2})/', $line, $matches)) {
+                            $extractedData['date'] = $matches[1];
+                        } elseif (preg_match('/(\d{2}\/\d{2}\/\d{4})/', $line, $matches)) {
+                            $extractedData['date'] = date('Y-m-d', strtotime($matches[1]));
+                        }
                     }
 
-                    // 2. Detect Unit Headers (e.g., Unit 1, Unit 2, Memory Care, Other Staff)
+                    // 2. Detect Unit Headers
                     if (preg_match('/(Unit\s*\d+|Memory\s*Care|Other\s*Staff)/i', $line, $matches)) {
-                        $currentUnit = ucwords(strtolower($matches[0]));
+                        $currentUnit = trim(ucwords(strtolower($matches[0])));
+                        $currentShiftIndex = -1; // Reset on unit change
                         if (!isset($extractedData['units'][$currentUnit])) {
-                            $extractedData['units'][$currentUnit] = [];
+                            $extractedData['units'][$currentUnit] = [
+                                'Day' => [],
+                                'Evening' => [],
+                                'Night' => []
+                            ];
                         }
                         continue;
                     }
 
-                    // 3. Detect Shift Headers (e.g., Day Shift, Evening Shift, Night Shift)
-                    if (preg_match('/(Day|Evening|Night)\s*Shift/i', $line, $matches)) {
-                        $currentShift = ucwords(strtolower($matches[1]));
+                    // 3. Detect Shift Header (The trigger to increment shift index)
+                    // Every "Name Other Position" signifies a new shift block in this sequential layout
+                    if (stripos($line, 'Name') !== false && stripos($line, 'Position') !== false) {
+                        $currentShiftIndex++;
                         continue;
                     }
 
-                    // 4. Extract Staff Rows (Name and Position)
-                    // Filter out header row keywords
-                    if (preg_match('/^(Name|Other|Position)$/i', $line)) continue;
+                    // 4. Extract Staff Rows (Only if we've found a shift block)
+                    if ($currentShiftIndex >= 0 && $currentShiftIndex < 3) {
+                        $shiftName = $currentShifts[$currentShiftIndex];
 
-                    // If a line contains a position, try to extract name
-                    if (preg_match($positionRegex, $line, $posMatches)) {
-                        $pos = $posMatches[1];
-                        // Name is typically before the position or on the same line
-                        $name = trim(str_ireplace([$pos, 'Other', 'Name', 'Position'], '', $line));
-                        $name = preg_replace('/[^a-zA-Z\s,]/', '', $name); // Basic name cleaning
-                        
-                        if (!empty($name)) {
-                            $extractedData['units'][$currentUnit][$currentShift][] = [
-                                'name' => trim($name),
-                                'position' => strtoupper($pos)
-                            ];
+                        // Skip lines that are just headers we already handled
+                        if (preg_match('/(Day|Evening|Night)\s*Shift/i', $line))
+                            continue;
+
+                        // Check if it's a staff row by looking for positions
+                        if (preg_match($positionRegex, $line, $posMatches)) {
+                            $pos = strtoupper($posMatches[1]);
+
+                            // Capture extra markers like "UM" if it's appended (e.g. LPN UM)
+                            $fullPos = $pos;
+                            if (stripos($line, $pos . ' UM') !== false)
+                                $fullPos = $pos . ' UM';
+                            if (stripos($line, $pos . ' Supervisor') !== false)
+                                $fullPos = $pos . ' Supervisor';
+
+                            // Extract Name: Text before the position usually.
+                            // Since it's sequential, the name is likely at the start of the line.
+                            // We remove position and common markers from the line to get the name.
+                            $name = trim(str_ireplace([$fullPos, 'Other', 'Name', 'Position', 'Orientee', 'ShiftMed'], '', $line));
+                            $name = preg_replace('/[^a-zA-Z\s,]/', '', $name);
+
+                            $other = '';
+                            if (stripos($line, 'Orientee') !== false)
+                                $other = 'Orientee';
+                            elseif (stripos($line, 'ShiftMed') !== false)
+                                $other = 'ShiftMed';
+                            elseif (stripos($line, 'UM') !== false && stripos($fullPos, 'UM') === false)
+                                $other = 'UM';
+
+                            if (!empty($name)) {
+                                $extractedData['units'][$currentUnit][$shiftName][] = [
+                                    'name' => trim($name),
+                                    'position' => $fullPos,
+                                    'other' => $other
+                                ];
+                            }
                         }
                     }
                 }
@@ -867,5 +1157,5 @@ class Schedules extends BaseController
 
         return $extractedData;
     }
-    
+
 }

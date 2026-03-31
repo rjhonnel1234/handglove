@@ -79,8 +79,8 @@ class Facilities extends BaseController
         }
 
         $agencies = "";
-        if(!empty($this->request->getPost('agencies'))){
-            $agencies = implode(",",$this->request->getPost('agencies'));
+        if (!empty($this->request->getPost('agencies'))) {
+            $agencies = implode(",", $this->request->getPost('agencies'));
         }
 
         $logoPath = $this->request->getPost('company_logo_path');
@@ -103,19 +103,19 @@ class Facilities extends BaseController
         } else {
             $provider_id = 0;
         }
-        
+
         $data = [
-            'provider_id'     => $provider_id,
-            'company_name'    => $company_name,
-            'company_email'   => $this->request->getPost('company_email'),
-            'company_number'  => $this->request->getPost('company_number'),
+            'provider_id' => $provider_id,
+            'company_name' => $company_name,
+            'company_email' => $this->request->getPost('company_email'),
+            'company_number' => $this->request->getPost('company_number'),
             'company_address' => $company_address,
-            'zip_code'        => $zip_code,
-            'state_id'        => $state_id,
-            'country_id'      => $country_id,
-            'agencies'        => $agencies,
-            'status'          => $this->request->getPost('status'),
-            'company_logo'    => $logoPath ?: '',
+            'zip_code' => $zip_code,
+            'state_id' => $state_id,
+            'country_id' => $country_id,
+            'agencies' => $agencies,
+            'status' => $this->request->getPost('status'),
+            'company_logo' => $logoPath ? base_url($logoPath) : '',
         ];
 
         $model->insert($data);
@@ -136,10 +136,10 @@ class Facilities extends BaseController
         $countriesModel = new CountriesModel();
         $agenciesModel = new AgenciesModel();
         $data['facility'] = $model->select('tbl_clients.*, states.name as state_name, countries.name as country_name')
-                                   ->join('states', 'states.id = tbl_clients.state_id', 'left')
-                                   ->join('countries', 'countries.id = tbl_clients.country_id', 'left')
-                                   ->find($id);
-        
+            ->join('states', 'states.id = tbl_clients.state_id', 'left')
+            ->join('countries', 'countries.id = tbl_clients.country_id', 'left')
+            ->find($id);
+
         if (!$data['facility']) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
@@ -185,8 +185,8 @@ class Facilities extends BaseController
         }
 
         $agencies = "";
-        if(!empty($this->request->getPost('agencies'))){
-            $agencies = implode(",",$this->request->getPost('agencies'));
+        if (!empty($this->request->getPost('agencies'))) {
+            $agencies = implode(",", $this->request->getPost('agencies'));
         }
 
         $logoPath = $this->request->getPost('company_logo_path');
@@ -209,22 +209,22 @@ class Facilities extends BaseController
         } else {
             $provider_id = 0;
         }
-        
+
         $data = [
-            'provider_id'     => $provider_id,
-            'company_name'    => $company_name,
-            'company_email'   => $this->request->getPost('company_email'),
-            'company_number'  => $this->request->getPost('company_number'),
+            'provider_id' => $provider_id,
+            'company_name' => $company_name,
+            'company_email' => $this->request->getPost('company_email'),
+            'company_number' => $this->request->getPost('company_number'),
             'company_address' => $company_address,
-            'zip_code'        => $zip_code,
-            'state_id'        => $state_id,
-            'country_id'      => $country_id,
-            'agencies'        => $agencies,
-            'status'          => $this->request->getPost('status'),
+            'zip_code' => $zip_code,
+            'state_id' => $state_id,
+            'country_id' => $country_id,
+            'agencies' => $agencies,
+            'status' => $this->request->getPost('status'),
         ];
 
         if (!empty($logoPath)) {
-            $data['company_logo'] = $logoPath;
+            $data['company_logo'] = base_url($logoPath);
         }
 
         $model->update($id, $data);
@@ -256,16 +256,16 @@ class Facilities extends BaseController
         $statusMapping = $model->status_mapping;
         $statusBadgeColor = $model->status_badge_color;
         $facilities = $model->select('tbl_clients.*, states.name as state_name')
-                           ->join('states', 'states.id = tbl_clients.state_id', 'left')
-                           ->orderBy('tbl_clients.id', 'DESC')
-                           ->findAll();
+            ->join('states', 'states.id = tbl_clients.state_id', 'left')
+            ->orderBy('tbl_clients.id', 'DESC')
+            ->findAll();
 
         $formattedData = [];
         foreach ($facilities as $facility) {
-            $statusBadge = '<div class="text-center"><span class="badge '.$statusBadgeColor[$facility['status']].' text-white">' . $statusMapping[$facility['status']] . '</span></div>';
+            $statusBadge = '<div class="text-center"><span class="badge ' . $statusBadgeColor[$facility['status']] . ' text-white">' . $statusMapping[$facility['status']] . '</span></div>';
 
             $formattedData[] = [
-                $facility['company_logo'] ? sprintf('<img src="%s" class="img-thumbnail" width="50" height="50">', base_url($facility['company_logo'])) : '-',
+                $facility['company_logo'] ? sprintf('<img src="%s" class="img-thumbnail" width="50" height="50">', $facility['company_logo']) : '-',
                 sprintf('<div><strong>%s</strong></div><div><small>%s</small></div>', $facility['company_name'], $facility['company_email']),
                 sprintf('<div><small><i class="fas fa-map-marker-alt"></i> %s, %s</small></div><div><small><i class="fas fa-phone"></i> %s</small></div>', $facility['company_address'], $facility['state_name'] ?? 'N/A', $facility['company_number']),
                 $statusBadge,
@@ -292,7 +292,7 @@ class Facilities extends BaseController
         if ($file && $file->isValid() && !$file->hasMoved()) {
             $newName = $file->getRandomName();
             $targetPath = 'uploads/facilities';
-            
+
             if (!is_dir(FCPATH . $targetPath)) {
                 mkdir(FCPATH . $targetPath, 0777, true);
             }
@@ -317,9 +317,9 @@ class Facilities extends BaseController
     {
         $model = new FacilityModel();
         $facility = $model->select('tbl_clients.*, states.name as state_name, countries.name as country_name')
-                          ->join('states', 'states.id = tbl_clients.state_id', 'left')
-                          ->join('countries', 'countries.id = tbl_clients.country_id', 'left')
-                          ->find($id);
+            ->join('states', 'states.id = tbl_clients.state_id', 'left')
+            ->join('countries', 'countries.id = tbl_clients.country_id', 'left')
+            ->find($id);
 
         if (!$facility) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
@@ -372,7 +372,7 @@ class Facilities extends BaseController
         $data['page_title'] = "Add Unit";
         $data['client_id'] = $client_id;
         $data['user_types'] = (new UserTypesModel())->findAll();
-        
+
         return view('admin/facilities/units/create', $data);
     }
 
@@ -380,7 +380,8 @@ class Facilities extends BaseController
     {
         $model = new FacilityUnitsModel();
         $data['unit'] = $model->find($id);
-        if (!$data['unit']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        if (!$data['unit'])
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
         $data['page_title'] = "Edit Unit";
         $data['client_id'] = $data['unit']['client_id'];
@@ -393,10 +394,10 @@ class Facilities extends BaseController
     {
         $model = new FacilityUnitsModel();
         $data = [
-            'client_id'   => $this->request->getPost('client_id'),
-            'name'        => $this->request->getPost('name'),
+            'client_id' => $this->request->getPost('client_id'),
+            'name' => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
-            'census'      => $this->request->getPost('census'),
+            'census' => $this->request->getPost('census'),
         ];
 
         $model->insert($data);
@@ -412,10 +413,10 @@ class Facilities extends BaseController
     {
         $model = new FacilityUnitsModel();
         $data = [
-            'client_id'   => $this->request->getPost('client_id'),
-            'name'        => $this->request->getPost('name'),
+            'client_id' => $this->request->getPost('client_id'),
+            'name' => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
-            'census'      => $this->request->getPost('census'),
+            'census' => $this->request->getPost('census'),
         ];
 
         $model->update($id, $data);
@@ -442,10 +443,10 @@ class Facilities extends BaseController
     {
         $model = new ClientPersonnelModel();
         $personnel = $model->select('tbl_client_personnel.*, tbl_user_types.name as type_name')
-                           ->join('tbl_user_types', 'tbl_user_types.id = tbl_client_personnel.type', 'left')
-                           ->where('client_id', $client_id)
-                           ->orderBy('id', 'DESC')
-                           ->findAll();
+            ->join('tbl_user_types', 'tbl_user_types.id = tbl_client_personnel.type', 'left')
+            ->where('client_id', $client_id)
+            ->orderBy('id', 'DESC')
+            ->findAll();
 
         $formattedData = [];
         foreach ($personnel as $p) {
@@ -482,7 +483,8 @@ class Facilities extends BaseController
     {
         $model = new ClientPersonnelModel();
         $data['personnel'] = $model->find($id);
-        if (!$data['personnel']) throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        if (!$data['personnel'])
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 
         $data['page_title'] = "Edit Personnel";
         $data['client_id'] = $data['personnel']['client_id'];
@@ -496,14 +498,14 @@ class Facilities extends BaseController
     {
         $model = new ClientPersonnelModel();
         $data = [
-            'client_id'      => $this->request->getPost('client_id'),
-            'first_name'     => $this->request->getPost('first_name'),
-            'last_name'      => $this->request->getPost('last_name'),
-            'email'          => $this->request->getPost('email'),
+            'client_id' => $this->request->getPost('client_id'),
+            'first_name' => $this->request->getPost('first_name'),
+            'last_name' => $this->request->getPost('last_name'),
+            'email' => $this->request->getPost('email'),
             'contact_number' => $this->request->getPost('contact_number'),
-            'type'           => $this->request->getPost('type'),
+            'type' => $this->request->getPost('type'),
             'clinician_type' => $this->request->getPost('clinician_type'),
-            'status'         => 1,
+            'status' => 1,
         ];
 
         $model->insert($data);
@@ -519,14 +521,14 @@ class Facilities extends BaseController
     {
         $model = new ClientPersonnelModel();
         $data = [
-            'client_id'      => $this->request->getPost('client_id'),
-            'first_name'     => $this->request->getPost('first_name'),
-            'last_name'      => $this->request->getPost('last_name'),
-            'email'          => $this->request->getPost('email'),
+            'client_id' => $this->request->getPost('client_id'),
+            'first_name' => $this->request->getPost('first_name'),
+            'last_name' => $this->request->getPost('last_name'),
+            'email' => $this->request->getPost('email'),
             'contact_number' => $this->request->getPost('contact_number'),
-            'type'           => $this->request->getPost('type'),
+            'type' => $this->request->getPost('type'),
             'clinician_type' => $this->request->getPost('clinician_type'),
-            'status'         => 1,
+            'status' => 1,
         ];
 
         $model->update($id, $data);
@@ -552,19 +554,17 @@ class Facilities extends BaseController
     public function shifts_list($client_id)
     {
         $model = new ShiftsModel();
-        $shifts = $model->select('tbl_shifts.*, tbl_clinicians.first_name, tbl_clinicians.last_name, tbl_client_units.name as unit_name')
-                        ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_shifts.clinician_id', 'left')
-                        ->join('tbl_client_units', 'tbl_client_units.id = tbl_shifts.unit_id', 'left')
-                        ->where('tbl_shifts.client_id', $client_id)
-                        ->orderBy('tbl_shifts.date', 'DESC')
-                        ->findAll();
+        $shifts = $model->select('tbl_shifts.*, tbl_client_units.name as unit_name')
+            ->join('tbl_client_units', 'tbl_client_units.id = tbl_shifts.unit_id', 'left')
+            ->where('tbl_shifts.client_id', $client_id)
+            ->orderBy('tbl_shifts.date', 'DESC')
+            ->findAll();
 
         $formattedData = [];
         foreach ($shifts as $s) {
             $formattedData[] = [
                 $s['date'],
                 $s['start_time'] . ' - ' . $s['end_time'],
-                $s['first_name'] ? $s['first_name'] . ' ' . $s['last_name'] : 'N/A',
                 $s['unit_name'] ?: 'N/A',
                 $s['total_hours'],
                 $s['status']
@@ -581,18 +581,18 @@ class Facilities extends BaseController
     public function invoices_list($client_id)
     {
         $model = new InvoicesModel();
-        $invoices = $model->select('tbl_invoices.*, tbl_clinicians.first_name, tbl_clinicians.last_name')
-                          ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_invoices.clinician_id', 'left')
-                          ->where('client_id', $client_id)
-                          ->orderBy('created_at', 'DESC')
-                          ->findAll();
+        $invoices = $model->select('tbl_invoices.*, tbl_clinicians.name')
+            ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_invoices.clinician_id', 'left')
+            ->where('tbl_invoices.client_id', $client_id)
+            ->orderBy('tbl_invoices.created_at', 'DESC')
+            ->findAll();
 
         $formattedData = [];
         foreach ($invoices as $inv) {
             $formattedData[] = [
                 '#' . $inv['id'],
                 $inv['created_at'],
-                $inv['first_name'] . ' ' . $inv['last_name'],
+                $inv['name'],
                 $inv['total_hours'],
                 number_format($inv['total_amount'], 2),
                 $inv['status']
