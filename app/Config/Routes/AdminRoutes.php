@@ -42,6 +42,16 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->post('list', 'TaxTypes::list');
     });
 
+    $routes->group('faqs', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'Faqs::index');
+        $routes->get('create', 'Faqs::create');
+        $routes->post('store', 'Faqs::store');
+        $routes->get('edit/(:num)', 'Faqs::edit/$1');
+        $routes->post('update/(:num)', 'Faqs::update/$1');
+        $routes->get('delete/(:num)', 'Faqs::delete/$1');
+        $routes->post('list', 'Faqs::list');
+    });
+
     $routes->group('settings', ['filter' => 'adminAuth'], function ($routes) {
         $routes->get('', 'Settings::index');
         $routes->post('store', 'Settings::store');

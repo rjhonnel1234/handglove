@@ -165,78 +165,27 @@
                         <h2>You'll Find Answers Here!</h2>
                     </div>
                     <ul class="accordion-box">
-                        <li class="accordion block">
-                            <div class="acc-btn">
-                                <div class="icon-outer"></div>
-                                <h5>01. What Kind of Services Offer?</h5>
-                            </div>
-                            <div class="acc-content">
-                                <div class="text">
-                                    <p>To take a trivial example, which of us ever undertakes laborious physical
-                                        exercise, except obtain some advantage from it? But who has any right.</p>
+                        <?php if (empty($faqs)): ?>
+                            <li class="accordion block">
+                                <div class="acc-btn">
+                                    <h5>No FAQs available at the moment.</h5>
                                 </div>
-                            </div>
-                        </li>
-                        <li class="accordion block active-block">
-                            <div class="acc-btn active">
-                                <div class="icon-outer"></div>
-                                <h5>02. How Do I Start Hiring?</h5>
-                            </div>
-                            <div class="acc-content current">
-                                <div class="text">
-                                    <p>To take a trivial example, which of us ever undertakes laborious physical
-                                        exercise, except obtain some advantage from it? But who has any right.</p>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="accordion block">
-                            <div class="acc-btn">
-                                <div class="icon-outer"></div>
-                                <h5>03. What is the Job Approval Process?</h5>
-                            </div>
-                            <div class="acc-content">
-                                <div class="text">
-                                    <p>To take a trivial example, which of us ever undertakes laborious physical
-                                        exercise, except obtain some advantage from it? But who has any right.</p>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="accordion block">
-                            <div class="acc-btn">
-                                <div class="icon-outer"></div>
-                                <h5>04. Why is the Job I Posted Not Approved Yet?</h5>
-                            </div>
-                            <div class="acc-content">
-                                <div class="text">
-                                    <p>To take a trivial example, which of us ever undertakes laborious physical
-                                        exercise, except obtain some advantage from it? But who has any right.</p>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="accordion block">
-                            <div class="acc-btn">
-                                <div class="icon-outer"></div>
-                                <h5>05. What is the Refund Policy?</h5>
-                            </div>
-                            <div class="acc-content">
-                                <div class="text">
-                                    <p>To take a trivial example, which of us ever undertakes laborious physical
-                                        exercise, except obtain some advantage from it? But who has any right.</p>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="accordion block">
-                            <div class="acc-btn">
-                                <div class="icon-outer"></div>
-                                <h5>06. What is Contractual Staffing?</h5>
-                            </div>
-                            <div class="acc-content">
-                                <div class="text">
-                                    <p>To take a trivial example, which of us ever undertakes laborious physical
-                                        exercise, except obtain some advantage from it? But who has any right.</p>
-                                </div>
-                            </div>
-                        </li>
+                            </li>
+                        <?php else: ?>
+                            <?php foreach ($faqs as $index => $faq): ?>
+                                <li class="accordion block <?= $index === 0 ? 'active-block' : '' ?>">
+                                    <div class="acc-btn <?= $index === 0 ? 'active' : '' ?>">
+                                        <div class="icon-outer"></div>
+                                        <h5><?= sprintf('%02d', $index + 1) ?>. <?= esc($faq['question']) ?></h5>
+                                    </div>
+                                    <div class="acc-content <?= $index === 0 ? 'current' : '' ?>">
+                                        <div class="text">
+                                            <p><?= nl2br(esc($faq['answer'])) ?></p>
+                                        </div>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </div>

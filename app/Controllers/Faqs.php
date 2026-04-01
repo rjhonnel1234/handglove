@@ -9,6 +9,9 @@ class Faqs extends BaseController
         $facilityModel = new \App\Models\FacilityModel();
         $latestFacilities = $facilityModel->orderBy('id', 'DESC')->limit(4)->find();
 
+        $faqModel = new \App\Models\FaqModel();
+        $faqs = $faqModel->getActiveFaqs();
+
         return view('components/header_v3', array(
             'title' => 'MSP | Handglove',
             'description' => 'Staffing Partners: Reliable & Cost Efficient Recruitment Agency',
@@ -38,7 +41,8 @@ class Faqs extends BaseController
             )
         ))
         .view('public/faqs', [
-            'latest_facilities' => $latestFacilities
+            'latest_facilities' => $latestFacilities,
+            'faqs' => $faqs
         ])
         .view('components/scripts_render', array(
             'scripts' => array(

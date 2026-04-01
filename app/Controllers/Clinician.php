@@ -6,6 +6,9 @@ class Clinician extends BaseController
 {
     public function index()
     {
+        $faqModel = new \App\Models\FaqModel();
+        $faqs = $faqModel->getActiveFaqs();
+
         return view('components/header_v3', array(
             'title' => 'Clinician | Handglove',
             'description' => 'Staffing Partners: Reliable & Cost Efficient Recruitment Agency',
@@ -34,7 +37,9 @@ class Clinician extends BaseController
                 COMPILED_ASSETS_PATH . 'css/pages/home'
             )
         ))
-            . view('public/clinician')
+            . view('public/clinician', [
+                'faqs' => $faqs
+            ])
             . view('components/scripts_render', array(
                 'scripts' => array(
                     'https://code.jquery.com/jquery-3.5.1.min.js' => array(

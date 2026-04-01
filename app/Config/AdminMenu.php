@@ -76,6 +76,11 @@ class AdminMenu extends BaseConfig
                 'icon'  => 'fa fa-hospital-alt'
             ],
             [
+                'title' => 'FAQs',
+                'url'   => 'admin/faqs',
+                'icon'  => 'fa fa-question-circle'
+            ],
+            [
                 'title' => 'General Settings',
                 'url'   => 'admin/settings',
                 'icon'  => 'fa fa-cog'
