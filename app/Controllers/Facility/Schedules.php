@@ -220,7 +220,6 @@ class Schedules extends BaseController
 
             // Clear existing schedule details for this date to ensure 1:1 sync with PDF
             $this->clientScheduleDetailsModel->where(['client_id' => $facilityId, 'schedule_date' => $date])->delete();
-
             foreach ($unitsData as $uData) {
                 $unitName = trim($uData['name']);
                 if (empty($unitName))
@@ -238,7 +237,10 @@ class Schedules extends BaseController
                     $unitId = $unit['id'];
                 }
 
-                foreach ($uData['shifts'] as $shiftName => $staffArray) {
+                foreach ($uData['shifts'] as $shiftName => $shiftInfo) {
+                    $staffArray = (isset($shiftInfo['staff'])) ? $shiftInfo['staff'] : $shiftInfo;
+                    $slots = (isset($shiftInfo['slots'])) ? $shiftInfo['slots'] : 0;
+
                     foreach ($staffArray as $staff) {
                         $name = trim($staff['name'] ?? '');
                         $position = trim($staff['position'] ?? '');
@@ -282,7 +284,6 @@ class Schedules extends BaseController
                             ]);
                         } else {
                             $personnelId = $personnel['id'];
-                            // Optional: Update clinician_type if it was changed/unknown?
                         }
 
                         // Create Schedule Detail
@@ -292,7 +293,8 @@ class Schedules extends BaseController
                             'personnel_id' => $personnelId,
                             'schedule_date' => $date,
                             'shift_name' => $shiftName,
-                            'shift_time' => $this->getShiftTimeRange($shiftName)
+                            'shift_time' => $this->getShiftTimeRange($shiftName),
+                            'slots' => $slots
                         ]);
                     }
                 }
@@ -363,23 +365,32 @@ class Schedules extends BaseController
                 foreach ($unitsSchedule as $unitId => $shifts) {
                     foreach ($shifts as $shiftName => $staffIds) {
                         foreach ($staffIds as $personnelId) {
-                            $exists = $this->clientScheduleDetailsModel->where(['client_id' => $facilityId, 'unit_id' => $unitId, 'personnel_id' => $personnelId, 'schedule_date' => $date, 'shift_name' => $shiftName])->first();
-                            if (!$exists) {
-                                $this->clientScheduleDetailsModel->insert([
-                                    'client_id' => $facilityId,
-                                    'unit_id' => $unitId,
-                                    'personnel_id' => $personnelId,
-                                    'schedule_date' => $date,
-                                    'shift_name' => $shiftName,
-                                    'shift_time' => $this->getShiftTimeRange($shiftName)
-                                ]);
+                            $this->clientScheduleDetailsModel->insert([
+                                'client_id' => $facilityId,
+                                'unit_id' => $unitId,
+                                'personnel_id' => $personnelId,
+                                'schedule_date' => $date,
+                                'shift_name' => $shiftName,
+                                'shift_time' => $this->getShiftTimeRange($shiftName),
+                            ]);
+                        }
+                    }
+                }
+            }
+            $unitsSlots = $this->request->getPost('units_slots');
+            if (is_array($unitsSlots)) {
+                foreach ($unitsSlots as $unitId => $shifts) {
+                    foreach ($shifts as $shiftName => $slots) {
+                        if ($slots > 0) {
+                            $staffs = $this->clientScheduleDetailsModel->where(['client_id' => $facilityId, 'unit_id' => $unitId, 'schedule_date' => $date, 'shift_name' => $shiftName])->findAll();
+                            foreach ($staffs as $staff) {
+                                $this->clientScheduleDetailsModel->update($staff['id'], ['slots' => $slots]);
                             }
                         }
                     }
                 }
             }
         }
-
         $db->transComplete();
 
         if ($db->transStatus() === false) {
@@ -398,15 +409,17 @@ class Schedules extends BaseController
 
         $facilityId = $this->session->get('facility_id');
         $date = $this->request->getPost('schedule_date');
+        $confirmedUnderstaffed = $this->request->getPost('confirmed_understaffed'); // Data from modal
 
         if (!$date) {
             return $this->response->setJSON(['success' => 0, 'message' => 'Missing date']);
         }
 
-        // Fetch all assignments for this date
+        // 1. Fetch all assignments for this date to analyze staffing levels
         $assignments = $this->clientScheduleDetailsModel
-            ->select('tbl_client_schedule_details.*, tbl_client_personnel.clinician_type')
+            ->select('tbl_client_schedule_details.*, tbl_client_personnel.clinician_type, tbl_client_units.name as unit_name')
             ->join('tbl_client_personnel', 'tbl_client_personnel.id = tbl_client_schedule_details.personnel_id')
+            ->join('tbl_client_units', 'tbl_client_units.id = tbl_client_schedule_details.unit_id')
             ->where([
                 'tbl_client_schedule_details.client_id' => $facilityId,
                 'tbl_client_schedule_details.schedule_date' => $date
@@ -416,14 +429,78 @@ class Schedules extends BaseController
             return $this->response->setJSON(['success' => 0, 'message' => 'No schedule assignments found for this date. Please save the schedule first.']);
         }
 
+        // 2. Group assignments by Unit and Shift to identify understaffed ones
+        $grouped = [];
+        foreach ($assignments as $a) {
+            $key = $a['unit_id'] . '_' . strtolower($a['shift_name']);
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                    'unit_id' => $a['unit_id'],
+                    'unit_name' => $a['unit_name'],
+                    'shift_name' => strtolower($a['shift_name']),
+                    'slots' => $a['slots'],
+                    'assigned_count' => 0,
+                    'staff' => []
+                ];
+            }
+            $grouped[$key]['assigned_count']++;
+            $grouped[$key]['staff'][] = $a;
+        }
+
+        // 3. Check for Understaffed Shifts (unless already confirmed)
+        if (!$confirmedUnderstaffed) {
+            $understaffedShifts = [];
+            $onboarding = $this->facilityOnboardingSettingsModel->where('client_id', $facilityId)->first();
+            $averageRate = ($onboarding && !empty($onboarding['average_rate'])) ? $onboarding['average_rate'] : 0;
+            $shiftTypes = ($this->shiftTypesModel ?? new \App\Models\ShiftTypesModel())->where('status', 1)->findAll();
+
+            foreach ($grouped as $g) {
+                if ($g['assigned_count'] < $g['slots']) {
+                    $understaffedShifts[] = [
+                        'unit_id' => $g['unit_id'],
+                        'unit_name' => $g['unit_name'],
+                        'shift_name' => $g['shift_name'],
+                        'shift_time_display' => $this->getShiftTimeRange($g['shift_name']),
+                        'slots_total' => $g['slots'],
+                        'slots_taken' => $g['assigned_count'],
+                        'slots_remaining' => $g['slots'] - $g['assigned_count'],
+                        'average_rate' => $averageRate,
+                        'date' => $date
+                    ];
+                }
+            }
+
+            if (!empty($understaffedShifts)) {
+                return $this->response->setJSON([
+                    'success' => 1,
+                    'understaffed' => true,
+                    'shifts' => $understaffedShifts,
+                    'shift_types' => $shiftTypes
+                ]);
+            }
+        }
+
+        // 4. Proceed with Synchronization
         $db = \Config\Database::connect();
         $db->transStart();
 
-        foreach ($assignments as $assignment) {
-            $shiftType = 1;
-            // $shiftType = $assignment['clinician_type'];
-            $unitId = $assignment['unit_id'];
-            $shiftName = strtolower($assignment['shift_name']);
+        // Process understaffed overrides if provided
+        $overrides = [];
+        if ($confirmedUnderstaffed) {
+            foreach ($confirmedUnderstaffed as $ov) {
+                $overrides[$ov['unit_id'] . '_' . strtolower($ov['shift_name'])] = $ov;
+            }
+        }
+
+        foreach ($grouped as $key => $g) {
+            $unitId = $g['unit_id'];
+            $shiftName = $g['shift_name'];
+            $override = $overrides[$key] ?? null;
+
+            $slots = ($override) ? $override['slots'] : $g['slots'];
+            $rate = ($override) ? $override['rate'] : null; // Will fetch average if still null
+            $shiftType = ($override) ? $override['shift_type'] : 1;
+            $posted = ($override && isset($override['posted']) && $override['posted'] == 'true') ? 1 : 0;
 
             $startTime = '';
             $endTime = '';
@@ -442,22 +519,21 @@ class Schedules extends BaseController
                 case 'night':
                     $startTime = '23:00:00';
                     $endTime = '07:00:00';
-                    $endDate = date('Y-m-d', strtotime($date . ' +1 day'));
+                    $endDate = date('Y-m-d', strtotime($date . ' + 1 day'));
                     break;
             }
 
-            //get average_rate column on facility onboarding settings
-            $onboarding = $this->facilityOnboardingSettingsModel->where('client_id', $facilityId)->first();
-            $averageRate = ($onboarding && !empty($onboarding['average_rate'])) ? $onboarding['average_rate'] : 0;
+            if (!$rate) {
+                $onboarding = $this->facilityOnboardingSettingsModel->where('client_id', $facilityId)->first();
+                $rate = ($onboarding && !empty($onboarding['average_rate'])) ? $onboarding['average_rate'] : 0;
+            }
 
-            // Check if a shift already exists for this unit, date, time, and type
+            // Create or Find Shift
             $shift = $this->shiftsModel->where([
                 'client_id' => $facilityId,
                 'unit_id' => $unitId,
                 'start_date' => $date,
-                'shift_start_time' => $startTime,
-                'rate' => $averageRate,
-                // 'shift_type' => $shiftType
+                'shift_start_time' => $startTime
             ])->first();
 
             if (!$shift) {
@@ -469,33 +545,46 @@ class Schedules extends BaseController
                     'shift_start_time' => $startTime,
                     'shift_end_time' => $endTime,
                     'shift_type' => $shiftType,
-                    'slots' => 10, // Default slots
-                    'status' => 1
+                    'rate' => $rate,
+                    'slots' => $slots,
+                    'status' => 1,
+                    'posted' => $posted
                 ]);
             } else {
                 $shiftId = $shift['id'];
+                // Update slots/posted if override provided?
+                if ($override) {
+                    $this->shiftsModel->update($shiftId, [
+                        'slots' => $slots,
+                        'posted' => $posted,
+                        'rate' => $rate,
+                        'shift_type' => $shiftType
+                    ]);
+                }
             }
 
-            // Link personnel to the shift
-            $exists = $this->shiftCliniciansModel->where([
-                'shift_id' => $shiftId,
-                'personnel_id' => $assignment['personnel_id']
-            ])->first();
-
-            if (!$exists) {
-                $this->shiftCliniciansModel->insert([
-                    'client_id' => $facilityId,
+            // Link personnel
+            foreach ($g['staff'] as $staff) {
+                $exists = $this->shiftCliniciansModel->where([
                     'shift_id' => $shiftId,
-                    'clinician_id' => 0, // 0 for internal personnel
-                    'personnel_id' => $assignment['personnel_id'],
-                    'status' => 10, // Active
-                    'shift_status' => 0,
-                    'pcc_status' => 10 // Off
-                ]);
+                    'personnel_id' => $staff['personnel_id']
+                ])->first();
+
+                if (!$exists) {
+                    $this->shiftCliniciansModel->insert([
+                        'client_id' => $facilityId,
+                        'shift_id' => $shiftId,
+                        'clinician_id' => 0,
+                        'personnel_id' => $staff['personnel_id'],
+                        'status' => 10,
+                        'shift_status' => 0,
+                        'pcc_status' => 10
+                    ]);
+                }
             }
         }
 
-        // Update schedule upload status to 20 (Posted/As Shifts)
+        // Update schedule upload status
         $this->clientScheduleUploadModel->where([
             'client_id' => $facilityId,
             'schedule_date' => $date
@@ -535,7 +624,11 @@ class Schedules extends BaseController
         $date = $this->request->getPost('date');
         $isPast = $date < date('Y-m-d');
 
-        if ($isPast) {
+        // Check upload status to determine source
+        $upload = $this->clientScheduleUploadModel->where(['client_id' => $facilityId, 'schedule_date' => $date])->first();
+        $status = $upload ? $upload['status'] : 10;
+
+        if ($status == 20) {
             // For past dates, we get personnel from actual shifts (could be internal or external)
             $schedules = $this->shiftCliniciansModel
                 ->select('tbl_shift_clinicians.personnel_id, tbl_shift_clinicians.clinician_id, 
@@ -608,9 +701,7 @@ class Schedules extends BaseController
         }
 
         // Check if locked
-        $upload = $this->clientScheduleUploadModel->where(['client_id' => $facilityId, 'schedule_date' => $date])->first();
-        $isLocked = ($isPast || ($upload && $upload['status'] == 20));
-
+        $isLocked = ($isPast || $status == 20);
         return $this->response->setJSON([
             'success' => 1,
             'data' => $schedules,
@@ -881,8 +972,8 @@ class Schedules extends BaseController
         foreach ($assignments as $assignment) {
             $unitId = $assignment['unit_id'];
             $shift = strtolower($assignment['shift_name']);
-            if ($shift == 'mid')
-                $shift = 'evening'; // Map to consistent internal key if needed, or keep both
+            // if ($shift == 'mid')
+            //     $shift = 'evening'; // Map to consistent internal key if needed, or keep both
 
             if (!isset($groupedAssignments[$unitId])) {
                 $groupedAssignments[$unitId] = [
@@ -951,7 +1042,7 @@ class Schedules extends BaseController
                 $shiftData['db_exists'] = !empty($unitExists);
 
                 // Personnel check
-                foreach (['Day', 'Evening', 'Night'] as $sKey) {
+                foreach (['Day', 'Mid', 'Night'] as $sKey) {
                     if (!empty($shiftData[$sKey])) {
                         foreach ($shiftData[$sKey] as &$staff) {
                             $nameParts = explode(' ', trim($staff['name'] ?? ''));
@@ -1062,7 +1153,7 @@ class Schedules extends BaseController
             $extractedData['raw_text'] = $pdf->getText();
 
             $currentUnit = 'Default';
-            $currentShifts = ['Day', 'Evening', 'Night'];
+            $currentShifts = ['Day', 'Mid', 'Night'];
             $currentShiftIndex = -1;
 
             // Known positions and roles to help identify staff rows
@@ -1093,7 +1184,7 @@ class Schedules extends BaseController
                         if (!isset($extractedData['units'][$currentUnit])) {
                             $extractedData['units'][$currentUnit] = [
                                 'Day' => [],
-                                'Evening' => [],
+                                'Mid' => [],
                                 'Night' => []
                             ];
                         }
@@ -1112,7 +1203,7 @@ class Schedules extends BaseController
                         $shiftName = $currentShifts[$currentShiftIndex];
 
                         // Skip lines that are just headers we already handled
-                        if (preg_match('/(Day|Evening|Night)\s*Shift/i', $line))
+                        if (preg_match('/(Day|Mid|Evening)\s*Shift/i', $line))
                             continue;
 
                         // Check if it's a staff row by looking for positions

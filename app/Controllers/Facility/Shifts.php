@@ -88,27 +88,27 @@ class Shifts extends BaseController
             ],
             'session' => $this->session
         ])
-        . view('facility/manage', $data)
-        . view('components/scripts_render', [
-            'scripts' => [
-                'https://code.jquery.com/jquery-3.5.1.min.js' => [
-                    'integrity' => 'sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=',
-                    'crossorigin' => 'anonymous'
-                ],
-                'https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.2/datatables.min.js',
-                ASSETS_URL . 'js/plugins/popper.min.js',
-                ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
-                ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
-                ASSETS_URL . 'js/components/global.min.js',
-                ASSETS_URL . 'js/plugins/bootstrap-datepicker.js',
-                ASSETS_URL . 'js/plugins/owl.carousel.min.js',
-                ASSETS_URL . 'js/components/navigation_bar.min.js',
-                ASSETS_URL . 'js/components/notifications.min.js',
-                ASSETS_URL . 'js/plugins/toastr.min.js',
-                ASSETS_URL . 'js/pages/facility_shifts.min.js',
-            ]
-        ])
-        . view('components/footer');
+            . view('facility/manage', $data)
+            . view('components/scripts_render', [
+                'scripts' => [
+                    'https://code.jquery.com/jquery-3.5.1.min.js' => [
+                        'integrity' => 'sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=',
+                        'crossorigin' => 'anonymous'
+                    ],
+                    'https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.2/datatables.min.js',
+                    ASSETS_URL . 'js/plugins/popper.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-select.min.js',
+                    ASSETS_URL . 'js/components/global.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-datepicker.js',
+                    ASSETS_URL . 'js/plugins/owl.carousel.min.js',
+                    ASSETS_URL . 'js/components/navigation_bar.min.js',
+                    ASSETS_URL . 'js/components/notifications.min.js',
+                    ASSETS_URL . 'js/plugins/toastr.min.js',
+                    ASSETS_URL . 'js/pages/facility_shifts.min.js',
+                ]
+            ])
+            . view('components/footer');
     }
 
     public function list()
@@ -127,8 +127,8 @@ class Shifts extends BaseController
             return $this->response->setJSON(['success' => 0, 'message' => 'Facility not found.']);
         }
 
-        $date = $this->request->getPost('date') ?: '2026-03-13';
-        // $date = $this->request->getPost('date') ?: date("Y-m-d");
+        // $date = $this->request->getPost('date') ?: '2026-03-13';
+        $date = $this->request->getPost('date') ?: date("Y-m-d");
         $unitId = $this->request->getPost('unitID');
 
         $shifts = $this->shiftsModel
@@ -170,6 +170,7 @@ class Shifts extends BaseController
                 ->where('tbl_shift_clinicians.shift_id', $shift['id'])
                 ->findAll();
 
+            $pccModel = new \App\Models\ClinicianPccModel();
             //get personnel/staff from shifts
             foreach ($shift['clinicians'] as &$clinician) {
                 // Resolve Name
@@ -178,19 +179,32 @@ class Shifts extends BaseController
                     $displayType = $clinician['clinician_type_name'];
                     $clockInIdField = 'clinician_id';
                     $clockInId = $clinician['clinician_id'];
+
+                    // Check for PCC Credentials
+                    $pcc = $pccModel->where('clinician_id', $clinician['clinician_id'])
+                        ->where('facility_id', $facilityId)
+                        ->first();
+                    if ($pcc) {
+                        $clinician['has_pcc'] = true;
+                        $clinician['pcc_username'] = $pcc['username'];
+                        $clinician['pcc_password'] = $pcc['password'];
+                        $clinician['pcc_status'] = 20; // Unlocked
+                    } else {
+                        $clinician['has_pcc'] = false;
+                    }
                 } else {
                     $displayName = $clinician['staff_first'] . ' ' . $clinician['staff_last'];
                     $displayType = $clinician['staff_type_name'];
                     $clockInIdField = 'personnel_id';
                     $clockInId = $clinician['personnel_id'];
-                    $clinician['profile_pic_url'] =  base_url('assets/img/blank-img.png');
-
+                    $clinician['profile_pic_url'] = base_url('assets/img/blank-img.png');
+                    $clinician['has_pcc'] = false;
                 }
                 $clinician['display_name'] = $displayName;
                 $clinician['display_type'] = $displayType;
                 $clinician['type'] = $clinician['clinician_id'] > 0 ? 'clinician' : 'staff';
                 $punchIn = '';
-                if($clockInIdField == 'clinician_id'){
+                if ($clockInIdField == 'clinician_id') {
                     $punchIn = $this->shiftsTimekeepingModel
                         ->where('shift_id', $shift['id'])
                         ->where($clockInIdField, $clockInId)
@@ -221,7 +235,7 @@ class Shifts extends BaseController
                 ->where('status', 10)
                 ->where('from_callout', 1)
                 ->findAll();
-            
+
             $shift['pending_replacements'] = [];
             foreach ($pendingReplacements as $pr) {
                 $shift['pending_replacements'][$pr['replacing_clinician_id']] = $pr['id'];
@@ -327,6 +341,45 @@ class Shifts extends BaseController
             ]);
         }
 
-        return $this->response->setJSON(['success' => 0, 'message' => 'Failed to transfer clinician.']);
+    }
+
+    public function pcc_request()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Invalid request.']);
+        }
+
+        $facilityId = $this->session->get('facility_id');
+        $clinicianId = $this->request->getPost('clinician_id');
+        $shiftId = $this->request->getPost('shift_id');
+
+        $facility = $this->facilityModel->find($facilityId);
+        $clinician = (new \App\Models\CliniciansModel())->find($clinicianId);
+
+        if (!$facility || !$clinician) {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Record not found.']);
+        }
+
+        $supervisorName = $this->session->get('first_name') . ' ' . $this->session->get('last_name');
+        
+        $email = \Config\Services::email();
+        $email->setTo('pjsangat@gmail.com');
+        $email->setSubject('PCC Credential Request');
+        
+        $message = "Supervisor <strong>$supervisorName</strong> is requesting PCC credentials for clinician <strong>{$clinician['name']}</strong> at facility <strong>{$facility['company_name']}</strong>.";
+        
+        $email->setMessage($message);
+
+        if ($email->send()) {
+            // Update pcc_status to 5 (Requested)
+            $this->shiftCliniciansModel->where('shift_id', $shiftId)
+                ->where('clinician_id', $clinicianId)
+                ->set(['pcc_status' => 5])
+                ->update();
+
+            return $this->response->setJSON(['success' => 1, 'message' => 'PCC request sent successfully to Handglove Admin.']);
+        } else {
+            return $this->response->setJSON(['success' => 0, 'message' => 'Failed to send PCC request. Please try again or contact support.']);
+        }
     }
 }

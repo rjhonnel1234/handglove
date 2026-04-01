@@ -13,7 +13,7 @@ class ShiftsModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['client_id', 'start_date', 'end_date', 'shift_type', 'shift_start_time', 'shift_end_time', 'slots', 'rate', 'unit_id', 'status'];
+    protected $allowedFields    = ['client_id', 'start_date', 'end_date', 'shift_type', 'shift_start_time', 'shift_end_time', 'slots', 'rate', 'unit_id', 'status', 'posted'];
 
     // Dates
     protected $useTimestamps = false;

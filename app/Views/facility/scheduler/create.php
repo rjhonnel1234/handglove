@@ -6,48 +6,65 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="mb-4">
-                                <h2 class="mb-0">Manual Schedule - <?= date('F d, Y', strtotime($selectedDate)) ?></h2>
+                                <h2 class="mb-0">Manual Schedule -
+                                    <?= date('F d, Y', strtotime($selectedDate)) ?>
+                                </h2>
                             </div>
                             <input type="hidden" id="selected_date" value="<?= $selectedDate ?>">
                             <div id="units-schedule-container">
-                                <?php foreach($units as $unit): ?>
+                                <?php foreach ($units as $unit): ?>
                                     <div class="unit-schedule-section mb-5" data-unit-id="<?= $unit['id'] ?>">
                                         <div class="unit-header mb-3 border-bottom pb-2 d-flex align-items-center">
-                                            <h3 class="mb-0"><i class="fa fa-hospital mr-2"></i> <?= $unit['name'] ?></h3>
+                                            <h3 class="mb-0"><i class="fa fa-hospital mr-2"></i>
+                                                <?= $unit['name'] ?>
+                                            </h3>
                                         </div>
 
                                         <div class="row">
-                                            <?php 
+                                            <?php
                                             $shifts = [
                                                 'Day' => '07:00 AM - 03:00 PM',
-                                                'Evening' => '03:00 PM - 11:00 PM',
+                                                'Mid' => '03:00 PM - 11:00 PM',
                                                 'Night' => '11:00 PM - 07:00 AM'
                                             ];
-                                            foreach($shifts as $name => $time): 
-                                            ?>
-                                            <div class="col-md-4 mb-3">
-                                                <div class="card shift-card shadow-sm border-light h-100">
-                                                    <div class="card-header bg-white border-bottom-0 pb-0">
-                                                        <div class="shift-header-content p-2 bg-light rounded">
-                                                            <h6 class="mb-0 text-center"><?= $name ?> Shift</h6>
-                                                            <small class="text-muted d-block text-center"><?= $time ?></small>
+                                            foreach ($shifts as $name => $time):
+                                                ?>
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card shift-card shadow-sm border-light h-100">
+                                                        <div class="card-header bg-white border-bottom-0 pb-0">
+                                                            <div class="shift-header-content p-2 bg-light rounded">
+                                                                <h6 class="mb-0 text-center">
+                                                                    <?= $name ?> Shift
+                                                                </h6>
+                                                                <small class="text-muted d-block text-center">
+                                                                    <?= $time ?>
+                                                                </small>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="card-body p-2">
-                                                        <div class="staff-assignment-list" id="list-unit-<?= $unit['id'] ?>-<?= strtolower($name) ?>">
-                                                            <div class="empty-shift-notice text-muted italic p-2Small">No staff assigned yet.</div>
-                                                        </div>
-                                                        <div class="mt-2 text-center">
-                                                            <button class="btn btn-primary btn-xs add-staff-btn" 
-                                                                    data-shift="<?= strtolower($name) ?>" 
-                                                                    data-unit-id="<?= $unit['id'] ?>" 
+                                                        <div class="card-body p-2">
+                                                            <div class="mb-3 px-2">
+                                                                <label class="small font-weight-bold mb-1">Slots Needed</label>
+                                                                <input type="number"
+                                                                    class="form-control form-control-sm shift-slots"
+                                                                    data-unit-id="<?= $unit['id'] ?>"
+                                                                    data-shift="<?= strtolower($name) ?>" value="0" min="0">
+                                                            </div>
+                                                            <div class="staff-assignment-list"
+                                                                id="list-unit-<?= $unit['id'] ?>-<?= strtolower($name) ?>">
+                                                                <div class="empty-shift-notice text-muted italic p-2Small">No
+                                                                    staff assigned yet.</div>
+                                                            </div>
+                                                            <div class="mt-2 text-center">
+                                                                <button class="btn btn-primary btn-xs add-staff-btn"
+                                                                    data-shift="<?= strtolower($name) ?>"
+                                                                    data-unit-id="<?= $unit['id'] ?>"
                                                                     data-unit-name="<?= $unit['name'] ?>">
-                                                                <i class="fa fa-plus"></i> Add
-                                                            </button>
+                                                                    <i class="fa fa-plus"></i> Add
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
                                             <?php endforeach; ?>
                                         </div>
                                     </div>
@@ -57,9 +74,11 @@
                             <div class="d-flex justify-content-end mt-4">
                                 <a href="<?= base_url('facility/') ?>" class="btn btn-warning mr-2">Back to Calendar</a>
                                 <?php if (!empty($scheduleUpload)): ?>
-                                    <a href="<?= base_url('facility/schedules/download/'.$scheduleUpload['id']) ?>" class="btn btn-info mr-2"><i class="fa fa-download mr-1"></i> Download PDF</a>
+                                    <a href="<?= base_url('facility/schedules/download/' . $scheduleUpload['id']) ?>"
+                                        class="btn btn-info mr-2"><i class="fa fa-download mr-1"></i> Download PDF</a>
                                 <?php endif; ?>
-                                <button id="btnSaveScheduleAsShifts" class="btn btn-success ml-2 mr-2">Save as Shifts</button>
+                                <button id="btnSaveScheduleAsShifts" class="btn btn-success ml-2 mr-2">Save as
+                                    Shifts</button>
                                 <button id="btnSaveSchedule" class="btn thm-btn">Save</button>
                             </div>
                         </div>
@@ -104,8 +123,10 @@
                     <div class="form-group">
                         <label>Clinician Type</label>
                         <select name="clinician_type" class="form-control selectpicker" required>
-                            <?php foreach($clinicianTypes as $type): ?>
-                                <option value="<?= $type['id'] ?>"><?= $type['name'] ?></option>
+                            <?php foreach ($clinicianTypes as $type): ?>
+                                <option value="<?= $type['id'] ?>">
+                                    <?= $type['name'] ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -131,16 +152,62 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Select Personnel</label>
-                    <select id="staff_select" class="selectpicker form-control" data-live-search="true" data-size="5" multiple data-title="Select Staff">
+                    <select id="staff_select" class="selectpicker form-control" data-live-search="true" data-size="5"
+                        multiple data-title="Select Staff">
                     </select>
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-between">
-                <button type="button" class="btn btn-link text-primary p-0" id="btnShowQuickAdd"><i class="fa fa-user-plus"></i> Clinician not in list? Add here</button>
+                <button type="button" class="btn btn-link text-primary p-0" id="btnShowQuickAdd"><i
+                        class="fa fa-user-plus"></i> Clinician not in list? Add here</button>
                 <div>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="confirmAddStaff">Add Selected</button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Confirm Understaffed Shifts -->
+<div class="modal fade" id="modalConfirmShifts" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title font-weight-bold"><i class="fa fa-exclamation-triangle mr-2"></i> Confirm
+                    Understaffed Shifts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>The following shifts have fewer staff assigned than the required slots. Please review and decide if
+                    you want to <strong>post</strong> the remaining slots for public clinicians.</p>
+
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered" id="tableUnderstaffedShifts">
+                        <thead class="bg-light text-center">
+                            <tr>
+                                <th>Unit</th>
+                                <th>Shift Time</th>
+                                <th style="width: 100px;">Total Slots</th>
+                                <th>Assigned</th>
+                                <th>Remaining</th>
+                                <th style="width: 180px;">Shift Type</th>
+                                <th style="width: 120px;">Rate ($)</th>
+                                <th class="text-center">Post to Public?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" id="btnConfirmUnderstaffed" class="btn btn-primary px-4">Confirm & Create
+                    Shifts</button>
             </div>
         </div>
     </div>

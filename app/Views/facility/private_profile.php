@@ -1,5 +1,5 @@
 <?php
-    echo view('facility/includes/profile_banner');
+echo view('facility/includes/profile_banner');
 ?>
 <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.3/dist/dotlottie-wc.js" type="module"></script>
 <style>
@@ -10,50 +10,75 @@
         border-bottom: 1px solid #eee;
         transition: background 0.3s;
     }
+
     .clinician-item:hover {
         background: #f9f9f9;
         cursor: pointer;
     }
+
     .clinician-item.selected {
         border-color: #007bff;
         background-color: #e7f1ff;
         border-radius: 8px;
         margin-bottom: 5px;
     }
+
     .pending-replacement {
         border: 2px solid #ffc107 !important;
         position: relative;
         animation: pulse-yellow 2s infinite;
     }
+
     .replacement {
         border: 2px solid #28a745 !important;
         position: relative;
         animation: pulse-green 2s infinite;
     }
+
     @keyframes pulse-yellow {
-        0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
-        70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+        }
     }
+
     @keyframes pulse-green {
-        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
-        70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        0% {
+            box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+        }
     }
+
     .clinician-item .profile-container {
         position: relative;
         width: 60px;
         margin-right: 15px;
         text-align: center;
     }
+
     .clinician-item .profile-container img {
         width: 60px;
         height: 60px;
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
+
     .clinician-item .role-badge {
         display: block;
         font-size: 10px;
@@ -67,23 +92,35 @@
         z-index: 1;
         text-transform: uppercase;
     }
-    .clinician-item .role-rn { background: #3182ce; }
-    .clinician-item .role-lpn { background: #e53e3e; }
-    .clinician-item .role-cna { background: #38a169; }
+
+    .clinician-item .role-rn {
+        background: #3182ce;
+    }
+
+    .clinician-item .role-lpn {
+        background: #e53e3e;
+    }
+
+    .clinician-item .role-cna {
+        background: #38a169;
+    }
 
     .clinician-item .clinician-info {
         flex-grow: 1;
     }
+
     .clinician-item .clinician-name {
         font-weight: bold;
         color: #ed8936;
         font-size: 1.1rem;
         margin-bottom: 2px;
     }
+
     .clinician-item .clinician-company {
         font-size: 0.85rem;
         color: #718096;
     }
+
     .clinician-item .distance-info {
         text-align: right;
         font-size: 0.9rem;
@@ -98,13 +135,16 @@
             <div id="profile-main" class="col-lg-12 col-md-12 col-sm-12 col-12">
                 <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="shifts-tab" data-toggle="tab" href="#shifts" role="tab" aria-controls="shifts" aria-selected="true">Shifts</a>
+                        <a class="nav-link active" id="shifts-tab" data-toggle="tab" href="#shifts" role="tab"
+                            aria-controls="shifts" aria-selected="true">Shifts</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="invoices-tab" data-toggle="tab" href="#invoices" role="tab" aria-controls="invoices" aria-selected="false">Invoices</a>
+                        <a class="nav-link" id="invoices-tab" data-toggle="tab" href="#invoices" role="tab"
+                            aria-controls="invoices" aria-selected="false">Invoices</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="time-logs-tab" data-toggle="tab" href="#time-logs" role="tab" aria-controls="time-logs" aria-selected="false">Time Logs</a>
+                        <a class="nav-link" id="time-logs-tab" data-toggle="tab" href="#time-logs" role="tab"
+                            aria-controls="time-logs" aria-selected="false">Time Logs</a>
                     </li>
                 </ul>
                 <div class="tab-content" id="profileTabsContent">
@@ -118,8 +158,11 @@
                                             <h2>Shifts</h2>
                                             <div class="buttons">
                                                 <select id="shiftUnit" class="selectpicker">
-                                                    <?php foreach($units as $unit){ ?>
-                                                        <option value="<?php echo $unit['id']; ?>"><?php echo $unit['name']; ?></option>
+                                                    <?php foreach ($units as $unit) { ?>
+                                                        <option value="<?php echo $unit['id']; ?>">
+                                                        
+
+                                                                                                                    <?php echo $unit['name']; ?></option>
                                                     <?php } ?>
                                                 </select>
                                             </div>
@@ -208,7 +251,9 @@
                                 <div class="heading d-flex justify-content-between align-items-center mb-4">
                                     <h2 class="mb-0">Invoices</h2>
                                     <div class="buttons d-flex align-items-center">
-                                        <button id="paySelectedBtn" class="btn btn-success btn-sm mr-3" style="display: none;"><i class="fas fa-money-bill-wave"></i> Pay Selected</button>
+                                        <button id="paySelectedBtn" class="btn btn-success btn-sm mr-3"
+                                            style="display: none;"><i class="fas fa-money-bill-wave"></i> Pay
+                                            Selected</button>
                                         <select id="invoiceStatus" class="selectpicker">
                                             <option value="">All Status</option>
                                             <option value="10">Unpaid</option>
@@ -224,8 +269,10 @@
                                                     <tr>
                                                         <th class="border-top-0 text-center pl-4">
                                                             <div class="custom-control custom-checkbox">
-                                                                <input type="checkbox" class="custom-control-input" id="checkAllInvoices">
-                                                                <label class="custom-control-label" for="checkAllInvoices"></label>
+                                                                <input type="checkbox" class="custom-control-input"
+                                                                    id="checkAllInvoices">
+                                                                <label class="custom-control-label"
+                                                                    for="checkAllInvoices"></label>
                                                             </div>
                                                         </th>
                                                         <th class="border-top-0">Clinician</th>
@@ -285,7 +332,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px;">
         <div class="modal-content">
             <div class="modal-header">
-                <div id="modal-title">
+                <div id="pcc-modal-title" class="font-weight-bold">
                     PCC Request
                 </div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -294,7 +341,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-12" id="pcc-modal-body">
                         Are you sure you want to submit PCC for this shift?
                     </div>
                 </div>
@@ -303,7 +350,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="text-right">
-                            <a href="javascript:;" class="calloff-shift btn btn-success">Submit</a>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <a href="javascript:;" class="pcc-request-shift btn btn-success" id="btnPccSubmit">Submit</a>
                         </div>
                     </div>
                 </div>
@@ -327,11 +375,13 @@
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <div id="online-clinicians-loading">
-                            <iframe src="https://lottie.host/embed/2d20c248-18ea-40e2-bd3e-8f9576168437/G1U5l3CjNo.json" style="border: none;width: 100%;"></iframe>
+                            <iframe src="https://lottie.host/embed/2d20c248-18ea-40e2-bd3e-8f9576168437/G1U5l3CjNo.json"
+                                style="border: none;width: 100%;"></iframe>
                         </div>
                         <div id="online-clinicians-container" style="display: none;">
                             <!-- allow to select clinician, add Request Shift button and once click send shift request to selected clinician -->
-                            <div id="onlineCliniciansList" class="text-left" style="max-height: 400px; overflow-y: auto;">
+                            <div id="onlineCliniciansList" class="text-left"
+                                style="max-height: 400px; overflow-y: auto;">
                                 <!-- Clinicians will be listed here -->
                             </div>
                         </div>

@@ -99,6 +99,7 @@ $routes->group("facility", ["namespace" => "App\Controllers"], function ($routes
             $routes->post('transfer', 'Shifts::transfer');
             $routes->get('get_clinician_timeline/(:num)', 'Shifts::get_clinician_timeline/$1');
             $routes->get('get_clinician_details/(:num)', 'Shifts::get_clinician_details/$1');
+            $routes->post('pcc_request', 'Shifts::pcc_request');
         });
 
         $routes->group("invoices", function ($routes) {

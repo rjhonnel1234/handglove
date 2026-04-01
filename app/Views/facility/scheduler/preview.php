@@ -74,13 +74,21 @@
                                                                     <?php
                                                                     $shifts = [
                                                                         'Day' => '7AM - 3PM',
-                                                                        'Evening' => '3PM - 11PM',
+                                                                        'Mid' => '3PM - 11PM',
                                                                         'Night' => '11PM - 7AM'
                                                                     ];
                                                                     foreach ($shifts as $name => $time): ?>
                                                                             <th style="width: 33.33%;" class="p-2 border-bottom-0">
                                                                                 <div class="shift-name font-weight-bold text-uppercase small"><?= $name ?> Shift</div>
                                                                                 <div class="shift-time text-muted x-small font-weight-normal"><?= $time ?></div>
+                                                                                <div class="mt-1 d-flex align-items-center justify-content-center">
+                                                                                    <?php $count = count($shiftData[$name] ?? []); ?>
+                                                                                    <label for="" class="small">Slots: </label>
+                                                                                    <input type="number" class="form-control form-control-sm mx-auto shift-slots-preview" 
+                                                                                           data-shift-key="<?= $name ?>" 
+                                                                                           value="<?= $count ?>" min="0" 
+                                                                                           style="width: 55px; height: 22px; font-size: 0.7rem; padding: 2px;">
+                                                                                </div>
                                                                             </th>
                                                                     <?php endforeach; ?>
                                                                 </tr>

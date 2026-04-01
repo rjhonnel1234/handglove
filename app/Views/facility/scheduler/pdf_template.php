@@ -149,7 +149,7 @@
                 <thead>
                     <tr>
                         <th>Day Shift</th>
-                        <th>Evening Shift</th>
+                        <th>Mid Shift</th>
                         <th>Night Shift</th>
                     </tr>
                 </thead>

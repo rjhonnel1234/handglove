@@ -14,7 +14,7 @@ class ClientScheduleDetailsModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['client_id', 'unit_id', 'personnel_id', 'schedule_date', 'shift_name', 'shift_time'];
+    protected $allowedFields    = ['client_id', 'unit_id', 'personnel_id', 'schedule_date', 'shift_name', 'shift_time', 'slots'];
 
     // Dates
     protected $useTimestamps = false;

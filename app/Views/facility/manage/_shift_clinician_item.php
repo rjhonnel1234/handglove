@@ -48,8 +48,20 @@ if ($isPendingReplacement) {
             <?php if (session()->get('type') != 4): ?>
                 <li class="">
                     <?php if ($clinician['type'] == 'clinician'): ?>
-                        <?php $pccIcon = $clinician['pcc_status'] == 20 ? '<i class="fa fa-unlock"></i>' : '<i class="fa fa-lock"></i>'; ?>
-                        <a href="javascript:;" class="pcc-action text-success" data-shift="<?= $shift['id'] ?>" data-clin="<?= $clinician['clinician_id'] ?>"><?= $pccIcon ?> PCC</a>
+                        <?php 
+                            $hasPcc = ($clinician['has_pcc'] ?? false);
+                            $pccIcon = (isset($clinician['pcc_status']) && $clinician['pcc_status'] == 20) || $hasPcc ? '<i class="fa fa-unlock"></i>' : '<i class="fa fa-lock"></i>'; 
+                            $pccUsername = $clinician['pcc_username'] ?? '';
+                            $pccPassword = $clinician['pcc_password'] ?? '';
+                        ?>
+                        <a href="javascript:;" class="pcc-action text-success" 
+                           data-shift="<?= $shift['id'] ?>" 
+                           data-clin="<?= $clinician['clinician_id'] ?>"
+                           data-has-pcc="<?= $hasPcc ? '1' : '0' ?>"
+                           data-username="<?= $pccUsername ?>"
+                           data-password="<?= $pccPassword ?>"
+                           data-clinician-name="<?= $clinician['display_name'] ?>"
+                        ><?= $pccIcon ?> PCC</a>
                     <?php endif; ?>
                 </li>
                 <li>
