@@ -42,8 +42,8 @@ class BoardOfDirectors extends BaseController
 
         $rules = [
             'company_name' => 'required',
-            'ceo_name'     => 'required',
-            'position'     => 'required',
+            'ceo_name' => 'required',
+            'position' => 'required',
         ];
 
         if (!$this->validate($rules)) {
@@ -54,14 +54,14 @@ class BoardOfDirectors extends BaseController
         }
 
         $data = [
-            'company_name'     => $this->request->getPost('company_name'),
-            'ceo_name'        => $this->request->getPost('ceo_name'),
-            'position'        => $this->request->getPost('position'),
-            'title'           => $this->request->getPost('title'),
+            'company_name' => $this->request->getPost('company_name'),
+            'ceo_name' => $this->request->getPost('ceo_name'),
+            'position' => $this->request->getPost('position'),
+            'title' => $this->request->getPost('title'),
             'company_website' => $this->request->getPost('company_website'),
-            'created_datetime'=> date('Y-m-d H:i:s'),
-            'picture'         => $this->request->getPost('picture_path'),
-            'company_logo'    => $this->request->getPost('logo_path'),
+            'created_datetime' => date('Y-m-d H:i:s'),
+            'picture' => $this->request->getPost('picture_path'),
+            'company_logo' => $this->request->getPost('logo_path'),
         ];
 
         // Fallback to traditional upload if Dropzone wasn't used
@@ -118,8 +118,8 @@ class BoardOfDirectors extends BaseController
 
         $rules = [
             'company_name' => 'required',
-            'ceo_name'     => 'required',
-            'position'     => 'required',
+            'ceo_name' => 'required',
+            'position' => 'required',
         ];
 
         if (!$this->validate($rules)) {
@@ -130,13 +130,13 @@ class BoardOfDirectors extends BaseController
         }
 
         $data = [
-            'company_name'     => $this->request->getPost('company_name'),
-            'ceo_name'        => $this->request->getPost('ceo_name'),
-            'position'        => $this->request->getPost('position'),
-            'title'           => $this->request->getPost('title'),
+            'company_name' => $this->request->getPost('company_name'),
+            'ceo_name' => $this->request->getPost('ceo_name'),
+            'position' => $this->request->getPost('position'),
+            'title' => $this->request->getPost('title'),
             'company_website' => $this->request->getPost('company_website'),
-            'picture'         => $this->request->getPost('picture_path'),
-            'company_logo'    => $this->request->getPost('logo_path'),
+            'picture' => $this->request->getPost('picture_path'),
+            'company_logo' => $this->request->getPost('logo_path'),
         ];
 
         // Only update image fields if new paths are provided
