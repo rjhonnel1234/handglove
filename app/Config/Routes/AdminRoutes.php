@@ -158,6 +158,17 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->post('apply-clinician', 'Schedules::apply_clinician');
     });
 
+    $routes->group('per-diem-networks', ['filter' => 'adminAuth'], function ($routes) {
+        $routes->get('', 'PerDiemNetworks::index');
+        $routes->get('create', 'PerDiemNetworks::create');
+        $routes->post('store', 'PerDiemNetworks::store');
+        $routes->get('edit/(:num)', 'PerDiemNetworks::edit/$1');
+        $routes->post('update/(:num)', 'PerDiemNetworks::update/$1');
+        $routes->get('delete/(:num)', 'PerDiemNetworks::delete/$1');
+        $routes->post('list', 'PerDiemNetworks::list');
+        $routes->post('upload', 'PerDiemNetworks::upload');
+    });
+
     $routes->group('shifts', ['filter' => 'adminAuth'], function ($routes) {
         $routes->get('/', 'Shifts::index');
         $routes->post('list', 'Shifts::list');

@@ -61,6 +61,11 @@ class AdminMenu extends BaseConfig
                 'icon'  => 'fa fa-file-medical'
             ],
             [
+                'title' => 'Per Diem Networks',
+                'url'   => 'admin/per-diem-networks',
+                'icon'  => 'fa fa-network-wired'
+            ],
+            [
                 'title' => 'Agency Providers',
                 'url'   => 'admin/agencies',
                 'icon'  => 'fa fa-building'
