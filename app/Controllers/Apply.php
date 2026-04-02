@@ -9,7 +9,7 @@ class Apply extends BaseController
 
 
         $session = session();
-        if( $session->get('isLoggedIn') == 1){
+        if ($session->get('isLoggedIn') == 1) {
             return redirect()->to('/jobs');
         }
         // PAGE HEAD PROCESSING
@@ -38,21 +38,21 @@ class Apply extends BaseController
                 COMPILED_ASSETS_PATH . 'css/pages/pages'
             )
         ))
-        .view('pages/apply')
-        .view('components/scripts_render', array(
-            'scripts' => array(
-                'https://code.jquery.com/jquery-3.5.1.min.js' => array(
-                    'integrity' => 'sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=',
-                    'crossorigin' => 'anonymous'
-                ),
-                ASSETS_URL . 'js/plugins/popper.min.js',
-                ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
-                ASSETS_URL . 'js/components/global.min.js',
-                ASSETS_URL . 'js/plugins/owl.carousel.min.js',
-                ASSETS_URL . 'js/components/navigation_bar.min.js',
-                ASSETS_URL . 'js/pages/home.min.js',
-            )
-        ))
-        .view('components/footer');
+            . view('pages/apply')
+            . view('components/scripts_render', array(
+                'scripts' => array(
+                    'https://code.jquery.com/jquery-3.5.1.min.js' => array(
+                        'integrity' => 'sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=',
+                        'crossorigin' => 'anonymous'
+                    ),
+                    ASSETS_URL . 'js/plugins/popper.min.js',
+                    ASSETS_URL . 'js/plugins/bootstrap-4.5.2/bootstrap.min.js',
+                    ASSETS_URL . 'js/components/global.min.js',
+                    ASSETS_URL . 'js/plugins/owl.carousel.min.js',
+                    ASSETS_URL . 'js/components/navigation_bar.min.js',
+                    ASSETS_URL . 'js/pages/home.min.js',
+                )
+            ))
+            . view('components/footer');
     }
 }

@@ -155,7 +155,7 @@ $routes->group("admin", ["namespace" => "App\Controllers\Admin"], function ($rou
         $routes->post('list', 'Schedules::list');
         $routes->post('details', 'Schedules::details');
         $routes->post('get-available-clinicians', 'Schedules::get_available_clinicians');
-        $routes->post('assign-clinician', 'Schedules::assign_clinician');
+        $routes->post('apply-clinician', 'Schedules::apply_clinician');
     });
 
     $routes->group('shifts', ['filter' => 'adminAuth'], function ($routes) {

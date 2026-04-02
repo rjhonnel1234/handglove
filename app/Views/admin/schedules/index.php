@@ -101,16 +101,6 @@
                     <p class="mt-2 text-muted">Fetching operational details...</p>
                 </div>
                 <div id="modal-content" style="display:none;">
-                    <div class="p-4 bg-light border-bottom mb-4" id="scheduler-header-wrapper">
-                        <!-- Schedulers will be injected here -->
-                    </div>
-                    <div class="px-4 pb-2" id="supervisor-section" style="display:none;">
-                        <h6 class="font-weight-bold text-uppercase text-muted mb-3"
-                            style="font-size: 0.8rem; letter-spacing: 1px;">Supervisor:</h6>
-                        <div id="supervisor-list" class="mb-4">
-                            <!-- Supervisors will be injected here -->
-                        </div>
-                    </div>
                     <div id="shifts-list-container" class="px-4 pb-4">
                         <!-- Shifts list will be injected here -->
                     </div>
@@ -120,8 +110,8 @@
                     <div class="d-flex align-items-center mb-4">
                         <button class="btn btn-sm btn-light mr-3" id="back-to-details"><i
                                 class="fas fa-arrow-left"></i></button>
-                        <h6 class="mb-0 font-weight-bold">Assign Clinician to <span id="assign-unit-name"></span> (<span
-                                id="assign-shift-time"></span>)</h6>
+                        <h6 class="mb-0 font-weight-bold">Apply for the Clinician to <span id="assign-unit-name"></span> (<span
+                                 id="assign-shift-time"></span>)</h6>
                     </div>
                     <div class="form-group mb-4">
                         <input type="text" class="form-control" id="clinician-search"
@@ -329,52 +319,7 @@
 
         function renderShiftDetails(data) {
             var shifts = data.shifts;
-            var schedulers = data.schedulers;
-            var supervisors = data.supervisors;
             var currentDate = data.date;
-
-            // Render Schedulers
-            var schedHtml = '';
-            if (schedulers && schedulers.length > 0) {
-                schedulers.forEach(function (s) {
-                    schedHtml += `
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="<?= base_url('assets/img/blank-img.png') ?>" class="scheduler-profile-img mr-3" alt="Scheduler">
-                            <div>
-                                <div class="mb-1 d-flex align-items-center">
-                                    <span class="badge badge-soft-primary mr-2 px-2 py-1" style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;">Scheduler</span>
-                                    <span class="font-weight-bold text-dark">${s.first_name} ${s.last_name}</span>
-                                </div>
-                                <div class="mb-0 small text-muted"><i class="fas fa-phone mr-1"></i> ${s.contact_number || 'N/A'}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                $('#scheduler-header-wrapper').html(schedHtml).show();
-            } else {
-                $('#scheduler-header-wrapper').hide();
-            }
-
-            // Render Supervisors
-            var supHtml = '';
-            if (supervisors && supervisors.length > 0) {
-                supervisors.forEach(function (sup) {
-                    supHtml += `
-                        <div class="supervisor-item">
-                            <div class="supervisor-info-col font-weight-bold text-dark">
-                                <i class="fas fa-user-tie mr-2 text-muted" style="width: 15px;"></i> ${sup.name} 
-                                ${sup.time ? `<span class="badge badge-light font-weight-normal border ml-2">${sup.time}</span>` : ''}
-                            </div>
-                            <div class="supervisor-info-col text-muted small"><i class="fas fa-phone mr-1"></i> ${sup.phone || ''}</div>
-                            <div class="supervisor-info-col text-muted small"><i class="fas fa-envelope mr-1"></i> ${sup.email || ''}</div>
-                        </div>
-                    `;
-                });
-                $('#supervisor-list').html(supHtml);
-                $('#supervisor-section').show();
-            } else {
-                $('#supervisor-section').hide();
-            }
 
             // Render Shifts
             var shiftsHtml = '';
@@ -389,9 +334,21 @@
                     if (shift.clinicians && shift.clinicians.length > 0) {
                         shift.clinicians.forEach(function (c) {
                             cliniciansHtml += `
-                                <div class="p-2 border-bottom d-flex align-items-center justify-content-between" ${c.is_external ? 'style="background-color: #f0fff4;"' : ''}>
+                                <div class="p-2 border-bottom d-flex align-items-center justify-content-between" style="background-color: #f0fff4;">
                                     <span class="text-dark"><i class="fas fa-user-check text-success mr-2"></i> ${c.display_name}</span>
-                                    <span class="badge ${c.is_external ? 'badge-success text-white' : 'badge-light'} px-2 py-1" style="font-size: 0.65rem; text-transform: uppercase;">${c.is_external ? 'Clinician' : 'Internal'}</span>
+                                    <span class="badge badge-success text-white px-2 py-1" style="font-size: 0.65rem; text-transform: uppercase;">Clinician</span>
+                                </div>`;
+                        });
+                    }
+
+                    // Render Applicants
+                    var applicantsHtml = '';
+                    if (shift.applicants && shift.applicants.length > 0) {
+                        shift.applicants.forEach(function (a) {
+                            applicantsHtml += `
+                                <div class="p-2 border-bottom d-flex align-items-center justify-content-between" style="background-color: #fffaf0;">
+                                    <span class="text-dark"><i class="fas fa-clock text-warning mr-2"></i> ${a.clinician_name}</span>
+                                    <span class="badge badge-warning text-dark px-2 py-1" style="font-size: 0.65rem; text-transform: uppercase;">Applied</span>
                                 </div>`;
                         });
                     }
@@ -403,7 +360,7 @@
                     var assignBtn = '';
                     if (!isFull) {
                         assignBtn = `<button class="btn btn-block btn-sm btn-outline-primary assign-clinician-trigger mt-2" data-shift-id="${shift.id}" data-unit-name="${shift.unit_name || 'General Unit'}" data-shift-time="${shift.shift_start_time} - ${shift.shift_end_time}">
-                            <i class="fas fa-plus-circle mr-1"></i> Assign Clinician
+                            <i class="fas fa-paper-plane mr-1"></i> Apply for the Clinician
                         </button>`;
                     }
 
@@ -431,7 +388,9 @@
                                 </div>
 
                                 <div class="clinicians-area py-1">
-                                    ${cliniciansHtml || '<div class="text-muted small italic px-1"><i class="fas fa-info-circle mr-1"></i> No personnel assigned to this shift yet.</div>'}
+                                    ${cliniciansHtml}
+                                    ${applicantsHtml}
+                                    ${(!cliniciansHtml && !applicantsHtml) ? '<div class="text-muted small italic px-1"><i class="fas fa-info-circle mr-1"></i> No personnel assigned or applications found for this shift yet.</div>' : ''}
                                 </div>
                                 
                                 ${assignBtn}
@@ -484,7 +443,7 @@
                         <a href="javascript:void(0)" class="list-group-item list-group-item-action available-clinician-item" data-clinician-id="${c.id}">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="font-weight-bold">${c.name}</span>
-                                <span class="badge badge-light">Assign <i class="fas fa-chevron-right ml-1"></i></span>
+                                <span class="badge badge-light">Apply <i class="fas fa-chevron-right ml-1"></i></span>
                             </div>
                         </a>
                     `;
@@ -500,25 +459,23 @@
             var clinicianId = $(this).data('clinician-id');
             var $item = $(this);
 
-            if (!confirm('Are you sure you want to assign this clinician?')) return;
+            if (!confirm('Are you sure you want to apply for this clinician?')) return;
 
-            $item.addClass('disabled').html('<div class="text-center py-1"><i class="fas fa-spinner fa-spin"></i> Assigning...</div>');
+            $item.addClass('disabled').html('<div class="text-center py-1"><i class="fas fa-spinner fa-spin"></i> Applying...</div>');
 
-            $.post('<?= base_url('admin/schedules/assign-clinician') ?>', {
+            $.post('<?= base_url('admin/schedules/apply-clinician') ?>', {
                 shift_id: activeShiftId,
                 clinician_id: clinicianId
             }, function (res) {
                 if (res.success) {
                     // Success! Refresh details
-                    var facilityId = $('.day-slot.is-today').data('facility-id') || $('[data-date="' + $('#modal-date-display').text() + '"]').data('facility-id');
-                    // Actually we have the original trigger date in the modal
-                    // We need to re-trigger the details AJAX or simplify
                     $('#shiftDetailsModal').modal('hide');
-                    alert('Clinician assigned successfully.');
-                    location.reload(); // Simplest for now to refresh grid counts too
+                    alert('Application submitted successfully.');
+                    location.reload(); 
                 } else {
                     alert(res.message);
                     $item.removeClass('disabled');
+                    $item.html(`<div class="d-flex justify-content-between align-items-center"><span class="font-weight-bold">${$(this).find('.font-weight-bold').text()}</span><span class="badge badge-light">Apply <i class="fas fa-chevron-right ml-1"></i></span></div>`);
                 }
             });
         });

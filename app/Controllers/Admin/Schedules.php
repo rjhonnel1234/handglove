@@ -146,6 +146,14 @@ class Schedules extends BaseController
             $builder->where('tbl_shifts.client_id', $facilityId);
         }
 
+        // Filter: posted = 1 OR having at least one clinician (clinician_id > 0)
+        $builder->groupStart()
+            ->where('tbl_shifts.posted', 1)
+            ->orGroupStart()
+                ->where("EXISTS (SELECT 1 FROM tbl_shift_clinicians WHERE tbl_shift_clinicians.shift_id = tbl_shifts.id AND tbl_shift_clinicians.clinician_id > 0)", null, false)
+            ->groupEnd()
+        ->groupEnd();
+
         $shifts = $builder->findAll();
         $db = \Config\Database::connect();
 
@@ -189,33 +197,35 @@ class Schedules extends BaseController
                 }
             }
 
-            // Get clinicians assigned to this shift
+            // Get clinicians assigned to this shift (Clinicians only, not personnel)
             $clinicians = $db->table('tbl_shift_clinicians')
-                ->select('tbl_shift_clinicians.*, tbl_clinicians.name as clinician_name, tbl_client_personnel.first_name, tbl_client_personnel.last_name')
-                ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_shift_clinicians.clinician_id', 'left')
-                ->join('tbl_client_personnel', 'tbl_client_personnel.id = tbl_shift_clinicians.personnel_id', 'left')
+                ->select('tbl_shift_clinicians.*, tbl_clinicians.name as clinician_name')
+                ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_shift_clinicians.clinician_id', 'inner')
                 ->where('shift_id', $shift['id'])
+                ->where('tbl_shift_clinicians.clinician_id >', 0)
                 ->get()->getResultArray();
 
             foreach ($clinicians as &$clinician) {
-                if ($clinician['clinician_id'] > 0) {
-                    $clinician['display_name'] = $clinician['clinician_name'];
-                    $clinician['is_external'] = true;
-                } else {
-                    $clinician['display_name'] = $clinician['first_name'] . ' ' . $clinician['last_name'];
-                    $clinician['is_external'] = false;
-                }
+                $clinician['display_name'] = $clinician['clinician_name'];
+                $clinician['is_external'] = true;
             }
 
+            // Get applicants (Shift Requests with status 15 - Applied)
+            $applicants = $db->table('tbl_client_shift_requests')
+                ->select('tbl_client_shift_requests.*, tbl_clinicians.name as clinician_name')
+                ->join('tbl_clinicians', 'tbl_clinicians.id = tbl_client_shift_requests.clinician_id', 'left')
+                ->where('shift_id', $shift['id'])
+                ->where('tbl_client_shift_requests.status', 15) // Applied
+                ->get()->getResultArray();
+
             $shift['clinicians'] = $clinicians;
+            $shift['applicants'] = $applicants;
             $enrichedShifts[] = $shift;
         }
 
         return $this->response->setJSON([
             'success' => 1,
             'date' => date('F j, Y', strtotime($date)),
-            'schedulers' => $schedulers,
-            'supervisors' => $supervisors,
             'shifts' => $enrichedShifts
         ]);
     }
@@ -262,7 +272,7 @@ class Schedules extends BaseController
         ]);
     }
 
-    public function assign_clinician()
+    public function apply_clinician()
     {
         if (!session()->get('isAdminLoggedIn')) {
             return $this->response->setJSON(['success' => 0, 'message' => 'Unauthorized']);
@@ -290,17 +300,17 @@ class Schedules extends BaseController
             return $this->response->setJSON(['success' => 0, 'message' => 'No available slots for this shift.']);
         }
 
-        // Assign
-        $db->table('tbl_shift_clinicians')->insert([
+        // Apply (Create request with status 15 - Applied)
+        $db->table('tbl_client_shift_requests')->insert([
             'client_id' => $shift['client_id'],
             'shift_id' => $shiftId,
             'clinician_id' => $clinicianId,
-            'personnel_id' => 0,
-            'status' => 10, // Accepted
-            'shift_status' => 0,
-            'pcc_status' => 10
+            'status' => 15, // Applied
+            'from_callout' => 0,
+            'bonus' => 0,
+            'replacing_clinician_id' => 0
         ]);
 
-        return $this->response->setJSON(['success' => 1, 'message' => 'Clinician assigned successfully']);
+        return $this->response->setJSON(['success' => 1, 'message' => 'Application submitted successfully']);
     }
 }
