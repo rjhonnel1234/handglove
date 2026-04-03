@@ -90,7 +90,7 @@ if (PHP_SAPI === 'cli' || !isset($_SERVER['SCRIPT_NAME'])) {
 
 define('DOMAIN', $_SERVER['SERVER_NAME']);
 define('DOMAIN_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . '/');
-define('BASE_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'].':8080' . str_replace('index.php', '', $_SERVER['SCRIPT_NAME']));
+define('BASE_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] . str_replace('index.php', '', $_SERVER['SCRIPT_NAME']));
 define('BASE_URL_PATH', str_replace('index.php', '', $_SERVER['SCRIPT_NAME']));
 define('IS_HTTPS_ENABLED', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? true : false);
 
