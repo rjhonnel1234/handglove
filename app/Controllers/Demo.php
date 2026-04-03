@@ -201,35 +201,30 @@ class Demo extends BaseController
                 $otpModel = new \App\Models\SMSOTPModel();
                 $otpModel->where('contact_number', $contact_number)->where('status', 1)->delete();
                 $id = $otpModel->insert($item);
-    
-    
-                if($id){
-                    // $email = service('email');
-                    // $email->setSubject('Demo OTP');
-                    // $email->setTo($email_address);
-                    // $body = '
-                    //     Hi there,<br><br>
-                    //     You are requesting a demo to Handglove website.<br><br>
-                    //     Please enter the OTP to verify the request before you can proceed with the registration.<br><br>
-                    //     <strong>Your One-Time Password (OTP) is</strong><br>
-                    //     <h3>'.$result.'</h3> 
-                    //     <br><br><br>
-                    //     Best,<br>
-                    //     Handglove team
-                    // ';
-                    // $email->setMessage($body);
-                    // $response = $email->send();
-                    sleep(5);
-                    $response = true;
-                    if($response){
+
+                if ($id) {
+                    $vonage = new \App\Libraries\VonageService();
+                    $to = $contact_number;
+                    $text = "Hi there,\n\n" .
+                            "You are requesting a demo to Handglove website.\n\n" .
+                            "Please enter the OTP to verify the request before you can proceed with the registration.\n\n" .
+                            "*Your One-Time Password (OTP) is:* $result\n\n" .
+                            "Best regards,\n" .
+                            "Handglove team";
+
+                    $channel = getenv('vonage.channel');
+
+                    $sendResult = $vonage->sendMessage($to, $text, $channel);
+
+                    if (isset($sendResult['error'])) {
+                        $data['message'] = 'Failed to send OTP: ' . $sendResult['error'];
+                    } else {
                         $data['success'] = true;
                         $data['message'] = 'OTP Sent';
-                    }else{
-                        pe(["error" => $email->printDebugger()]);
-                        $data['message'] = 'An unexpected error occurred. Please try again after few minutes.';
+                        $data['message_uuid'] = $sendResult['message_uuid'] ?? null;
                     }
-                }else{
-                    $data['message'] = 'An unexpected error occurred. Please try again after few minutes.';
+                } else {
+                    $data['message'] = 'Failed to generate OTP. Please try again.';
                 }
 
             }

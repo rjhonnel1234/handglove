@@ -430,6 +430,25 @@ class Clinicians extends BaseController
         $email->setMessage($template);
 
         if ($email->send()) {
+            $vonage = new \App\Libraries\VonageService();
+            $to =  $clinician['contact_number'];
+
+            $text = "Dear Clinician,\n\n".
+                    "We have received a request to reset the password of your account.\n\n".
+                    "Reset your password using this link: $url\n\n".
+                    "This link will only be valid for 24 hours.\n\n".
+                    "If you did not request this, please ignore this message.\n\n".
+                    "Best regards,\n".
+                    "Handglove";
+
+            $channel = $channel = getenv('vonage.channel');
+
+            $sendResult = $vonage->sendMessage($to, $text, $channel);
+      
+            if (isset($sendResult['error'])) {
+                return redirect()->to('admin/clinicians')->with('error', 'Failed to send password reset message: '. $sendResult['error']);
+            }
+
             return redirect()->to('admin/clinicians')->with('message', 'Password reset email sent successfully.');
         } else {
             //show email error if there are any

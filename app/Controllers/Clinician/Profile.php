@@ -22,6 +22,7 @@ use \Datetime;
 use CodeIgniter\Files\File;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Libraries\PinService;
 
 class Profile extends BaseController
 {
@@ -83,6 +84,11 @@ class Profile extends BaseController
 
             $awardModel = new \App\Models\ClinicianAwardsModel();
             $data['awards'] = $awardModel->where('clinician_id', $data['profileData']['id'])->findAll();
+
+            $pinService = new PinService();
+            $ip = $this->request->getIPAddress();
+            $pin = $pinService->getPinForRequest($ip);
+            $data['pin'] = $pin ?? 'N/A';
 
             // PAGE HEAD PROCESSING
             return view('components/header', array(

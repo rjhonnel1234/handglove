@@ -16,6 +16,7 @@ use App\Models\UserModel;
 use App\Models\ShiftClinicianUpdatesModel;
 use \Datetime;
 use CodeIgniter\Files\File;
+use App\Libraries\PinService;
 
 class Shifts extends BaseController
 {
@@ -160,6 +161,11 @@ class Shifts extends BaseController
             $stats = $objTimekeeping->getStats($data['profileData']['id']);
             $data['profileData']['attendance_percentage'] = $stats['attendance'];
             $data['profileData']['lateness_percentage'] = $stats['lateness'];
+
+            $pinService = new PinService();
+            $ip = $this->request->getIPAddress();
+            $pin = $pinService->getPinForRequest($ip);
+            $data['pin'] = $pin ?? 'N/A';
 
             // PAGE HEAD PROCESSING
             return view('components/header', array(

@@ -168,7 +168,7 @@ class Login extends BaseController
             'message' => 'Invalid request. Please try again later',
         ];
 
-        if ($this->request->isAJAX()) {
+        //if ($this->request->isAJAX()) {
             $token = $this->request->getPost('token');
             $user = $this->user->where('token', $token)->first();
             if($user){
@@ -188,7 +188,7 @@ class Login extends BaseController
             }else{
                 $data['message'] = 'The reset password link is either invalid or already expired.';
             }
-        }
+        //}
 
         echo json_encode($data);
         exit();

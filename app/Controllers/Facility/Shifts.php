@@ -127,8 +127,13 @@ class Shifts extends BaseController
             return $this->response->setJSON(['success' => 0, 'message' => 'Facility not found.']);
         }
 
+<<<<<<< Updated upstream
         // $date = $this->request->getPost('date') ?: '2026-03-13';
         $date = $this->request->getPost('date') ?: date("Y-m-d");
+=======
+        $date = $this->request->getPost('date') ?: '2026-03-25';
+        // $date = $this->request->getPost('date') ?: date("Y-m-d");
+>>>>>>> Stashed changes
         $unitId = $this->request->getPost('unitID');
 
         $shifts = $this->shiftsModel

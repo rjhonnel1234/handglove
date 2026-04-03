@@ -67,3 +67,8 @@ $routes->get('how-it-works', 'HowItWorks::index');
 $routes->get('industries', 'Industries::index');
 $routes->get('contact-us', 'ContactUs::index');
 $routes->post('contact-us/submit', 'ContactUs::submit');
+
+$routes->post('vonage/send', 'Vonage::send');
+$routes->post('vonage/inbound', 'Vonage::inbound');
+$routes->get('vonage/messages', 'Vonage::index');
+$routes->post('vonage/status', 'Vonage::status');

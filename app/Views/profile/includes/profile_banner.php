@@ -19,6 +19,7 @@
                         <ul class="profile-short-info">
                             <li><i class="fa fa-map-marker-alt"></i> <?php echo $profileData['address']; ?></li>
                             <li><i class="fa fa-phone"></i> </i> <?php echo $profileData['contact_number']; ?></li>
+                            <li>SMS Facility ID: </i> <?php echo $pin; ?></li>
                         </ul>
                     </div>
 

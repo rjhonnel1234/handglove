@@ -69,3 +69,11 @@ database.default.DBDriver =
 STRIPE_PUBLIC_KEY = 
 STRIPE_SECRET_KEY = 
 STRIPE_WEBHOOK_SECRET = 
+
+vonage.channel=
+vonage.mode=
+vonage.from=
+vonage.api_key=
+vonage.api_secret=
+vonage.application_id=
+pin.secret_key=

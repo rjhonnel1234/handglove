@@ -7,9 +7,9 @@ namespace Composer\Autoload;
 class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
 {
     public static $files = array (
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
@@ -105,11 +105,11 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
     );
 
     public static $prefixLengthsPsr4 = array (
-        't' => 
+        't' =>
         array (
             'thiagoalessio\\TesseractOCR\\' => 27,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Php84\\' => 23,
             'Symfony\\Polyfill\\Php81\\' => 23,
@@ -132,7 +132,7 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
             'Stripe\\' => 7,
             'Sabberworm\\CSS\\' => 15,
         ),
-        'R' => 
+        'R' =>
         array (
             'React\\Stream\\' => 13,
             'React\\Socket\\' => 13,
@@ -142,7 +142,7 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
             'React\\ChildProcess\\' => 19,
             'React\\Cache\\' => 12,
         ),
-        'P' => 
+        'P' =>
         array (
             'Psr\\Log\\' => 8,
             'Psr\\EventDispatcher\\' => 20,
@@ -151,38 +151,39 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
             'PhpParser\\' => 10,
             'PhpCsFixer\\' => 11,
         ),
-        'N' => 
+        'N' =>
         array (
             'Nexus\\CsConfig\\' => 15,
         ),
-        'M' => 
+        'M' =>
         array (
             'Masterminds\\' => 12,
         ),
-        'L' => 
+        'L' =>
         array (
             'Laminas\\Escaper\\' => 16,
         ),
-        'K' => 
+        'K' =>
         array (
             'Kint\\' => 5,
         ),
-        'F' => 
+        'F' =>
         array (
             'FontLib\\' => 8,
+            'Firebase\\JWT\\' => 13,
             'Fidry\\CpuCoreCounter\\' => 21,
             'Faker\\' => 6,
         ),
-        'E' => 
+        'E' =>
         array (
             'Evenement\\' => 10,
         ),
-        'D' => 
+        'D' =>
         array (
             'Dompdf\\' => 7,
             'DeepCopy\\' => 9,
         ),
-        'C' => 
+        'C' =>
         array (
             'Composer\\XdebugHandler\\' => 23,
             'Composer\\Semver\\' => 16,
@@ -194,219 +195,223 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
     );
 
     public static $prefixDirsPsr4 = array (
-        'thiagoalessio\\TesseractOCR\\' => 
+        'thiagoalessio\\TesseractOCR\\' =>
         array (
             0 => __DIR__ . '/..' . '/thiagoalessio/tesseract_ocr/src',
         ),
-        'Symfony\\Polyfill\\Php84\\' => 
+        'Symfony\\Polyfill\\Php84\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php84',
         ),
-        'Symfony\\Polyfill\\Php81\\' => 
+        'Symfony\\Polyfill\\Php81\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php81',
         ),
-        'Symfony\\Polyfill\\Php80\\' => 
+        'Symfony\\Polyfill\\Php80\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Intl\\Normalizer\\' => 
+        'Symfony\\Polyfill\\Intl\\Normalizer\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer',
         ),
-        'Symfony\\Polyfill\\Intl\\Grapheme\\' => 
+        'Symfony\\Polyfill\\Intl\\Grapheme\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme',
         ),
-        'Symfony\\Polyfill\\Ctype\\' => 
+        'Symfony\\Polyfill\\Ctype\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
-        'Symfony\\Contracts\\Service\\' => 
+        'Symfony\\Contracts\\Service\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/service-contracts',
         ),
-        'Symfony\\Contracts\\EventDispatcher\\' => 
+        'Symfony\\Contracts\\EventDispatcher\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/event-dispatcher-contracts',
         ),
-        'Symfony\\Component\\String\\' => 
+        'Symfony\\Component\\String\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/string',
         ),
-        'Symfony\\Component\\Stopwatch\\' => 
+        'Symfony\\Component\\Stopwatch\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/stopwatch',
         ),
-        'Symfony\\Component\\Process\\' => 
+        'Symfony\\Component\\Process\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
         ),
-        'Symfony\\Component\\OptionsResolver\\' => 
+        'Symfony\\Component\\OptionsResolver\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/options-resolver',
         ),
-        'Symfony\\Component\\Finder\\' => 
+        'Symfony\\Component\\Finder\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/finder',
         ),
-        'Symfony\\Component\\Filesystem\\' => 
+        'Symfony\\Component\\Filesystem\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/filesystem',
         ),
-        'Symfony\\Component\\EventDispatcher\\' => 
+        'Symfony\\Component\\EventDispatcher\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
         ),
-        'Symfony\\Component\\Console\\' => 
+        'Symfony\\Component\\Console\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
         ),
-        'Svg\\' => 
+        'Svg\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
         ),
-        'Stripe\\' => 
+        'Stripe\\' =>
         array (
             0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
         ),
-        'Sabberworm\\CSS\\' => 
+        'Sabberworm\\CSS\\' =>
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
         ),
-        'React\\Stream\\' => 
+        'React\\Stream\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/stream/src',
         ),
-        'React\\Socket\\' => 
+        'React\\Socket\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/socket/src',
         ),
-        'React\\Promise\\' => 
+        'React\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/promise/src',
         ),
-        'React\\EventLoop\\' => 
+        'React\\EventLoop\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/event-loop/src',
         ),
-        'React\\Dns\\' => 
+        'React\\Dns\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/dns/src',
         ),
-        'React\\ChildProcess\\' => 
+        'React\\ChildProcess\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/child-process/src',
         ),
-        'React\\Cache\\' => 
+        'React\\Cache\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/cache/src',
         ),
-        'Psr\\Log\\' => 
+        'Psr\\Log\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
         ),
-        'Psr\\EventDispatcher\\' => 
+        'Psr\\EventDispatcher\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/event-dispatcher/src',
         ),
-        'Psr\\Container\\' => 
+        'Psr\\Container\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
         ),
-        'Predis\\' => 
+        'Predis\\' =>
         array (
             0 => __DIR__ . '/..' . '/predis/predis/src',
         ),
-        'PhpParser\\' => 
+        'PhpParser\\' =>
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
-        'PhpCsFixer\\' => 
+        'PhpCsFixer\\' =>
         array (
             0 => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src',
         ),
-        'Nexus\\CsConfig\\' => 
+        'Nexus\\CsConfig\\' =>
         array (
             0 => __DIR__ . '/..' . '/nexusphp/cs-config/src',
         ),
-        'Masterminds\\' => 
+        'Masterminds\\' =>
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
-        'Laminas\\Escaper\\' => 
+        'Laminas\\Escaper\\' =>
         array (
             0 => __DIR__ . '/..' . '/laminas/laminas-escaper/src',
         ),
-        'Kint\\' => 
+        'Kint\\' =>
         array (
             0 => __DIR__ . '/..' . '/kint-php/kint/src',
         ),
-        'FontLib\\' => 
+        'FontLib\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib',
         ),
-        'Fidry\\CpuCoreCounter\\' => 
+        'Firebase\\JWT\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
+        'Fidry\\CpuCoreCounter\\' =>
         array (
             0 => __DIR__ . '/..' . '/fidry/cpu-core-counter/src',
         ),
-        'Faker\\' => 
+        'Faker\\' =>
         array (
             0 => __DIR__ . '/..' . '/fakerphp/faker/src/Faker',
         ),
-        'Evenement\\' => 
+        'Evenement\\' =>
         array (
             0 => __DIR__ . '/..' . '/evenement/evenement/src',
         ),
-        'Dompdf\\' => 
+        'Dompdf\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/dompdf/src',
         ),
-        'DeepCopy\\' => 
+        'DeepCopy\\' =>
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
-        'Composer\\XdebugHandler\\' => 
+        'Composer\\XdebugHandler\\' =>
         array (
             0 => __DIR__ . '/..' . '/composer/xdebug-handler/src',
         ),
-        'Composer\\Semver\\' => 
+        'Composer\\Semver\\' =>
         array (
             0 => __DIR__ . '/..' . '/composer/semver/src',
         ),
-        'Composer\\Pcre\\' => 
+        'Composer\\Pcre\\' =>
         array (
             0 => __DIR__ . '/..' . '/composer/pcre/src',
         ),
-        'CodeIgniter\\CodingStandard\\' => 
+        'CodeIgniter\\CodingStandard\\' =>
         array (
             0 => __DIR__ . '/..' . '/codeigniter/coding-standard/src',
         ),
-        'CodeIgniter\\' => 
+        'CodeIgniter\\' =>
         array (
             0 => __DIR__ . '/../..' . '/system',
         ),
-        'Clue\\React\\NDJson\\' => 
+        'Clue\\React\\NDJson\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/ndjson-react/src',
         ),
     );
 
     public static $prefixesPsr0 = array (
-        'o' => 
+        'o' =>
         array (
-            'org\\bovigo\\vfs\\' => 
+            'org\\bovigo\\vfs\\' =>
             array (
                 0 => __DIR__ . '/..' . '/mikey179/vfsstream/src/main/php',
             ),
         ),
-        'S' => 
+        'S' =>
         array (
-            'Smalot\\PdfParser\\' => 
+            'Smalot\\PdfParser\\' =>
             array (
                 0 => __DIR__ . '/..' . '/smalot/pdfparser/src',
             ),
@@ -1492,6 +1497,14 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
         'Fidry\\CpuCoreCounter\\Finder\\_NProcessorFinder' => __DIR__ . '/..' . '/fidry/cpu-core-counter/src/Finder/_NProcessorFinder.php',
         'Fidry\\CpuCoreCounter\\NumberOfCpuCoreNotFound' => __DIR__ . '/..' . '/fidry/cpu-core-counter/src/NumberOfCpuCoreNotFound.php',
         'Fidry\\CpuCoreCounter\\ParallelisationResult' => __DIR__ . '/..' . '/fidry/cpu-core-counter/src/ParallelisationResult.php',
+        'Firebase\\JWT\\BeforeValidException' => __DIR__ . '/..' . '/firebase/php-jwt/src/BeforeValidException.php',
+        'Firebase\\JWT\\CachedKeySet' => __DIR__ . '/..' . '/firebase/php-jwt/src/CachedKeySet.php',
+        'Firebase\\JWT\\ExpiredException' => __DIR__ . '/..' . '/firebase/php-jwt/src/ExpiredException.php',
+        'Firebase\\JWT\\JWK' => __DIR__ . '/..' . '/firebase/php-jwt/src/JWK.php',
+        'Firebase\\JWT\\JWT' => __DIR__ . '/..' . '/firebase/php-jwt/src/JWT.php',
+        'Firebase\\JWT\\JWTExceptionWithPayloadInterface' => __DIR__ . '/..' . '/firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php',
+        'Firebase\\JWT\\Key' => __DIR__ . '/..' . '/firebase/php-jwt/src/Key.php',
+        'Firebase\\JWT\\SignatureInvalidException' => __DIR__ . '/..' . '/firebase/php-jwt/src/SignatureInvalidException.php',
         'FontLib\\AdobeFontMetrics' => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib/AdobeFontMetrics.php',
         'FontLib\\BinaryStream' => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib/BinaryStream.php',
         'FontLib\\EOT\\File' => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib/EOT/File.php',
@@ -2658,46 +2671,6 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
         'PhpCsFixer\\ConfigurationException\\InvalidForEnvFixerConfigurationException' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/ConfigurationException/InvalidForEnvFixerConfigurationException.php',
         'PhpCsFixer\\ConfigurationException\\RequiredFixerConfigurationException' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/ConfigurationException/RequiredFixerConfigurationException.php',
         'PhpCsFixer\\ConfigurationException\\UnresolvableAutoRuleSetConfigurationException' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/ConfigurationException/UnresolvableAutoRuleSetConfigurationException.php',
-        'PhpCsFixer\\Console\\Application' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Application.php',
-        'PhpCsFixer\\Console\\Command\\CheckCommand' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/CheckCommand.php',
-        'PhpCsFixer\\Console\\Command\\DescribeCommand' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/DescribeCommand.php',
-        'PhpCsFixer\\Console\\Command\\DescribeNameNotFoundException' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/DescribeNameNotFoundException.php',
-        'PhpCsFixer\\Console\\Command\\FixCommand' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/FixCommand.php',
-        'PhpCsFixer\\Console\\Command\\FixCommandExitStatusCalculator' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/FixCommandExitStatusCalculator.php',
-        'PhpCsFixer\\Console\\Command\\HelpCommand' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/HelpCommand.php',
-        'PhpCsFixer\\Console\\Command\\InitCommand' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/InitCommand.php',
-        'PhpCsFixer\\Console\\Command\\ListFilesCommand' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/ListFilesCommand.php',
-        'PhpCsFixer\\Console\\Command\\ListSetsCommand' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/ListSetsCommand.php',
-        'PhpCsFixer\\Console\\Command\\SelfUpdateCommand' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/SelfUpdateCommand.php',
-        'PhpCsFixer\\Console\\Command\\WorkerCommand' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Command/WorkerCommand.php',
-        'PhpCsFixer\\Console\\ConfigurationResolver' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/ConfigurationResolver.php',
-        'PhpCsFixer\\Console\\Output\\ErrorOutput' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Output/ErrorOutput.php',
-        'PhpCsFixer\\Console\\Output\\OutputContext' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Output/OutputContext.php',
-        'PhpCsFixer\\Console\\Output\\Progress\\DotsOutput' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Output/Progress/DotsOutput.php',
-        'PhpCsFixer\\Console\\Output\\Progress\\NullOutput' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Output/Progress/NullOutput.php',
-        'PhpCsFixer\\Console\\Output\\Progress\\PercentageBarOutput' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Output/Progress/PercentageBarOutput.php',
-        'PhpCsFixer\\Console\\Output\\Progress\\ProgressOutputFactory' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Output/Progress/ProgressOutputFactory.php',
-        'PhpCsFixer\\Console\\Output\\Progress\\ProgressOutputInterface' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Output/Progress/ProgressOutputInterface.php',
-        'PhpCsFixer\\Console\\Output\\Progress\\ProgressOutputType' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Output/Progress/ProgressOutputType.php',
-        'PhpCsFixer\\Console\\Report\\FixReport\\CheckstyleReporter' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/FixReport/CheckstyleReporter.php',
-        'PhpCsFixer\\Console\\Report\\FixReport\\GitlabReporter' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/FixReport/GitlabReporter.php',
-        'PhpCsFixer\\Console\\Report\\FixReport\\JsonReporter' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/FixReport/JsonReporter.php',
-        'PhpCsFixer\\Console\\Report\\FixReport\\JunitReporter' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/FixReport/JunitReporter.php',
-        'PhpCsFixer\\Console\\Report\\FixReport\\ReportSummary' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/FixReport/ReportSummary.php',
-        'PhpCsFixer\\Console\\Report\\FixReport\\ReporterFactory' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/FixReport/ReporterFactory.php',
-        'PhpCsFixer\\Console\\Report\\FixReport\\ReporterInterface' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/FixReport/ReporterInterface.php',
-        'PhpCsFixer\\Console\\Report\\FixReport\\TextReporter' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/FixReport/TextReporter.php',
-        'PhpCsFixer\\Console\\Report\\FixReport\\XmlReporter' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/FixReport/XmlReporter.php',
-        'PhpCsFixer\\Console\\Report\\ListSetsReport\\JsonReporter' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/ListSetsReport/JsonReporter.php',
-        'PhpCsFixer\\Console\\Report\\ListSetsReport\\ReportSummary' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/ListSetsReport/ReportSummary.php',
-        'PhpCsFixer\\Console\\Report\\ListSetsReport\\ReporterFactory' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/ListSetsReport/ReporterFactory.php',
-        'PhpCsFixer\\Console\\Report\\ListSetsReport\\ReporterInterface' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/ListSetsReport/ReporterInterface.php',
-        'PhpCsFixer\\Console\\Report\\ListSetsReport\\TextReporter' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/Report/ListSetsReport/TextReporter.php',
-        'PhpCsFixer\\Console\\SelfUpdate\\GithubClient' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/SelfUpdate/GithubClient.php',
-        'PhpCsFixer\\Console\\SelfUpdate\\GithubClientInterface' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/SelfUpdate/GithubClientInterface.php',
-        'PhpCsFixer\\Console\\SelfUpdate\\NewVersionChecker' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/SelfUpdate/NewVersionChecker.php',
-        'PhpCsFixer\\Console\\SelfUpdate\\NewVersionCheckerInterface' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/SelfUpdate/NewVersionCheckerInterface.php',
-        'PhpCsFixer\\Console\\WarningsDetector' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Console/WarningsDetector.php',
         'PhpCsFixer\\CustomRulesetsAwareConfigInterface' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/CustomRulesetsAwareConfigInterface.php',
         'PhpCsFixer\\Differ\\DiffConsoleFormatter' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Differ/DiffConsoleFormatter.php',
         'PhpCsFixer\\Differ\\DifferInterface' => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src/Differ/DifferInterface.php',
@@ -5055,7 +5028,14 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
         'Svg\\Tag\\Text' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/Text.php',
         'Svg\\Tag\\UseTag' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/UseTag.php',
         'Symfony\\Component\\Console\\Application' => __DIR__ . '/..' . '/symfony/console/Application.php',
+        'Symfony\\Component\\Console\\Attribute\\Argument' => __DIR__ . '/..' . '/symfony/console/Attribute/Argument.php',
         'Symfony\\Component\\Console\\Attribute\\AsCommand' => __DIR__ . '/..' . '/symfony/console/Attribute/AsCommand.php',
+        'Symfony\\Component\\Console\\Attribute\\Ask' => __DIR__ . '/..' . '/symfony/console/Attribute/Ask.php',
+        'Symfony\\Component\\Console\\Attribute\\Interact' => __DIR__ . '/..' . '/symfony/console/Attribute/Interact.php',
+        'Symfony\\Component\\Console\\Attribute\\InteractiveAttributeInterface' => __DIR__ . '/..' . '/symfony/console/Attribute/InteractiveAttributeInterface.php',
+        'Symfony\\Component\\Console\\Attribute\\MapInput' => __DIR__ . '/..' . '/symfony/console/Attribute/MapInput.php',
+        'Symfony\\Component\\Console\\Attribute\\Option' => __DIR__ . '/..' . '/symfony/console/Attribute/Option.php',
+        'Symfony\\Component\\Console\\Attribute\\Reflection\\ReflectionMember' => __DIR__ . '/..' . '/symfony/console/Attribute/Reflection/ReflectionMember.php',
         'Symfony\\Component\\Console\\CI\\GithubActionReporter' => __DIR__ . '/..' . '/symfony/console/CI/GithubActionReporter.php',
         'Symfony\\Component\\Console\\Color' => __DIR__ . '/..' . '/symfony/console/Color.php',
         'Symfony\\Component\\Console\\CommandLoader\\CommandLoaderInterface' => __DIR__ . '/..' . '/symfony/console/CommandLoader/CommandLoaderInterface.php',
@@ -5065,6 +5045,7 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
         'Symfony\\Component\\Console\\Command\\CompleteCommand' => __DIR__ . '/..' . '/symfony/console/Command/CompleteCommand.php',
         'Symfony\\Component\\Console\\Command\\DumpCompletionCommand' => __DIR__ . '/..' . '/symfony/console/Command/DumpCompletionCommand.php',
         'Symfony\\Component\\Console\\Command\\HelpCommand' => __DIR__ . '/..' . '/symfony/console/Command/HelpCommand.php',
+        'Symfony\\Component\\Console\\Command\\InvokableCommand' => __DIR__ . '/..' . '/symfony/console/Command/InvokableCommand.php',
         'Symfony\\Component\\Console\\Command\\LazyCommand' => __DIR__ . '/..' . '/symfony/console/Command/LazyCommand.php',
         'Symfony\\Component\\Console\\Command\\ListCommand' => __DIR__ . '/..' . '/symfony/console/Command/ListCommand.php',
         'Symfony\\Component\\Console\\Command\\LockableTrait' => __DIR__ . '/..' . '/symfony/console/Command/LockableTrait.php',
@@ -5091,6 +5072,7 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
         'Symfony\\Component\\Console\\Descriptor\\TextDescriptor' => __DIR__ . '/..' . '/symfony/console/Descriptor/TextDescriptor.php',
         'Symfony\\Component\\Console\\Descriptor\\XmlDescriptor' => __DIR__ . '/..' . '/symfony/console/Descriptor/XmlDescriptor.php',
         'Symfony\\Component\\Console\\EventListener\\ErrorListener' => __DIR__ . '/..' . '/symfony/console/EventListener/ErrorListener.php',
+        'Symfony\\Component\\Console\\Event\\ConsoleAlarmEvent' => __DIR__ . '/..' . '/symfony/console/Event/ConsoleAlarmEvent.php',
         'Symfony\\Component\\Console\\Event\\ConsoleCommandEvent' => __DIR__ . '/..' . '/symfony/console/Event/ConsoleCommandEvent.php',
         'Symfony\\Component\\Console\\Event\\ConsoleErrorEvent' => __DIR__ . '/..' . '/symfony/console/Event/ConsoleErrorEvent.php',
         'Symfony\\Component\\Console\\Event\\ConsoleEvent' => __DIR__ . '/..' . '/symfony/console/Event/ConsoleEvent.php',
@@ -5134,6 +5116,9 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
         'Symfony\\Component\\Console\\Helper\\TableSeparator' => __DIR__ . '/..' . '/symfony/console/Helper/TableSeparator.php',
         'Symfony\\Component\\Console\\Helper\\TableStyle' => __DIR__ . '/..' . '/symfony/console/Helper/TableStyle.php',
         'Symfony\\Component\\Console\\Helper\\TerminalInputHelper' => __DIR__ . '/..' . '/symfony/console/Helper/TerminalInputHelper.php',
+        'Symfony\\Component\\Console\\Helper\\TreeHelper' => __DIR__ . '/..' . '/symfony/console/Helper/TreeHelper.php',
+        'Symfony\\Component\\Console\\Helper\\TreeNode' => __DIR__ . '/..' . '/symfony/console/Helper/TreeNode.php',
+        'Symfony\\Component\\Console\\Helper\\TreeStyle' => __DIR__ . '/..' . '/symfony/console/Helper/TreeStyle.php',
         'Symfony\\Component\\Console\\Input\\ArgvInput' => __DIR__ . '/..' . '/symfony/console/Input/ArgvInput.php',
         'Symfony\\Component\\Console\\Input\\ArrayInput' => __DIR__ . '/..' . '/symfony/console/Input/ArrayInput.php',
         'Symfony\\Component\\Console\\Input\\Input' => __DIR__ . '/..' . '/symfony/console/Input/Input.php',
@@ -5144,6 +5129,7 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
         'Symfony\\Component\\Console\\Input\\InputOption' => __DIR__ . '/..' . '/symfony/console/Input/InputOption.php',
         'Symfony\\Component\\Console\\Input\\StreamableInputInterface' => __DIR__ . '/..' . '/symfony/console/Input/StreamableInputInterface.php',
         'Symfony\\Component\\Console\\Input\\StringInput' => __DIR__ . '/..' . '/symfony/console/Input/StringInput.php',
+        'Symfony\\Component\\Console\\Interaction\\Interaction' => __DIR__ . '/..' . '/symfony/console/Interaction/Interaction.php',
         'Symfony\\Component\\Console\\Logger\\ConsoleLogger' => __DIR__ . '/..' . '/symfony/console/Logger/ConsoleLogger.php',
         'Symfony\\Component\\Console\\Messenger\\RunCommandContext' => __DIR__ . '/..' . '/symfony/console/Messenger/RunCommandContext.php',
         'Symfony\\Component\\Console\\Messenger\\RunCommandMessage' => __DIR__ . '/..' . '/symfony/console/Messenger/RunCommandMessage.php',
@@ -5232,6 +5218,7 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
         'Symfony\\Component\\Process\\Exception\\LogicException' => __DIR__ . '/..' . '/symfony/process/Exception/LogicException.php',
         'Symfony\\Component\\Process\\Exception\\ProcessFailedException' => __DIR__ . '/..' . '/symfony/process/Exception/ProcessFailedException.php',
         'Symfony\\Component\\Process\\Exception\\ProcessSignaledException' => __DIR__ . '/..' . '/symfony/process/Exception/ProcessSignaledException.php',
+        'Symfony\\Component\\Process\\Exception\\ProcessStartFailedException' => __DIR__ . '/..' . '/symfony/process/Exception/ProcessStartFailedException.php',
         'Symfony\\Component\\Process\\Exception\\ProcessTimedOutException' => __DIR__ . '/..' . '/symfony/process/Exception/ProcessTimedOutException.php',
         'Symfony\\Component\\Process\\Exception\\RunProcessFailedException' => __DIR__ . '/..' . '/symfony/process/Exception/RunProcessFailedException.php',
         'Symfony\\Component\\Process\\Exception\\RuntimeException' => __DIR__ . '/..' . '/symfony/process/Exception/RuntimeException.php',
@@ -5263,9 +5250,11 @@ class ComposerStaticInit662d79f1bc1c04798a2a43aa00234c45
         'Symfony\\Component\\String\\Inflector\\EnglishInflector' => __DIR__ . '/..' . '/symfony/string/Inflector/EnglishInflector.php',
         'Symfony\\Component\\String\\Inflector\\FrenchInflector' => __DIR__ . '/..' . '/symfony/string/Inflector/FrenchInflector.php',
         'Symfony\\Component\\String\\Inflector\\InflectorInterface' => __DIR__ . '/..' . '/symfony/string/Inflector/InflectorInterface.php',
+        'Symfony\\Component\\String\\Inflector\\SpanishInflector' => __DIR__ . '/..' . '/symfony/string/Inflector/SpanishInflector.php',
         'Symfony\\Component\\String\\LazyString' => __DIR__ . '/..' . '/symfony/string/LazyString.php',
         'Symfony\\Component\\String\\Slugger\\AsciiSlugger' => __DIR__ . '/..' . '/symfony/string/Slugger/AsciiSlugger.php',
         'Symfony\\Component\\String\\Slugger\\SluggerInterface' => __DIR__ . '/..' . '/symfony/string/Slugger/SluggerInterface.php',
+        'Symfony\\Component\\String\\TruncateMode' => __DIR__ . '/..' . '/symfony/string/TruncateMode.php',
         'Symfony\\Component\\String\\UnicodeString' => __DIR__ . '/..' . '/symfony/string/UnicodeString.php',
         'Symfony\\Contracts\\EventDispatcher\\Event' => __DIR__ . '/..' . '/symfony/event-dispatcher-contracts/Event.php',
         'Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface' => __DIR__ . '/..' . '/symfony/event-dispatcher-contracts/EventDispatcherInterface.php',
