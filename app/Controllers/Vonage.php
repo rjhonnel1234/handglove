@@ -91,18 +91,18 @@ class Vonage extends BaseController
         }
 
         // // Reply to sender
-        // $this->vonage->sendMessage($from, $responseMessage, $channel);
+        $this->vonage->sendMessage($from, $responseMessage, $channel);
 
-        // // Save inbound message
-        // $this->messageModel->save([
-        //     'message_uuid' => $data['message_uuid'] ?? null,
-        //     'from_number' => $from,
-        //     'to_number' => $data['to'] ?? '',
-        //     'message' => $text,
-        //     'channel' => $channel,
-        //     'direction' => 'inbound',
-        //     'status' => 'received'
-        // ]);
+        // Save inbound message
+        $this->messageModel->save([
+            'message_uuid' => $data['message_uuid'] ?? null,
+            'from_number' => $from,
+            'to_number' => $data['to'] ?? '',
+            'message' => $text,
+            'channel' => $channel,
+            'direction' => 'inbound',
+            'status' => 'received'
+        ]);
 
         return $this->respond([
             'status' => 'received',
